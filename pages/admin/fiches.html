@@ -117,8 +117,11 @@ document.getElementById('publishBtn').addEventListener('click', async ()=>{
  const upload=await supabaseClient.storage.from('cours').upload(fileName,file);
  if(upload.error){alert(upload.error.message);return;}
 
- const pub=supabaseClient.storage.from('cours').getPublicUrl(fileName);
+ const pub = supabaseClient.storage
+.from('cours')
+.getPublicUrl(fileName);
 
+console.log(pub.data.publicUrl);
  const ins=await supabaseClient.from('fiches').insert({
    titre,matiere,niveau,resume,pdf_url:pub.data.publicUrl,publiee:true
  });

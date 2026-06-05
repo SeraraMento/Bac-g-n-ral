@@ -4,64 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fiches de révision - Bac Général</title>
+<title>Fiches de révision</title>
 
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
-
 .container{
     max-width:1400px;
     margin:40px auto;
     padding:0 30px;
 }
 
-.header{
-    margin-bottom:40px;
+.matiere{
+    margin-bottom:50px;
 }
 
-.header h1{
-    font-size:3rem;
-    margin-bottom:10px;
-}
-
-.header p{
-    color:#666;
-    font-size:1.1rem;
-}
-
-.filters{
-    display:flex;
-    gap:15px;
-    margin-top:25px;
-    flex-wrap:wrap;
-}
-
-.search{
-    flex:1;
-    min-width:300px;
-    padding:15px;
-    border:1px solid #ddd;
-    border-radius:12px;
-    font-size:16px;
-}
-
-.select{
-    padding:15px;
-    border:1px solid #ddd;
-    border-radius:12px;
-    min-width:220px;
-}
-
-.stats{
-    margin:30px 0;
-    color:#666;
+.matiere h2{
+    margin-bottom:20px;
+    font-size:2rem;
 }
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
-    gap:25px;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:20px;
 }
 
 .card{
@@ -75,42 +41,25 @@
 
 .card:hover{
     transform:translateY(-5px);
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
 .badge{
     display:inline-block;
+    background:#f5e5d6;
+    color:#e56a00;
     padding:8px 14px;
     border-radius:999px;
-    background:#f7e7d8;
-    color:#eb6d00;
-    font-size:.9rem;
     margin-bottom:15px;
 }
 
 .card h3{
-    font-size:1.8rem;
-    margin-bottom:15px;
+    margin-bottom:10px;
 }
 
 .card p{
     color:#666;
-    line-height:1.6;
 }
-
-.loading{
-    text-align:center;
-    padding:80px;
-    font-size:1.2rem;
-}
-
-.empty{
-    text-align:center;
-    padding:60px;
-    font-size:1.2rem;
-    color:#666;
-}
-
 </style>
 
 </head>
@@ -118,38 +67,11 @@
 
 <div class="container">
 
-    <div class="header">
-        <h1>📚 Fiches de révision</h1>
-        <p>Retrouve toutes les fiches du Bac Général.</p>
+<h1>📚 Fiches de révision</h1>
 
-        <div class="filters">
-
-            <input
-                type="text"
-                id="searchInput"
-                class="search"
-                placeholder="Rechercher une fiche..."
-            >
-
-            <select id="matiereFilter" class="select">
-                <option value="">Toutes les matières</option>
-                <option value="Mathématiques">📐 Mathématiques</option>
-                <option value="SVT">🧬 SVT</option>
-                <option value="Physique-Chimie">⚛️ Physique-Chimie</option>
-                <option value="Français">📖 Français</option>
-                <option value="Histoire-Géographie">🌍 Histoire-Géographie</option>
-            </select>
-
-        </div>
-    </div>
-
-    <div id="stats" class="stats"></div>
-
-    <div id="grid" class="grid">
-        <div class="loading">
-            Chargement des fiches...
-        </div>
-    </div>
+<div id="conteneur">
+Chargement...
+</div>
 
 </div>
 
@@ -157,16 +79,6 @@
 <script src="../js/supabase-config.js"></script>
 
 <script>
-
-let fiches = [];
-
-const icons = {
-    "Mathématiques":"📐",
-    "SVT":"🧬",
-    "Physique-Chimie":"⚛️",
-    "Français":"📖",
-    "Histoire-Géographie":"🌍"
-};
 
 async function chargerFiches(){
 
@@ -179,112 +91,64 @@ async function chargerFiches(){
 
     if(error){
 
-        document.getElementById('grid').innerHTML =
-            `<div class="empty">${error.message}</div>`;
+        document.getElementById('conteneur').innerHTML =
+            error.message;
 
         return;
     }
 
-    fiches = data;
+    const groupes = {};
 
-    afficherFiches(fiches);
-}
+    data.forEach(fiche => {
 
-function afficherFiches(liste){
+        if(!groupes[fiche.matiere])
+            groupes[fiche.matiere] = [];
 
-    const grid =
-        document.getElementById('grid');
+        groupes[fiche.matiere].push(fiche);
+    });
 
-    document.getElementById('stats').innerHTML =
-        `${liste.length} fiche(s) disponible(s)`;
+    let html = '';
 
-    if(liste.length === 0){
+    Object.keys(groupes).forEach(matiere => {
 
-        grid.innerHTML =
-            `<div class="empty">
-                Aucune fiche trouvée
-            </div>`;
+        html += `
+        <section class="matiere">
 
-        return;
-    }
+            <h2>${matiere}</h2>
 
-    grid.innerHTML = liste.map(fiche => `
+            <div class="grid">
+        `;
 
-        <div class="card"
-             onclick="ouvrirFiche('${fiche.id}')">
+        groupes[matiere].forEach(fiche => {
 
-            <div class="badge">
-                ${icons[fiche.matiere] || '📚'}
-                ${fiche.matiere}
+            html += `
+
+            <div class="card"
+                 onclick="window.open('${fiche.pdf_url}','_blank')">
+
+                <div class="badge">
+                    ${fiche.niveau}
+                </div>
+
+                <h3>${fiche.titre}</h3>
+
+                <p>
+                    ${fiche.resume || ''}
+                </p>
+
             </div>
 
-            <h3>${fiche.titre}</h3>
+            `;
+        });
 
-            <p>
-                ${fiche.resume || ''}
-            </p>
+        html += `
+            </div>
+        </section>
+        `;
+    });
 
-        </div>
-
-    `).join('');
+    document.getElementById('conteneur').innerHTML = html;
 }
-
-function filtrer(){
-
-    const texte =
-        document.getElementById('searchInput')
-        .value
-        .toLowerCase();
-
-    const matiere =
-        document.getElementById('matiereFilter')
-        .value;
-
-    let resultat = fiches;
-
-    if(matiere){
-
-        resultat = resultat.filter(
-            f => f.matiere === matiere
-        );
-    }
-
-    if(texte){
-
-        resultat = resultat.filter(f =>
-
-            f.titre.toLowerCase().includes(texte)
-
-            ||
-
-            (f.resume || '')
-            .toLowerCase()
-            .includes(texte)
-
-            ||
-
-            f.matiere
-            .toLowerCase()
-            .includes(texte)
-        );
-    }
-
-    afficherFiches(resultat);
-}
-
-function ouvrirFiche(id){
-
-    window.location.href =
-        `fiche.html?id=${id}`;
-}
-
-document
-.getElementById('searchInput')
-.addEventListener('input', filtrer);
-
-document
-.getElementById('matiereFilter')
-.addEventListener('change', filtrer);
 
 chargerFiches();
 

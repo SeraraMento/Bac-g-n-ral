@@ -191,7 +191,12 @@
       const { count: annalesCount } = await supabaseClient
         .from('annales').select('*', { count: 'exact', head: true });
       document.getElementById('stat-annales').textContent = annalesCount ?? 0;
+      const { count: usersCount } = await supabaseClient
+  .from('profiles')
+  .select('*', { count: 'exact', head: true });
 
+document.getElementById('stat-users').textContent =
+  usersCount ?? 0;
       // Derniers inscrits
       const { data: profiles } = await supabaseClient
         .from('profiles')
@@ -200,7 +205,6 @@
         .limit(8);
 
       if (profiles && profiles.length > 0) {
-        document.getElementById('stat-users').textContent = profiles.length + '+';
         document.getElementById('users-table').innerHTML = profiles.map(p => `
           <tr>
             <td>${p.full_name || '—'}</td>

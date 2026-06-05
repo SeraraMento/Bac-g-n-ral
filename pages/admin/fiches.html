@@ -3,168 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestion des fiches</title>
-
+<title>Gestion des fiches - Admin</title>
 <link rel="stylesheet" href="../../css/style.css">
+<style>
+.form-card,.table-card{background:#fff;border:1px solid #e5e5e5;border-radius:20px;padding:24px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
+label{display:block;margin:12px 0 6px;font-weight:600}
+.btn{background:#d65a0a;color:#fff;border:none;padding:12px 18px;border-radius:999px;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;border-bottom:1px solid #eee;text-align:left}
+.danger{background:#c62828;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+.view{background:#111;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none}
+</style>
 </head>
 <body>
-
 <div class="dashboard">
+<aside class="sidebar">
+<a href="dashboard.html" class="sidebar-logo">Bac<span>·</span>Général</a>
+<nav class="sidebar-nav">
+<a href="dashboard.html" class="sidebar-link">📊 Dashboard</a>
+<a href="fiches.html" class="sidebar-link active">📋 Fiches</a>
+</nav>
+</aside>
 
-  <aside class="sidebar">
-    <a href="dashboard.html" class="sidebar-logo">
-      Bac<span>·</span>Général
-    </a>
+<main class="main-content">
+<div class="page-header">
+<h1>Gestion des fiches PDF</h1>
+<p>Ajout et gestion des cours.</p>
+</div>
 
-    <nav class="sidebar-nav">
+<div class="form-card">
+<h2>Ajouter une fiche</h2>
+<div class="grid">
+<div>
+<label>Titre du chapitre</label>
+<input id="titre">
+<label>Matière</label>
+<select id="matiere">
+<option>Mathématiques</option>
+<option>Physique-Chimie</option>
+<option>SVT</option>
+<option>Français</option>
+<option>Histoire-Géographie</option>
+<option>Philosophie</option>
+<option>SES</option>
+<option>Langues</option>
+</select>
+<label>Niveau</label>
+<select id="niveau">
+<option>Seconde</option>
+<option>Première</option>
+<option>Terminale</option>
+</select>
+</div>
+<div>
+<label>Résumé</label>
+<textarea id="resume" rows="6"></textarea>
+<label>PDF</label>
+<input type="file" id="pdf" accept=".pdf">
+</div>
+</div>
+<br>
+<button class="btn" id="publishBtn">Publier la fiche</button>
+<div id="msg"></div>
+</div>
 
-      <span class="sidebar-section">Administration</span>
-
-      <a href="dashboard.html" class="sidebar-link">
-        📊 Dashboard
-      </a>
-
-      <a href="fiches.html" class="sidebar-link active">
-        📋 Fiches
-      </a>
-
-    </nav>
-  </aside>
-
-  <main class="main-content">
-
-    <div class="page-header">
-      <h1>Gestion des fiches</h1>
-      <p>Liste des fiches enregistrées</p>
-    </div>
-
-    <div id="status"></div>
-
-    <div id="liste"></div>
-
-  </main>
-
+<div class="table-card">
+<h2>Fiches publiées</h2>
+<table>
+<thead><tr><th>Titre</th><th>Matière</th><th>Niveau</th><th>Actions</th></tr></thead>
+<tbody id="fichesBody"></tbody>
+</table>
+</div>
+</main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-<!-- Vérifie ce chemin -->
 <script src="../../js/supabase-config.js"></script>
-
 <script>
-(async () => {
+async function loadFiches(){
+ const {data,error}=await supabaseClient.from('fiches').select('*').order('created_at',{ascending:false});
+ const body=document.getElementById('fichesBody');
+ if(error){body.innerHTML='<tr><td colspan="4">'+error.message+'</td></tr>';return;}
+ body.innerHTML=data.map(f=>`
+ <tr>
+ <td>${f.titre||''}</td>
+ <td>${f.matiere||''}</td>
+ <td>${f.niveau||''}</td>
+ <td>
+ ${f.pdf_url?`<a class="view" target="_blank" href="${f.pdf_url}">PDF</a>`:''}
+ <button class="danger" onclick="deleteFiche('${f.id}')">Supprimer</button>
+ </td>
+ </tr>`).join('');
+}
 
-  const status =
-    document.getElementById('status');
+async function deleteFiche(id){
+ if(!confirm('Supprimer cette fiche ?')) return;
+ await supabaseClient.from('fiches').delete().eq('id',id);
+ loadFiches();
+}
 
-  const liste =
-    document.getElementById('liste');
+document.getElementById('publishBtn').addEventListener('click', async ()=>{
+ const titre=document.getElementById('titre').value.trim();
+ const matiere=document.getElementById('matiere').value;
+ const niveau=document.getElementById('niveau').value;
+ const resume=document.getElementById('resume').value.trim();
+ const file=document.getElementById('pdf').files[0];
+ if(!titre||!file){alert('Titre et PDF requis');return;}
 
-  if (!window.supabaseClient) {
+ const fileName=Date.now()+'-'+file.name;
 
-    status.innerHTML = `
-      <div style="
-        background:#ffe5e5;
-        color:red;
-        padding:15px;
-        border-radius:10px;
-        margin-bottom:20px;">
-        ERREUR :
-        supabase-config.js n'est pas chargé.
-      </div>
-    `;
+ const upload=await supabaseClient.storage.from('cours').upload(fileName,file);
+ if(upload.error){alert(upload.error.message);return;}
 
-    console.error(
-      "supabase-config.js non chargé"
-    );
+ const pub=supabaseClient.storage.from('cours').getPublicUrl(fileName);
 
-    return;
-  }
+ const ins=await supabaseClient.from('fiches').insert({
+   titre,matiere,niveau,resume,pdf_url:pub.data.publicUrl,publiee:true
+ });
 
-  status.innerHTML = `
-    <div style="
-      background:#e8fff0;
-      color:green;
-      padding:15px;
-      border-radius:10px;
-      margin-bottom:20px;">
-      Supabase connecté.
-    </div>
-  `;
+ if(ins.error){alert(ins.error.message);return;}
 
-  const { data, error } =
-    await supabaseClient
-      .from('fiches')
-      .select('*')
-      .order('created_at', {
-        ascending:false
-      });
+ document.getElementById('msg').innerHTML='<p style="color:green">Fiche publiée.</p>';
+ loadFiches();
+});
 
-  console.log(data);
-  console.log(error);
-
-  if (error) {
-
-    liste.innerHTML = `
-      <div style="
-        background:#ffe5e5;
-        color:red;
-        padding:15px;
-        border-radius:10px;">
-        ${error.message}
-      </div>
-    `;
-
-    return;
-  }
-
-  if (!data || data.length === 0) {
-
-    liste.innerHTML = `
-      <div style="
-        background:white;
-        padding:20px;
-        border-radius:12px;">
-        Aucune fiche trouvée.
-      </div>
-    `;
-
-    return;
-  }
-
-  liste.innerHTML = data.map(f => `
-    <div style="
-      background:white;
-      border:1px solid #ddd;
-      border-radius:12px;
-      padding:20px;
-      margin-bottom:15px;
-    ">
-      <h3>${f.titre || ''}</h3>
-
-      <p>
-        <strong>Matière :</strong>
-        ${f.matiere || ''}
-      </p>
-
-      <p>
-        <strong>Niveau :</strong>
-        ${f.niveau || ''}
-      </p>
-
-      <p>
-        <strong>Résumé :</strong>
-        ${f.resume || ''}
-      </p>
-
-      <button onclick="alert('${f.id}')">
-        Voir ID
-      </button>
-    </div>
-  `).join('');
-
-})();
+loadFiches();
 </script>
-
 </body>
 </html>

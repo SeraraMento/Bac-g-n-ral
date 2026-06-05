@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Connexion — Bac-Général</title>
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
 </head>
+
 <body>
 
   <div class="auth-page">
@@ -70,7 +74,11 @@
       }
 
       // Redirection selon le rôle
-      if (isAdmin(data.user)) {
+      const admin = await isAdmin();
+
+      const profile = await getCurrentProfile();
+
+      if (profile?.role === 'admin') {
         window.location.href = 'admin/dashboard.html';
       } else {
         window.location.href = 'dashboard.html';
@@ -83,4 +91,5 @@
     });
   </script>
 </body>
+
 </html>

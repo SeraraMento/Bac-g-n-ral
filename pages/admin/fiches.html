@@ -1,48 +1,39 @@
 <script>
 (async () => {
 
-  const liste =
-    document.getElementById('liste');
+  const liste = document.getElementById('liste');
 
-  const { data, error } =
-    await supabaseClient
+  try {
+
+    const { data, error } = await supabaseClient
       .from('fiches')
-      .select('*')
-      .order('created_at', {
-        ascending:false
-      });
+      .select('*');
 
-  console.log(data);
-  console.log(error);
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
 
-  if(error){
+    if (error) {
+      liste.innerHTML =
+        "<h2 style='color:red'>" +
+        error.message +
+        "</h2>";
+      return;
+    }
+
     liste.innerHTML =
-      '<h2>Erreur : ' +
-      error.message +
-      '</h2>';
-    return;
-  }
+      "<pre>" +
+      JSON.stringify(data, null, 2) +
+      "</pre>";
 
-  if(!data || data.length === 0){
+  } catch(err) {
+
+    console.error(err);
+
     liste.innerHTML =
-      '<h2>Aucune fiche trouvée</h2>';
-    return;
+      "<h2 style='color:red'>" +
+      err.message +
+      "</h2>";
   }
-
-  liste.innerHTML =
-    data.map(f => `
-      <div style="
-        background:white;
-        border:1px solid #ddd;
-        padding:20px;
-        margin-bottom:15px;
-        border-radius:12px;
-      ">
-        <h3>${f.titre}</h3>
-        <p>${f.matiere}</p>
-        <p>${f.niveau}</p>
-      </div>
-    `).join('');
 
 })();
 </script>

@@ -44,6 +44,7 @@ async function signOut() {
 }
 
 async function getCurrentUser() {
+
   const {
     data: { user }
   } = await supabaseClient.auth.getUser();
@@ -57,11 +58,16 @@ async function getCurrentProfile() {
 
   if (!user) return null;
 
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
+
+  if (error) {
+    console.error('PROFILE ERROR', error);
+    return null;
+  }
 
   return data;
 }
@@ -72,7 +78,7 @@ async function isAdmin() {
 
   if (!profile) return false;
 
-  return profile.role === 'admin';
+  return String(profile.role).toLowerCase() === 'admin';
 }
 
 async function requireAuth() {
@@ -92,13 +98,41 @@ async function requireAuth() {
 
 async function requireAdmin() {
 
-  const user = await requireAuth();
+  const user = await getCurrentUser();
 
-  if (!user) return null;
+  if (!user) {
 
-  const admin = await isAdmin();
+    window.location.href =
+      '../../pages/login.html';
 
-  if (!admin) {
+    return null;
+  }
+
+  const { data: profile, error } = await supabaseClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  console.log('ADMIN CHECK', {
+    userId: user.id,
+    profile,
+    error
+  });
+
+  if (error || !profile) {
+
+    console.error(error);
+
+    window.location.href =
+      '../../index.html';
+
+    return null;
+  }
+
+  if (
+    String(profile.role).toLowerCase() !== 'admin'
+  ) {
 
     window.location.href =
       '../../index.html';

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Fiches Admin</title>
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<h1>Gestion des fiches</h1>
+
+<div id="liste"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../../js/supabase-config.js"></script>
+
+<script>
+(async () => {
+
+const { data, error } = await supabaseClient
+.from('fiches')
+.select('*')
+.order('created_at', { ascending:false });
+
+console.log(data);
+
+document.getElementById('liste').innerHTML =
+data.map(f => `
+<div>
+<h3>${f.titre}</h3>
+<p>${f.matiere}</p>
+</div>
+`).join('');
+
+})();
+</script>
+
+</body>
+</html>

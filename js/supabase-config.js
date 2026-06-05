@@ -1,5 +1,5 @@
 // ============================================
-// Bac-Général — Supabase Config & Auth
+// SUPABASE
 // ============================================
 
 const SUPABASE_URL =
@@ -8,113 +8,129 @@ const SUPABASE_URL =
 const SUPABASE_ANON_KEY =
 'sb_publishable_OCngSeY6-r_A2hKCCQmoQw_6CSZP893';
 
-const supabaseClient =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_ANON_KEY
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
 window.supabaseClient = supabaseClient;
-
-const ADMIN_EMAIL =
-'[admin@bac-general.fr](mailto:admin@bac-general.fr)';
 
 // ============================================
 // AUTH
 // ============================================
 
-async function signUp(
-email,
-password,
-fullName
-) {
-return await supabaseClient.auth.signUp({
-email,
-password,
-options: {
-data: {
-full_name: fullName,
-role: 'student'
-}
-}
-});
+async function signUp(email, password, fullName) {
+  return await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName
+      }
+    }
+  });
 }
 
-async function signIn(
-email,
-password
-) {
-return await supabaseClient.auth.signInWithPassword({
-email,
-password
-});
+async function signIn(email, password) {
+  return await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 }
 
 async function signOut() {
-await supabaseClient.auth.signOut();
-window.location.href = '../index.html';
+  await supabaseClient.auth.signOut();
+  window.location.href = "../../index.html";
 }
 
 async function getCurrentUser() {
-const {
-data: { user }
-} = await supabaseClient.auth.getUser();
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
 
-return user;
+  return user;
 }
 
-function isAdmin(user) {
-return user?.email === ADMIN_EMAIL;
+async function getCurrentProfile() {
+
+  const user = await getCurrentUser();
+
+  if (!user) return null;
+
+  const { data } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  return data;
 }
 
-async function requireAuth(
-redirectTo = '../pages/login.html'
-) {
-const user = await getCurrentUser();
+async function isAdmin() {
 
-if (!user) {
-window.location.href = redirectTo;
-return null;
+  const profile = await getCurrentProfile();
+
+  if (!profile) return false;
+
+  return profile.role === 'admin';
 }
 
-return user;
+async function requireAuth() {
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+
+    window.location.href =
+      '../../pages/login.html';
+
+    return null;
+  }
+
+  return user;
 }
 
 async function requireAdmin() {
-const user = await requireAuth();
 
-if (!user || !isAdmin(user)) {
-window.location.href = '../index.html';
-return null;
-}
+  const user = await requireAuth();
 
-return user;
+  if (!user) return null;
+
+  const admin = await isAdmin();
+
+  if (!admin) {
+
+    window.location.href =
+      '../../index.html';
+
+    return null;
+  }
+
+  return user;
 }
 
 // ============================================
-// PROFIL
+// PROFILE
 // ============================================
 
 async function getProfile(userId) {
-return await supabaseClient
-.from('profiles')
-.select('*')
-.eq('id', userId)
-.single();
+
+  return await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
 }
 
 async function updateProfile(
-userId,
-updates
+  userId,
+  updates
 ) {
-return await supabaseClient
-.from('profiles')
-.upsert({
-id: userId,
-...updates,
-updated_at:
-new Date().toISOString()
-});
+
+  return await supabaseClient
+    .from('profiles')
+    .update(updates)
+    .eq('id', userId);
 }
 
 // ============================================
@@ -122,48 +138,43 @@ new Date().toISOString()
 // ============================================
 
 async function markFicheRead(
-userId,
-ficheId
+  userId,
+  ficheId
 ) {
-return await supabaseClient
-.from('progression')
-.upsert(
-{
-user_id: userId,
-fiche_id: ficheId,
-read_at:
-new Date().toISOString()
-},
-{
-onConflict:
-'user_id,fiche_id'
-}
-);
+
+  return await supabaseClient
+    .from('progression')
+    .upsert({
+      user_id: userId,
+      fiche_id: ficheId,
+      read_at: new Date().toISOString()
+    });
 }
 
 async function getProgression(
-userId
+  userId
 ) {
-return await supabaseClient
-.from('progression')
-.select('*')
-.eq('user_id', userId);
+
+  return await supabaseClient
+    .from('progression')
+    .select('*')
+    .eq('user_id', userId);
 }
 
 async function saveQcmResult(
-userId,
-qcmId,
-score,
-total
+  userId,
+  qcmId,
+  score,
+  total
 ) {
-return await supabaseClient
-.from('qcm_results')
-.insert({
-user_id: userId,
-qcm_id: qcmId,
-score,
-total,
-completed_at:
-new Date().toISOString()
-});
+
+  return await supabaseClient
+    .from('qcm_results')
+    .insert({
+      user_id: userId,
+      qcm_id: qcmId,
+      score,
+      total,
+      completed_at: new Date().toISOString()
+    });
 }

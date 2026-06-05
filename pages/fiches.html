@@ -9,94 +9,146 @@
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
-.fiches-container{
-    max-width:1200px;
+
+.container{
+    max-width:1400px;
     margin:40px auto;
-    padding:0 20px;
+    padding:0 30px;
 }
 
-.fiches-header{
+.header{
     margin-bottom:40px;
 }
 
-.fiches-header h1{
-    font-size:48px;
+.header h1{
+    font-size:3rem;
     margin-bottom:10px;
 }
 
-.search-box{
-    width:100%;
-    max-width:500px;
+.header p{
+    color:#666;
+    font-size:1.1rem;
+}
+
+.filters{
+    display:flex;
+    gap:15px;
+    margin-top:25px;
+    flex-wrap:wrap;
+}
+
+.search{
+    flex:1;
+    min-width:300px;
     padding:15px;
     border:1px solid #ddd;
     border-radius:12px;
-    margin-top:20px;
+    font-size:16px;
 }
 
-.fiches-grid{
+.select{
+    padding:15px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    min-width:220px;
+}
+
+.stats{
+    margin:30px 0;
+    color:#666;
+}
+
+.grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-    gap:20px;
+    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:25px;
 }
 
-.fiche-card{
+.card{
     background:white;
     border:1px solid #e5e5e5;
     border-radius:20px;
     padding:25px;
     cursor:pointer;
-    transition:0.3s;
+    transition:.25s;
 }
 
-.fiche-card:hover{
+.card:hover{
     transform:translateY(-5px);
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
 .badge{
     display:inline-block;
-    background:#f6e6d9;
-    color:#e56a00;
-    padding:6px 12px;
+    padding:8px 14px;
     border-radius:999px;
-    font-size:14px;
+    background:#f7e7d8;
+    color:#eb6d00;
+    font-size:.9rem;
     margin-bottom:15px;
 }
 
-.fiche-card h3{
-    margin-bottom:10px;
+.card h3{
+    font-size:1.8rem;
+    margin-bottom:15px;
 }
 
-.fiche-card p{
+.card p{
     color:#666;
-    line-height:1.5;
+    line-height:1.6;
 }
 
 .loading{
     text-align:center;
-    padding:60px;
+    padding:80px;
+    font-size:1.2rem;
 }
-</style>
-</head>
 
+.empty{
+    text-align:center;
+    padding:60px;
+    font-size:1.2rem;
+    color:#666;
+}
+
+</style>
+
+</head>
 <body>
 
-<div class="fiches-container">
+<div class="container">
 
-    <div class="fiches-header">
-        <h1>Fiches de révision</h1>
+    <div class="header">
+        <h1>📚 Fiches de révision</h1>
         <p>Retrouve toutes les fiches du Bac Général.</p>
 
-        <input
-            type="text"
-            id="searchInput"
-            class="search-box"
-            placeholder="Rechercher une fiche..."
-        >
+        <div class="filters">
+
+            <input
+                type="text"
+                id="searchInput"
+                class="search"
+                placeholder="Rechercher une fiche..."
+            >
+
+            <select id="matiereFilter" class="select">
+                <option value="">Toutes les matières</option>
+                <option value="Mathématiques">📐 Mathématiques</option>
+                <option value="SVT">🧬 SVT</option>
+                <option value="Physique-Chimie">⚛️ Physique-Chimie</option>
+                <option value="Français">📖 Français</option>
+                <option value="Histoire-Géographie">🌍 Histoire-Géographie</option>
+            </select>
+
+        </div>
     </div>
 
-    <div id="fichesGrid" class="fiches-grid">
-        <div class="loading">Chargement...</div>
+    <div id="stats" class="stats"></div>
+
+    <div id="grid" class="grid">
+        <div class="loading">
+            Chargement des fiches...
+        </div>
     </div>
 
 </div>
@@ -108,21 +160,28 @@
 
 let fiches = [];
 
-async function chargerFiches() {
+const icons = {
+    "Mathématiques":"📐",
+    "SVT":"🧬",
+    "Physique-Chimie":"⚛️",
+    "Français":"📖",
+    "Histoire-Géographie":"🌍"
+};
 
-    const grid =
-        document.getElementById('fichesGrid');
+async function chargerFiches(){
 
-    const { data, error } =
-        await supabaseClient
-            .from('fiches')
-            .select('*')
-            .eq('publiee', true)
-            .order('titre');
+    const { data, error } = await supabaseClient
+        .from('fiches')
+        .select('*')
+        .eq('publiee', true)
+        .order('matiere')
+        .order('titre');
 
     if(error){
-        grid.innerHTML =
-            `<h2>${error.message}</h2>`;
+
+        document.getElementById('grid').innerHTML =
+            `<div class="empty">${error.message}</div>`;
+
         return;
     }
 
@@ -134,23 +193,28 @@ async function chargerFiches() {
 function afficherFiches(liste){
 
     const grid =
-        document.getElementById('fichesGrid');
+        document.getElementById('grid');
+
+    document.getElementById('stats').innerHTML =
+        `${liste.length} fiche(s) disponible(s)`;
 
     if(liste.length === 0){
 
         grid.innerHTML =
-            '<p>Aucune fiche trouvée.</p>';
+            `<div class="empty">
+                Aucune fiche trouvée
+            </div>`;
 
         return;
     }
 
-    grid.innerHTML =
-        liste.map(fiche => `
+    grid.innerHTML = liste.map(fiche => `
 
-        <div class="fiche-card"
+        <div class="card"
              onclick="ouvrirFiche('${fiche.id}')">
 
             <div class="badge">
+                ${icons[fiche.matiere] || '📚'}
                 ${fiche.matiere}
             </div>
 
@@ -162,7 +226,50 @@ function afficherFiches(liste){
 
         </div>
 
-        `).join('');
+    `).join('');
+}
+
+function filtrer(){
+
+    const texte =
+        document.getElementById('searchInput')
+        .value
+        .toLowerCase();
+
+    const matiere =
+        document.getElementById('matiereFilter')
+        .value;
+
+    let resultat = fiches;
+
+    if(matiere){
+
+        resultat = resultat.filter(
+            f => f.matiere === matiere
+        );
+    }
+
+    if(texte){
+
+        resultat = resultat.filter(f =>
+
+            f.titre.toLowerCase().includes(texte)
+
+            ||
+
+            (f.resume || '')
+            .toLowerCase()
+            .includes(texte)
+
+            ||
+
+            f.matiere
+            .toLowerCase()
+            .includes(texte)
+        );
+    }
+
+    afficherFiches(resultat);
 }
 
 function ouvrirFiche(id){
@@ -173,27 +280,11 @@ function ouvrirFiche(id){
 
 document
 .getElementById('searchInput')
-.addEventListener('input', e => {
+.addEventListener('input', filtrer);
 
-    const texte =
-        e.target.value.toLowerCase();
-
-    const resultat =
-        fiches.filter(f =>
-
-            f.titre
-            .toLowerCase()
-            .includes(texte)
-
-            ||
-
-            f.matiere
-            .toLowerCase()
-            .includes(texte)
-        );
-
-    afficherFiches(resultat);
-});
+document
+.getElementById('matiereFilter')
+.addEventListener('change', filtrer);
 
 chargerFiches();
 

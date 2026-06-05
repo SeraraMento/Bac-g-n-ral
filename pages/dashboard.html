@@ -1,141 +1,206 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mon espace — Bac-Général</title>
+
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <div class="dashboard">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
+<div class="dashboard">
 
-      <nav class="sidebar-nav">
-        <span class="sidebar-section">Révisions</span>
-        <a href="dashboard.html" class="sidebar-link active">
-          <span class="icon">🏠</span> Tableau de bord
-        </a>
-        <a href="fiches.html" class="sidebar-link">
-          <span class="icon">📋</span> Fiches de cours
-        </a>
-        <a href="qcm.html" class="sidebar-link">
-          <span class="icon">🎯</span> QCM
-        </a>
-        <a href="annales.html" class="sidebar-link">
-          <span class="icon">📝</span> Annales
-        </a>
-        <a href="ressources.html" class="sidebar-link">
-          <span class="icon">🎬</span> Ressources
-        </a>
+  <aside class="sidebar">
+    <a href="../index.html" class="sidebar-logo">
+      Bac<span>·</span>Général
+    </a>
 
-        <span class="sidebar-section">Mon compte</span>
-        <a href="profil.html" class="sidebar-link">
-          <span class="icon">👤</span> Mon profil
-        </a>
-        <a href="#" class="sidebar-link" id="btn-logout">
-          <span class="icon">🚪</span> Déconnexion
-        </a>
-      </nav>
-    </aside>
+```
+<nav class="sidebar-nav">
 
-    <!-- MAIN -->
-    <main class="main-content">
-      <div class="page-header">
-        <h1>Bonjour, <span id="user-name">…</span> 👋</h1>
-        <p>Voici ton tableau de bord de révision</p>
-      </div>
+  <span class="sidebar-section">Révisions</span>
 
-      <!-- STATS -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Fiches lues</div>
-          <div class="stat-value" id="stat-fiches">0</div>
-          <div class="stat-sub">sur 500+ disponibles</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">QCM complétés</div>
-          <div class="stat-value" id="stat-qcm">0</div>
-          <div class="stat-sub">exercices réalisés</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Score moyen</div>
-          <div class="stat-value" id="stat-score">—</div>
-          <div class="stat-sub">sur les QCM</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Annales vues</div>
-          <div class="stat-value" id="stat-annales">0</div>
-          <div class="stat-sub">sujets consultés</div>
-        </div>
-      </div>
+  <a href="dashboard.html" class="sidebar-link active">
+    <span class="icon">🏠</span>
+    Tableau de bord
+  </a>
 
-      <!-- ACCÈS RAPIDE -->
-      <h2 style="font-family:var(--font-display); font-size:1.3rem; font-weight:700; margin-bottom:1rem;">Accès rapide</h2>
-      <div class="matieres-grid" style="max-width:none;">
-        <a href="fiches.html?matiere=maths" class="matiere-card">
-          <span class="matiere-icon">📐</span>
-          <h3>Mathématiques</h3>
-          <p>Reprendre là où j'en étais</p>
-        </a>
-        <a href="fiches.html?matiere=physique" class="matiere-card">
-          <span class="matiere-icon">⚛️</span>
-          <h3>Physique-Chimie</h3>
-          <p>Reprendre là où j'en étais</p>
-        </a>
-        <a href="fiches.html?matiere=francais" class="matiere-card">
-          <span class="matiere-icon">📖</span>
-          <h3>Français</h3>
-          <p>Reprendre là où j'en étais</p>
-        </a>
-        <a href="qcm.html" class="matiere-card">
-          <span class="matiere-icon">🎯</span>
-          <h3>QCM du jour</h3>
-          <p>Entraîne-toi !</p>
-          <span class="matiere-count">Nouveau</span>
-        </a>
-      </div>
-    </main>
+  <a href="fiches.html" class="sidebar-link">
+    <span class="icon">📋</span>
+    Fiches de cours
+  </a>
+
+  <a href="qcm.html" class="sidebar-link">
+    <span class="icon">🎯</span>
+    QCM
+  </a>
+
+  <a href="annales.html" class="sidebar-link">
+    <span class="icon">📝</span>
+    Annales
+  </a>
+
+  <a href="ressources.html" class="sidebar-link">
+    <span class="icon">🎬</span>
+    Ressources
+  </a>
+
+  <span class="sidebar-section">Mon compte</span>
+
+  <a href="profil.html" class="sidebar-link">
+    <span class="icon">👤</span>
+    Mon profil
+  </a>
+
+  <a href="#" class="sidebar-link" id="btn-logout">
+    <span class="icon">🚪</span>
+    Déconnexion
+  </a>
+
+</nav>
+```
+
+  </aside>
+
+  <main class="main-content">
+
+```
+<div class="page-header">
+  <h1>
+    Bonjour, <span id="user-name">...</span> 👋
+  </h1>
+  <p>
+    Voici ton tableau de bord de révision
+  </p>
+</div>
+
+<div class="stats-row">
+
+  <div class="stat-card">
+    <div class="stat-label">Fiches lues</div>
+    <div class="stat-value" id="stat-fiches">0</div>
+    <div class="stat-sub">sur 500+ disponibles</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../js/supabase-config.js"></script>
-  <script>
-    (async () => {
-      const user = await requireAuth('../pages/login.html');
-      if (!user) return;
+  <div class="stat-card">
+    <div class="stat-label">QCM complétés</div>
+    <div class="stat-value" id="stat-qcm">0</div>
+    <div class="stat-sub">exercices réalisés</div>
+  </div>
 
-      // Affiche le prénom
-      const name = user.user_metadata?.full_name?.split(' ')[0] || 'toi';
-      document.getElementById('user-name').textContent = name;
+  <div class="stat-card">
+    <div class="stat-label">Score moyen</div>
+    <div class="stat-value" id="stat-score">—</div>
+    <div class="stat-sub">sur les QCM</div>
+  </div>
 
-      // Charge la progression
-      const { data: progression } = await getProgression(user.id);
-      if (progression) {
-        document.getElementById('stat-fiches').textContent = progression.length;
-      }
+  <div class="stat-card">
+    <div class="stat-label">Annales vues</div>
+    <div class="stat-value" id="stat-annales">0</div>
+    <div class="stat-sub">sujets consultés</div>
+  </div>
 
-      // Charge les résultats QCM
-      const { data: qcmData } = await supabase
-        .from('qcm_results')
-        .select('score, total')
-        .eq('user_id', user.id);
+</div>
 
-      if (qcmData && qcmData.length > 0) {
-        document.getElementById('stat-qcm').textContent = qcmData.length;
-        const avg = qcmData.reduce((acc, r) => acc + (r.score / r.total), 0) / qcmData.length;
-        document.getElementById('stat-score').textContent = Math.round(avg * 100) + '%';
-      }
-    })();
+<h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:1rem;">
+  Accès rapide
+</h2>
 
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      signOut();
-    });
-  </script>
+<div class="matieres-grid" style="max-width:none;">
+
+  <a href="fiches.html?matiere=maths" class="matiere-card">
+    <span class="matiere-icon">📐</span>
+    <h3>Mathématiques</h3>
+    <p>Reprendre là où j'en étais</p>
+  </a>
+
+  <a href="fiches.html?matiere=physique" class="matiere-card">
+    <span class="matiere-icon">⚛️</span>
+    <h3>Physique-Chimie</h3>
+    <p>Reprendre là où j'en étais</p>
+  </a>
+
+  <a href="fiches.html?matiere=francais" class="matiere-card">
+    <span class="matiere-icon">📖</span>
+    <h3>Français</h3>
+    <p>Reprendre là où j'en étais</p>
+  </a>
+
+  <a href="qcm.html" class="matiere-card">
+    <span class="matiere-icon">🎯</span>
+    <h3>QCM du jour</h3>
+    <p>Entraîne-toi !</p>
+    <span class="matiere-count">Nouveau</span>
+  </a>
+
+</div>
+```
+
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<script src="../js/supabase-config.js"></script>
+
+<script>
+(async () => {
+
+  const user = await requireAuth('../pages/login.html');
+
+  if (!user) return;
+
+  const name =
+    user.user_metadata?.full_name?.split(' ')[0]
+    || 'toi';
+
+  document.getElementById('user-name').textContent = name;
+
+  const { data: progression } =
+    await getProgression(user.id);
+
+  if (progression) {
+    document.getElementById('stat-fiches').textContent =
+      progression.length;
+  }
+
+  const { data: qcmData } =
+    await supabaseClient
+      .from('qcm_results')
+      .select('score,total')
+      .eq('user_id', user.id);
+
+  if (qcmData && qcmData.length > 0) {
+
+    document.getElementById('stat-qcm').textContent =
+      qcmData.length;
+
+    const avg =
+      qcmData.reduce(
+        (acc, r) => acc + (r.score / r.total),
+        0
+      ) / qcmData.length;
+
+    document.getElementById('stat-score').textContent =
+      Math.round(avg * 100) + '%';
+  }
+
+})();
+
+document
+  .getElementById('btn-logout')
+  .addEventListener('click', (e) => {
+
+    e.preventDefault();
+    signOut();
+
+  });
+</script>
+
 </body>
 </html>

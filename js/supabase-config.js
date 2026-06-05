@@ -7,8 +7,8 @@
 //  (Supabase Dashboard → Project Settings → API)
 //
 
-const SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
-const SUPABASE_ANON_KEY = 'VOTRE_ANON_KEY';
+const SUPABASE_URL = 'https://mogfxolarfoaltmqornq.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_OCngSeY6-r_A2hKCCQmoQw_6CSZP893';
 
 // Importe depuis CDN dans tes pages HTML :
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>

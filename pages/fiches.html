@@ -9,18 +9,39 @@
 <link rel="stylesheet" href="../css/style.css">
 
 <style>
-.container{
-    max-width:1400px;
-    margin:40px auto;
-    padding:0 30px;
+
+.main-content{
+    padding:40px;
+}
+
+.page-header{
+    margin-bottom:40px;
+}
+
+.page-header h1{
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.page-header p{
+    color:#666;
+}
+
+#conteneur{
+    display:flex;
+    flex-direction:column;
+    gap:40px;
 }
 
 .matiere{
-    margin-bottom:50px;
+    background:white;
+    border:1px solid #e5e5e5;
+    border-radius:24px;
+    padding:30px;
 }
 
 .matiere h2{
-    margin-bottom:20px;
+    margin-bottom:25px;
     font-size:2rem;
 }
 
@@ -31,26 +52,27 @@
 }
 
 .card{
-    background:white;
-    border:1px solid #e5e5e5;
+    background:#fff;
+    border:1px solid #ececec;
     border-radius:20px;
     padding:25px;
     cursor:pointer;
-    transition:.25s;
+    transition:0.25s;
 }
 
 .card:hover{
-    transform:translateY(-5px);
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    transform:translateY(-4px);
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
 .badge{
     display:inline-block;
-    background:#f5e5d6;
+    background:#f6e4d5;
     color:#e56a00;
     padding:8px 14px;
     border-radius:999px;
     margin-bottom:15px;
+    font-size:.9rem;
 }
 
 .card h3{
@@ -59,19 +81,85 @@
 
 .card p{
     color:#666;
+    line-height:1.5;
 }
+
+.sidebar-section{
+    display:block;
+    margin:25px 0 10px;
+    opacity:.6;
+    font-size:.8rem;
+    text-transform:uppercase;
+}
+
+.loading{
+    text-align:center;
+    padding:80px;
+}
+
 </style>
 
 </head>
 <body>
 
-<div class="container">
+<div class="dashboard">
 
-<h1>📚 Fiches de révision</h1>
+<aside class="sidebar">
 
-<div id="conteneur">
-Chargement...
-</div>
+    <a href="../index.html" class="sidebar-logo">
+        Bac<span>·</span>Général
+    </a>
+
+    <nav class="sidebar-nav">
+
+        <span class="sidebar-section">
+            Révisions
+        </span>
+
+        <a href="dashboard.html" class="sidebar-link">
+            🏠 Tableau de bord
+        </a>
+
+        <a href="fiches.html" class="sidebar-link active">
+            📚 Fiches de cours
+        </a>
+
+        <a href="qcm.html" class="sidebar-link">
+            🎯 QCM
+        </a>
+
+        <a href="annales.html" class="sidebar-link">
+            📝 Annales
+        </a>
+
+        <a href="ressources.html" class="sidebar-link">
+            🎬 Ressources
+        </a>
+
+        <span class="sidebar-section">
+            Mon compte
+        </span>
+
+        <a href="profil.html" class="sidebar-link">
+            👤 Mon profil
+        </a>
+
+    </nav>
+
+</aside>
+
+<main class="main-content">
+
+    <div class="page-header">
+        <h1>📚 Fiches de révision</h1>
+        <p>Tous les cours disponibles classés par matière.</p>
+    </div>
+
+    <div id="conteneur" class="loading">
+        Chargement...
+    </div>
+
+</main>
 
 </div>
 
@@ -92,7 +180,7 @@ async function chargerFiches(){
     if(error){
 
         document.getElementById('conteneur').innerHTML =
-            error.message;
+            `<p>${error.message}</p>`;
 
         return;
     }
@@ -101,8 +189,9 @@ async function chargerFiches(){
 
     data.forEach(fiche => {
 
-        if(!groupes[fiche.matiere])
+        if(!groupes[fiche.matiere]){
             groupes[fiche.matiere] = [];
+        }
 
         groupes[fiche.matiere].push(fiche);
     });
@@ -122,7 +211,6 @@ async function chargerFiches(){
         groupes[matiere].forEach(fiche => {
 
             html += `
-
             <div class="card"
                  onclick="window.open('${fiche.pdf_url}','_blank')">
 
@@ -133,16 +221,16 @@ async function chargerFiches(){
                 <h3>${fiche.titre}</h3>
 
                 <p>
-                    ${fiche.resume || ''}
+                    ${fiche.resume || 'Cours disponible'}
                 </p>
 
             </div>
-
             `;
         });
 
         html += `
             </div>
+
         </section>
         `;
     });

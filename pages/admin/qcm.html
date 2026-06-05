@@ -7,6 +7,11 @@
 <link rel="stylesheet" href="../../css/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
 <style>
 .admin-badge{background:var(--accent);color:#fff;font-size:.7rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;letter-spacing:.05em;text-transform:uppercase;margin-left:.5rem}
 .form-card,.table-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem}
@@ -32,7 +37,7 @@ tr:hover td{background:var(--paper)}
 /* Questions builder */
 .questions-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:1rem}
 .question-block{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:1rem}
-.question-block h4{font-size:.875rem;font-weight:700;margin-bottom:.75rem;display:flex;justify-content:space-between}
+.question-block h4{font-size:.875rem;font-weight:700;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
 .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem}
 .option-row{display:flex;align-items:center;gap:.5rem}
 .option-row input[type="radio"]{width:auto;flex-shrink:0}
@@ -41,11 +46,17 @@ tr:hover td{background:var(--paper)}
 .btn-add-q:hover{border-color:var(--accent);color:var(--accent)}
 .remove-q{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem}
 
+/* Aperçu KaTeX */
+.math-field-wrap{position:relative}
+.math-preview{min-height:2rem;padding:.4rem .75rem;background:#f0f4ff;border:1px solid #c7d4f7;border-radius:8px;font-size:.875rem;margin-top:.25rem;display:none;line-height:1.6}
+.math-preview.active{display:block}
+.math-hint{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.math-hint code{background:#f0f0f0;padding:.1rem .3rem;border-radius:4px;font-size:.7rem}
+
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:#fff;padding:.75rem 1.25rem;border-radius:12px;font-size:.875rem;font-weight:500;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:2000}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.success{background:#2a6e2a}
 .toast.error{background:#c62828}
-
 .empty{text-align:center;padding:2.5rem;color:var(--muted)}
 </style>
 </head>
@@ -99,6 +110,20 @@ tr:hover td{background:var(--paper)}
             <option value="true">Oui</option>
             <option value="false">Non (brouillon)</option>
           </select>
+          <!-- Aide LaTeX -->
+          <div style="margin-top:1.25rem;background:#faf5ef;border:1px solid var(--border);border-radius:10px;padding:.85rem">
+            <p style="font-size:.8rem;font-weight:700;margin-bottom:.5rem">💡 Formules mathématiques</p>
+            <p style="font-size:.75rem;color:var(--muted);line-height:1.5">
+              Entoure les formules avec <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$…$</code> pour du LaTeX inline.<br>
+              Un aperçu s'affiche en temps réel sous chaque champ.
+            </p>
+            <p style="font-size:.74rem;color:var(--muted);margin-top:.5rem;line-height:1.7">
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$x^2$</code> → x²<br>
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$\frac{a}{b}$</code> → fraction<br>
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$\sqrt{x}$</code> → racine<br>
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$\vec{AB}$</code> → vecteur
+            </p>
+          </div>
         </div>
         <div>
           <!-- Questions builder -->
@@ -137,7 +162,7 @@ let questionCount = 0;
 (async () => {
   const user = await requireAdmin();
   if (!user) return;
-  addQuestion(); // one default question
+  addQuestion();
   loadQcm();
 })();
 
@@ -146,6 +171,37 @@ function toast(msg, type='success') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = `toast ${type} show`;
   setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Rendu KaTeX dans un élément preview
+function renderPreview(text, previewEl) {
+  if (!text.includes('$')) { previewEl.classList.remove('active'); return; }
+  previewEl.classList.add('active');
+  try {
+    previewEl.innerHTML = '';
+    // Rendu inline : remplacer $...$ par du KaTeX
+    const parts = text.split(/(\$[^$]+\$)/g);
+    parts.forEach(part => {
+      if (part.startsWith('$') && part.endsWith('$')) {
+        const span = document.createElement('span');
+        try {
+          katex.render(part.slice(1, -1), span, { throwOnError: false });
+        } catch(e) {
+          span.textContent = part;
+        }
+        previewEl.appendChild(span);
+      } else {
+        previewEl.appendChild(document.createTextNode(part));
+      }
+    });
+  } catch(e) {
+    previewEl.textContent = text;
+  }
+}
+
+// ── Attacher aperçu KaTeX à un input
+function attachMathPreview(input, previewEl) {
+  input.addEventListener('input', () => renderPreview(input.value, previewEl));
 }
 
 // ── Question builder
@@ -160,26 +216,46 @@ function addQuestion(data = {}) {
   block.dataset.idx = idx;
   block.innerHTML = `
     <h4>Question ${idx} <button class="remove-q" onclick="this.closest('.question-block').remove()">✕</button></h4>
-    <input placeholder="Énoncé de la question" class="q-text" value="${escHtml(data.question||'')}">
+    <div class="math-field-wrap">
+      <input placeholder="Énoncé — utilisez $…$ pour les maths" class="q-text" value="${escHtml(data.question||'')}">
+      <div class="math-preview"></div>
+    </div>
     <div class="options-grid" style="margin-top:.6rem">
       ${opts.map((o, i) => `
         <div class="option-row">
           <input type="radio" name="correct-${idx}" value="${i}" ${i === correct ? 'checked' : ''}>
-          <input type="text" class="q-opt" placeholder="Option ${i+1}" value="${escHtml(o)}">
+          <div class="math-field-wrap" style="flex:1">
+            <input type="text" class="q-opt" placeholder="Option ${i+1}" value="${escHtml(o)}">
+            <div class="math-preview"></div>
+          </div>
         </div>
       `).join('')}
     </div>
     <label style="margin-top:.6rem">Explication <span style="font-weight:400;color:var(--muted)">(optionnelle)</span></label>
-    <input placeholder="Explication de la bonne réponse" class="q-expl" value="${escHtml(data.explication||'')}">
+    <div class="math-field-wrap">
+      <input placeholder="Explication — $…$ pour les maths" class="q-expl" value="${escHtml(data.explication||'')}">
+      <div class="math-preview"></div>
+    </div>
   `;
+
   document.getElementById('questions-list').appendChild(block);
+
+  // Attacher les aperçus KaTeX
+  const inputs = block.querySelectorAll('.math-field-wrap');
+  inputs.forEach(wrap => {
+    const inp = wrap.querySelector('input');
+    const prev = wrap.querySelector('.math-preview');
+    attachMathPreview(inp, prev);
+    // Déclencher si déjà une valeur (édition)
+    if (inp.value) renderPreview(inp.value, prev);
+  });
 }
 
 function escHtml(s) { return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 
 document.getElementById('btn-add-q').addEventListener('click', () => addQuestion());
 
-// ── Collect questions from DOM
+// ── Collect questions
 function collectQuestions() {
   const blocks = document.querySelectorAll('.question-block');
   const questions = [];

@@ -1,40 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion des fiches</title>
+
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <a href="dashboard.html" class="sidebar-logo">
+      Bac<span>·</span>Général
+    </a>
+
+    <nav class="sidebar-nav">
+
+      <span class="sidebar-section">Administration</span>
+
+      <a href="dashboard.html" class="sidebar-link">
+        📊 Dashboard
+      </a>
+
+      <a href="fiches.html" class="sidebar-link active">
+        📋 Fiches
+      </a>
+
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1>Gestion des fiches</h1>
+      <p>Liste des fiches enregistrées</p>
+    </div>
+
+    <div id="status"></div>
+
+    <div id="liste"></div>
+
+  </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<!-- Vérifie ce chemin -->
+<script src="../../js/supabase-config.js"></script>
+
 <script>
-    console.log('supabaseClient =', supabaseClient);
 (async () => {
 
-  const liste = document.getElementById('liste');
+  const status =
+    document.getElementById('status');
 
-  try {
+  const liste =
+    document.getElementById('liste');
 
-    const { data, error } = await supabaseClient
-      .from('fiches')
-      .select('*');
+  if (!window.supabaseClient) {
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
+    status.innerHTML = `
+      <div style="
+        background:#ffe5e5;
+        color:red;
+        padding:15px;
+        border-radius:10px;
+        margin-bottom:20px;">
+        ERREUR :
+        supabase-config.js n'est pas chargé.
+      </div>
+    `;
 
-    if (error) {
-      liste.innerHTML =
-        "<h2 style='color:red'>" +
-        error.message +
-        "</h2>";
-      return;
-    }
+    console.error(
+      "supabase-config.js non chargé"
+    );
 
-    liste.innerHTML =
-      "<pre>" +
-      JSON.stringify(data, null, 2) +
-      "</pre>";
-
-  } catch(err) {
-
-    console.error(err);
-
-    liste.innerHTML =
-      "<h2 style='color:red'>" +
-      err.message +
-      "</h2>";
+    return;
   }
+
+  status.innerHTML = `
+    <div style="
+      background:#e8fff0;
+      color:green;
+      padding:15px;
+      border-radius:10px;
+      margin-bottom:20px;">
+      Supabase connecté.
+    </div>
+  `;
+
+  const { data, error } =
+    await supabaseClient
+      .from('fiches')
+      .select('*')
+      .order('created_at', {
+        ascending:false
+      });
+
+  console.log(data);
+  console.log(error);
+
+  if (error) {
+
+    liste.innerHTML = `
+      <div style="
+        background:#ffe5e5;
+        color:red;
+        padding:15px;
+        border-radius:10px;">
+        ${error.message}
+      </div>
+    `;
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    liste.innerHTML = `
+      <div style="
+        background:white;
+        padding:20px;
+        border-radius:12px;">
+        Aucune fiche trouvée.
+      </div>
+    `;
+
+    return;
+  }
+
+  liste.innerHTML = data.map(f => `
+    <div style="
+      background:white;
+      border:1px solid #ddd;
+      border-radius:12px;
+      padding:20px;
+      margin-bottom:15px;
+    ">
+      <h3>${f.titre || ''}</h3>
+
+      <p>
+        <strong>Matière :</strong>
+        ${f.matiere || ''}
+      </p>
+
+      <p>
+        <strong>Niveau :</strong>
+        ${f.niveau || ''}
+      </p>
+
+      <p>
+        <strong>Résumé :</strong>
+        ${f.resume || ''}
+      </p>
+
+      <button onclick="alert('${f.id}')">
+        Voir ID
+      </button>
+    </div>
+  `).join('');
 
 })();
 </script>
+
+</body>
+</html>

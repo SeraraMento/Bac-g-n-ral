@@ -178,22 +178,22 @@
       if (!user) return;
 
       // Compte les fiches
-      const { count: fichesCount } = await supabase
+      const { count: fichesCount } = await supabaseClient
         .from('fiches').select('*', { count: 'exact', head: true });
       document.getElementById('stat-fiches').textContent = fichesCount ?? 0;
 
       // Compte les QCM
-      const { count: qcmCount } = await supabase
+      const { count: qcmCount } = await supabaseClient
         .from('qcm').select('*', { count: 'exact', head: true });
       document.getElementById('stat-qcm').textContent = qcmCount ?? 0;
 
       // Compte les annales
-      const { count: annalesCount } = await supabase
+      const { count: annalesCount } = await supabaseClient
         .from('annales').select('*', { count: 'exact', head: true });
       document.getElementById('stat-annales').textContent = annalesCount ?? 0;
 
       // Derniers inscrits
-      const { data: profiles } = await supabase
+      const { data: profiles } = await supabaseClient
         .from('profiles')
         .select('full_name, email, created_at, role')
         .order('created_at', { ascending: false })

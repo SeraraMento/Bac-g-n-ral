@@ -1,39 +1,48 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Fiches Admin</title>
-<link rel="stylesheet" href="../../css/style.css">
-</head>
-<body>
-
-<h1>Gestion des fiches</h1>
-
-<div id="liste"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="../../js/supabase-config.js"></script>
-
 <script>
 (async () => {
 
-const { data, error } = await supabaseClient
-.from('fiches')
-.select('*')
-.order('created_at', { ascending:false });
+  const liste =
+    document.getElementById('liste');
 
-console.log(data);
+  const { data, error } =
+    await supabaseClient
+      .from('fiches')
+      .select('*')
+      .order('created_at', {
+        ascending:false
+      });
 
-document.getElementById('liste').innerHTML =
-data.map(f => `
-<div>
-<h3>${f.titre}</h3>
-<p>${f.matiere}</p>
-</div>
-`).join('');
+  console.log(data);
+  console.log(error);
+
+  if(error){
+    liste.innerHTML =
+      '<h2>Erreur : ' +
+      error.message +
+      '</h2>';
+    return;
+  }
+
+  if(!data || data.length === 0){
+    liste.innerHTML =
+      '<h2>Aucune fiche trouvée</h2>';
+    return;
+  }
+
+  liste.innerHTML =
+    data.map(f => `
+      <div style="
+        background:white;
+        border:1px solid #ddd;
+        padding:20px;
+        margin-bottom:15px;
+        border-radius:12px;
+      ">
+        <h3>${f.titre}</h3>
+        <p>${f.matiere}</p>
+        <p>${f.niveau}</p>
+      </div>
+    `).join('');
 
 })();
 </script>
-
-</body>
-</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inscription — Bac-Général</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <a href="../index.html" class="auth-logo">Bac<span>·</span>Général</a>
+      <h2>Créer un compte</h2>
+      <p class="auth-subtitle">Gratuit, sans engagement</p>
+
+      <div class="auth-error" id="auth-error"></div>
+
+      <div id="success-msg" style="display:none; background:#e6f4ea; border:1px solid #a8d5b0; color:#1a5c28; padding:0.75rem 1rem; border-radius:12px; font-size:0.875rem; margin-bottom:1rem; text-align:center;">
+        ✅ Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.
+      </div>
+
+      <div class="form-group">
+        <label for="fullname">Prénom et nom</label>
+        <input type="text" id="fullname" placeholder="Marie Dupont" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Adresse email</label>
+        <input type="email" id="email" placeholder="ton@email.fr" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" placeholder="8 caractères minimum" />
+      </div>
+
+      <button class="btn-submit" id="btn-register">Créer mon compte</button>
+
+      <p class="auth-footer">
+        Déjà un compte ? <a href="login.html">Se connecter</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script>
+    const btn = document.getElementById('btn-register');
+    const errorBox = document.getElementById('auth-error');
+    const successMsg = document.getElementById('success-msg');
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.add('visible');
+    }
+
+    btn.addEventListener('click', async () => {
+      const fullName = document.getElementById('fullname').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      errorBox.classList.remove('visible');
+
+      if (!fullName || !email || !password) {
+        showError('Merci de remplir tous les champs.');
+        return;
+      }
+      if (password.length < 8) {
+        showError('Le mot de passe doit faire au moins 8 caractères.');
+        return;
+      }
+
+      btn.textContent = 'Création…';
+      btn.disabled = true;
+
+      const { data, error } = await signUp(email, password, fullName);
+
+      if (error) {
+        showError(error.message === 'User already registered'
+          ? 'Cet email est déjà utilisé.'
+          : 'Une erreur est survenue. Réessaie.');
+        btn.textContent = 'Créer mon compte';
+        btn.disabled = false;
+        return;
+      }
+
+      successMsg.style.display = 'block';
+      btn.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

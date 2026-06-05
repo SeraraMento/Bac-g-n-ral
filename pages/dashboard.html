@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon espace — Bac-Général</title>
 
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/style.css">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -19,133 +19,128 @@
       Bac<span>·</span>Général
     </a>
 
-```
-<nav class="sidebar-nav">
+    <nav class="sidebar-nav">
 
-  <span class="sidebar-section">Révisions</span>
+      <span class="sidebar-section">Révisions</span>
 
-  <a href="dashboard.html" class="sidebar-link active">
-    <span class="icon">🏠</span>
-    Tableau de bord
-  </a>
+      <a href="dashboard.html" class="sidebar-link active">
+        <span class="icon">🏠</span>
+        Tableau de bord
+      </a>
 
-  <a href="fiches.html" class="sidebar-link">
-    <span class="icon">📋</span>
-    Fiches de cours
-  </a>
+      <a href="fiches.html" class="sidebar-link">
+        <span class="icon">📋</span>
+        Fiches de cours
+      </a>
 
-  <a href="qcm.html" class="sidebar-link">
-    <span class="icon">🎯</span>
-    QCM
-  </a>
+      <a href="qcm.html" class="sidebar-link">
+        <span class="icon">🎯</span>
+        QCM
+      </a>
 
-  <a href="annales.html" class="sidebar-link">
-    <span class="icon">📝</span>
-    Annales
-  </a>
+      <a href="annales.html" class="sidebar-link">
+        <span class="icon">📝</span>
+        Annales
+      </a>
 
-  <a href="ressources.html" class="sidebar-link">
-    <span class="icon">🎬</span>
-    Ressources
-  </a>
+      <a href="ressources.html" class="sidebar-link">
+        <span class="icon">🎬</span>
+        Ressources
+      </a>
 
-  <span class="sidebar-section">Mon compte</span>
+      <span class="sidebar-section">Mon compte</span>
 
-  <a href="profil.html" class="sidebar-link">
-    <span class="icon">👤</span>
-    Mon profil
-  </a>
+      <a href="profil.html" class="sidebar-link">
+        <span class="icon">👤</span>
+        Mon profil
+      </a>
 
-  <a href="#" class="sidebar-link" id="btn-logout">
-    <span class="icon">🚪</span>
-    Déconnexion
-  </a>
+      <a href="#" class="sidebar-link" id="btn-logout">
+        <span class="icon">🚪</span>
+        Déconnexion
+      </a>
 
-</nav>
-```
-
+    </nav>
   </aside>
 
   <main class="main-content">
 
-```
-<div class="page-header">
-  <h1>
-    Bonjour, <span id="user-name">...</span> 👋
-  </h1>
-  <p>
-    Voici ton tableau de bord de révision
-  </p>
-</div>
+    <div class="page-header">
+      <h1>
+        Bonjour, <span id="user-name">Utilisateur</span> 👋
+      </h1>
 
-<div class="stats-row">
+      <p>
+        Voici ton tableau de bord de révision
+      </p>
+    </div>
 
-  <div class="stat-card">
-    <div class="stat-label">Fiches lues</div>
-    <div class="stat-value" id="stat-fiches">0</div>
-    <div class="stat-sub">sur 500+ disponibles</div>
-  </div>
+    <div class="stats-row">
 
-  <div class="stat-card">
-    <div class="stat-label">QCM complétés</div>
-    <div class="stat-value" id="stat-qcm">0</div>
-    <div class="stat-sub">exercices réalisés</div>
-  </div>
+      <div class="stat-card">
+        <div class="stat-label">Fiches lues</div>
+        <div class="stat-value" id="stat-fiches">0</div>
+        <div class="stat-sub">sur 500+ disponibles</div>
+      </div>
 
-  <div class="stat-card">
-    <div class="stat-label">Score moyen</div>
-    <div class="stat-value" id="stat-score">—</div>
-    <div class="stat-sub">sur les QCM</div>
-  </div>
+      <div class="stat-card">
+        <div class="stat-label">QCM complétés</div>
+        <div class="stat-value" id="stat-qcm">0</div>
+        <div class="stat-sub">exercices réalisés</div>
+      </div>
 
-  <div class="stat-card">
-    <div class="stat-label">Annales vues</div>
-    <div class="stat-value" id="stat-annales">0</div>
-    <div class="stat-sub">sujets consultés</div>
-  </div>
+      <div class="stat-card">
+        <div class="stat-label">Score moyen</div>
+        <div class="stat-value" id="stat-score">0%</div>
+        <div class="stat-sub">sur les QCM</div>
+      </div>
 
-</div>
+      <div class="stat-card">
+        <div class="stat-label">Annales vues</div>
+        <div class="stat-value" id="stat-annales">0</div>
+        <div class="stat-sub">sujets consultés</div>
+      </div>
 
-<h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:1rem;">
-  Accès rapide
-</h2>
+    </div>
 
-<div class="matieres-grid" style="max-width:none;">
+    <h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:1rem;">
+      Accès rapide
+    </h2>
 
-  <a href="fiches.html?matiere=maths" class="matiere-card">
-    <span class="matiere-icon">📐</span>
-    <h3>Mathématiques</h3>
-    <p>Reprendre là où j'en étais</p>
-  </a>
+    <div class="matieres-grid" style="max-width:none;">
 
-  <a href="fiches.html?matiere=physique" class="matiere-card">
-    <span class="matiere-icon">⚛️</span>
-    <h3>Physique-Chimie</h3>
-    <p>Reprendre là où j'en étais</p>
-  </a>
+      <a href="fiches.html?matiere=maths" class="matiere-card">
+        <span class="matiere-icon">📐</span>
+        <h3>Mathématiques</h3>
+        <p>Reprendre là où j'en étais</p>
+      </a>
 
-  <a href="fiches.html?matiere=francais" class="matiere-card">
-    <span class="matiere-icon">📖</span>
-    <h3>Français</h3>
-    <p>Reprendre là où j'en étais</p>
-  </a>
+      <a href="fiches.html?matiere=physique" class="matiere-card">
+        <span class="matiere-icon">⚛️</span>
+        <h3>Physique-Chimie</h3>
+        <p>Reprendre là où j'en étais</p>
+      </a>
 
-  <a href="qcm.html" class="matiere-card">
-    <span class="matiere-icon">🎯</span>
-    <h3>QCM du jour</h3>
-    <p>Entraîne-toi !</p>
-    <span class="matiere-count">Nouveau</span>
-  </a>
+      <a href="fiches.html?matiere=francais" class="matiere-card">
+        <span class="matiere-icon">📖</span>
+        <h3>Français</h3>
+        <p>Reprendre là où j'en étais</p>
+      </a>
 
-</div>
-```
+      <a href="qcm.html" class="matiere-card">
+        <span class="matiere-icon">🎯</span>
+        <h3>QCM du jour</h3>
+        <p>Entraîne-toi !</p>
+        <span class="matiere-count">Nouveau</span>
+      </a>
+
+    </div>
 
   </main>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
 <script src="../js/supabase-config.js"></script>
 
 <script>
@@ -155,49 +150,62 @@
 
   if (!user) return;
 
-  const name =
-    user.user_metadata?.full_name?.split(' ')[0]
-    || 'toi';
+  const firstName =
+    user.user_metadata?.full_name?.split(' ')[0] ||
+    user.email?.split('@')[0] ||
+    'Utilisateur';
 
-  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-name').textContent = firstName;
 
-  const { data: progression } =
-    await getProgression(user.id);
+  try {
 
-  if (progression) {
-    document.getElementById('stat-fiches').textContent =
-      progression.length;
+    const { data: progression } =
+      await getProgression(user.id);
+
+    if (progression) {
+      document.getElementById('stat-fiches').textContent =
+        progression.length;
+    }
+
+  } catch (err) {
+    console.error(err);
   }
 
-  const { data: qcmData } =
-    await supabaseClient
-      .from('qcm_results')
-      .select('score,total')
-      .eq('user_id', user.id);
+  try {
 
-  if (qcmData && qcmData.length > 0) {
+    const { data: qcmData } =
+      await supabaseClient
+        .from('qcm_results')
+        .select('score,total')
+        .eq('user_id', user.id);
 
-    document.getElementById('stat-qcm').textContent =
-      qcmData.length;
+    if (qcmData && qcmData.length > 0) {
 
-    const avg =
-      qcmData.reduce(
-        (acc, r) => acc + (r.score / r.total),
-        0
-      ) / qcmData.length;
+      document.getElementById('stat-qcm').textContent =
+        qcmData.length;
 
-    document.getElementById('stat-score').textContent =
-      Math.round(avg * 100) + '%';
+      const avg =
+        qcmData.reduce(
+          (acc, r) => acc + (r.score / r.total),
+          0
+        ) / qcmData.length;
+
+      document.getElementById('stat-score').textContent =
+        Math.round(avg * 100) + '%';
+    }
+
+  } catch (err) {
+    console.error('QCM non disponible :', err);
   }
 
 })();
 
 document
   .getElementById('btn-logout')
-  .addEventListener('click', (e) => {
+  .addEventListener('click', async (e) => {
 
     e.preventDefault();
-    signOut();
+    await signOut();
 
   });
 </script>

@@ -19,13 +19,44 @@ th,td{padding:12px;border-bottom:1px solid #eee;text-align:left}
 </head>
 <body>
 <div class="dashboard">
-<aside class="sidebar">
-<a href="dashboard.html" class="sidebar-logo">Bac<span>·</span>Général</a>
-<nav class="sidebar-nav">
-<a href="dashboard.html" class="sidebar-link">📊 Dashboard</a>
-<a href="fiches.html" class="sidebar-link active">📋 Fiches</a>
-</nav>
-</aside>
+    <aside class="sidebar">
+      <span class="sidebar-logo">Bac<span>·</span>Général <span class="admin-badge">Admin</span></span>
+
+      <nav class="sidebar-nav">
+        <span class="sidebar-section">Contenu</span>
+        <a href="dashboard.html" class="sidebar-link">
+          <span class="icon">📊</span> Vue d'ensemble
+        </a>
+        <a href="fiches.html" class="sidebar-link active">
+          <span class="icon">📋</span> Fiches de cours
+        </a>
+        <a href="qcm.html" class="sidebar-link">
+          <span class="icon">🎯</span> QCM
+        </a>
+        <a href="annales.html" class="sidebar-link">
+          <span class="icon">📝</span> Annales
+        </a>
+        <a href="ressources.html" class="sidebar-link">
+          <span class="icon">🎬</span> Ressources
+        </a>
+
+        <span class="sidebar-section">Utilisateurs</span>
+        <a href="users.html" class="sidebar-link">
+          <span class="icon">👥</span> Élèves
+        </a>
+        <a href="stats.html" class="sidebar-link">
+          <span class="icon">📈</span> Statistiques
+        </a>
+
+        <span class="sidebar-section">Compte</span>
+        <a href="../../index.html" class="sidebar-link">
+          <span class="icon">🌐</span> Voir le site
+        </a>
+        <a href="#" class="sidebar-link" id="btn-logout">
+          <span class="icon">🚪</span> Déconnexion
+        </a>
+      </nav>
+    </aside>
 
 <main class="main-content">
 <div class="page-header">
@@ -133,6 +164,11 @@ console.log(pub.data.publicUrl);
 });
 
 loadFiches();
+
+document.getElementById('btn-logout')?.addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  window.location.href = '../../pages/login.html';
+});
 </script>
 </body>
 </html>

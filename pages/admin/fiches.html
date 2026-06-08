@@ -1,33 +1,94 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestion des fiches - Admin</title>
-<link rel="stylesheet" href="../../css/style.css">
-<style>
-.form-card,.table-card{background:#fff;border:1px solid #e5e5e5;border-radius:20px;padding:24px;margin-bottom:24px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px}
-label{display:block;margin:12px 0 6px;font-weight:600}
-.btn{background:#d65a0a;color:#fff;border:none;padding:12px 18px;border-radius:999px;cursor:pointer}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;border-bottom:1px solid #eee;text-align:left}
-.danger{background:#c62828;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
-.view{background:#111;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des fiches - Admin</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <style>
+    .form-card,
+    .table-card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 12px
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 600
+    }
+
+    .btn {
+      background: #d65a0a;
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 999px;
+      cursor: pointer
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left
+    }
+
+    .danger {
+      background: #c62828;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer
+    }
+
+    .view {
+      background: #111;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none
+    }
+  </style>
 </head>
+
 <body>
-<div class="dashboard">
+  <div class="dashboard">
+    <!-- SIDEBAR ADMIN -->
     <aside class="sidebar">
       <span class="sidebar-logo">Bac<span>·</span>Général <span class="admin-badge">Admin</span></span>
 
       <nav class="sidebar-nav">
         <span class="sidebar-section">Contenu</span>
-        <a href="dashboard.html" class="sidebar-link">
+        <a href="dashboard.html" class="sidebar-link active">
           <span class="icon">📊</span> Vue d'ensemble
         </a>
-        <a href="fiches.html" class="sidebar-link active">
+        <a href="fiches.html" class="sidebar-link">
           <span class="icon">📋</span> Fiches de cours
         </a>
         <a href="qcm.html" class="sidebar-link">
@@ -58,117 +119,186 @@ th,td{padding:12px;border-bottom:1px solid #eee;text-align:left}
       </nav>
     </aside>
 
-<main class="main-content">
-<div class="page-header">
-<h1>Gestion des fiches PDF</h1>
-<p>Ajout et gestion des cours.</p>
-</div>
+    <!-- MAIN -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Tableau de bord Admin</h1>
+        <p>Gère le contenu et les utilisateurs de Bac-Général</p>
+      </div>
 
-<div class="form-card">
-<h2>Ajouter une fiche</h2>
-<div class="grid">
-<div>
-<label>Titre du chapitre</label>
-<input id="titre">
-<label>Matière</label>
-<select id="matiere">
-<option>Mathématiques</option>
-<option>Physique-Chimie</option>
-<option>SVT</option>
-<option>Français</option>
-<option>Histoire-Géographie</option>
-<option>Philosophie</option>
-<option>SES</option>
-<option>Langues</option>
-</select>
-<label>Niveau</label>
-<select id="niveau">
-<option>Seconde</option>
-<option>Première</option>
-<option>Terminale</option>
-</select>
-</div>
-<div>
-<label>Résumé</label>
-<textarea id="resume" rows="6"></textarea>
-<label>PDF</label>
-<input type="file" id="pdf" accept=".pdf">
-</div>
-</div>
-<br>
-<button class="btn" id="publishBtn">Publier la fiche</button>
-<div id="msg"></div>
-</div>
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Élèves inscrits</div>
+          <div class="stat-value" id="stat-users">—</div>
+          <div class="stat-sub">comptes actifs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fiches publiées</div>
+          <div class="stat-value" id="stat-fiches">—</div>
+          <div class="stat-sub">toutes matières</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">QCM publiés</div>
+          <div class="stat-value" id="stat-qcm">—</div>
+          <div class="stat-sub">exercices en ligne</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Annales</div>
+          <div class="stat-value" id="stat-annales">—</div>
+          <div class="stat-sub">sujets corrigés</div>
+        </div>
+      </div>
 
-<div class="table-card">
-<h2>Fiches publiées</h2>
-<table>
-<thead><tr><th>Titre</th><th>Matière</th><th>Niveau</th><th>Actions</th></tr></thead>
-<tbody id="fichesBody"></tbody>
-</table>
-</div>
-</main>
-</div>
+      <!-- DERNIERS INSCRITS -->
+      <div class="section-actions">
+        <span class="admin-section-title">Derniers inscrits</span>
+        <a href="users.html" style="font-size:0.875rem; color:var(--accent); font-weight:500;">Voir tous →</a>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Inscrit le</th>
+              <th>Rôle</th>
+            </tr>
+          </thead>
+          <tbody id="users-table">
+            <tr>
+              <td colspan="4" style="color:var(--muted); text-align:center; padding:2rem;">Chargement…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="../../js/supabase-config.js"></script>
-<script>
-async function loadFiches(){
- const {data,error}=await supabaseClient.from('fiches').select('*').order('created_at',{ascending:false});
- const body=document.getElementById('fichesBody');
- if(error){body.innerHTML='<tr><td colspan="4">'+error.message+'</td></tr>';return;}
- body.innerHTML=data.map(f=>`
+      <!-- ACTIONS RAPIDES -->
+      <div class="section-actions">
+        <span class="admin-section-title">Actions rapides</span>
+      </div>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="fiches.html?action=new" class="btn-add">+ Nouvelle fiche</a>
+        <a href="qcm.html?action=new" class="btn-add" style="background:var(--ink);">+ Nouveau QCM</a>
+        <a href="annales.html?action=new" class="btn-add" style="background:#2a6e2a;">+ Publier une annale</a>
+        <a href="ressources.html?action=new" class="btn-add" style="background:#1565c0;">+ Ajouter une ressource</a>
+      </div>
+    </main>
+  </div>
+
+  <div class="form-card">
+    <h2>Ajouter une fiche</h2>
+    <div class="grid">
+      <div>
+        <label>Titre du chapitre</label>
+        <input id="titre">
+        <label>Matière</label>
+        <select id="matiere">
+          <option>Mathématiques</option>
+          <option>Physique-Chimie</option>
+          <option>SVT</option>
+          <option>Français</option>
+          <option>Histoire-Géographie</option>
+          <option>Philosophie</option>
+          <option>SES</option>
+          <option>Langues</option>
+        </select>
+        <label>Niveau</label>
+        <select id="niveau">
+          <option>Seconde</option>
+          <option>Première</option>
+          <option>Terminale</option>
+        </select>
+      </div>
+      <div>
+        <label>Résumé</label>
+        <textarea id="resume" rows="6"></textarea>
+        <label>PDF</label>
+        <input type="file" id="pdf" accept=".pdf">
+      </div>
+    </div>
+    <br>
+    <button class="btn" id="publishBtn">Publier la fiche</button>
+    <div id="msg"></div>
+  </div>
+
+  <div class="table-card">
+    <h2>Fiches publiées</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Matière</th>
+          <th>Niveau</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="fichesBody"></tbody>
+    </table>
+  </div>
+  </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../../js/supabase-config.js"></script>
+  <script>
+    async function loadFiches() {
+      const { data, error } = await supabaseClient.from('fiches').select('*').order('created_at', { ascending: false });
+      const body = document.getElementById('fichesBody');
+      if (error) { body.innerHTML = '<tr><td colspan="4">' + error.message + '</td></tr>'; return; }
+      body.innerHTML = data.map(f => `
  <tr>
- <td>${f.titre||''}</td>
- <td>${f.matiere||''}</td>
- <td>${f.niveau||''}</td>
+ <td>${f.titre || ''}</td>
+ <td>${f.matiere || ''}</td>
+ <td>${f.niveau || ''}</td>
  <td>
- ${f.pdf_url?`<a class="view" target="_blank" href="${f.pdf_url}">PDF</a>`:''}
+ ${f.pdf_url ? `<a class="view" target="_blank" href="${f.pdf_url}">PDF</a>` : ''}
  <button class="danger" onclick="deleteFiche('${f.id}')">Supprimer</button>
  </td>
  </tr>`).join('');
-}
+    }
 
-async function deleteFiche(id){
- if(!confirm('Supprimer cette fiche ?')) return;
- await supabaseClient.from('fiches').delete().eq('id',id);
- loadFiches();
-}
+    async function deleteFiche(id) {
+      if (!confirm('Supprimer cette fiche ?')) return;
+      await supabaseClient.from('fiches').delete().eq('id', id);
+      loadFiches();
+    }
 
-document.getElementById('publishBtn').addEventListener('click', async ()=>{
- const titre=document.getElementById('titre').value.trim();
- const matiere=document.getElementById('matiere').value;
- const niveau=document.getElementById('niveau').value;
- const resume=document.getElementById('resume').value.trim();
- const file=document.getElementById('pdf').files[0];
- if(!titre||!file){alert('Titre et PDF requis');return;}
+    document.getElementById('publishBtn').addEventListener('click', async () => {
+      const titre = document.getElementById('titre').value.trim();
+      const matiere = document.getElementById('matiere').value;
+      const niveau = document.getElementById('niveau').value;
+      const resume = document.getElementById('resume').value.trim();
+      const file = document.getElementById('pdf').files[0];
+      if (!titre || !file) { alert('Titre et PDF requis'); return; }
 
- const fileName=Date.now()+'-'+file.name;
+      const fileName = Date.now() + '-' + file.name;
 
- const upload=await supabaseClient.storage.from('cours').upload(fileName,file);
- if(upload.error){alert(upload.error.message);return;}
+      const upload = await supabaseClient.storage.from('cours').upload(fileName, file);
+      if (upload.error) { alert(upload.error.message); return; }
 
- const pub = supabaseClient.storage
-.from('cours')
-.getPublicUrl(fileName);
+      const pub = supabaseClient.storage
+        .from('cours')
+        .getPublicUrl(fileName);
 
-console.log(pub.data.publicUrl);
- const ins=await supabaseClient.from('fiches').insert({
-   titre,matiere,niveau,resume,pdf_url:pub.data.publicUrl,publiee:true
- });
+      console.log(pub.data.publicUrl);
+      const ins = await supabaseClient.from('fiches').insert({
+        titre, matiere, niveau, resume, pdf_url: pub.data.publicUrl, publiee: true
+      });
 
- if(ins.error){alert(ins.error.message);return;}
+      if (ins.error) { alert(ins.error.message); return; }
 
- document.getElementById('msg').innerHTML='<p style="color:green">Fiche publiée.</p>';
- loadFiches();
-});
+      document.getElementById('msg').innerHTML = '<p style="color:green">Fiche publiée.</p>';
+      loadFiches();
+    });
 
-loadFiches();
+    loadFiches();
 
-document.getElementById('btn-logout')?.addEventListener('click', async () => {
-  await supabaseClient.auth.signOut();
-  window.location.href = '../../pages/login.html';
-});
-</script>
+    document.getElementById('btn-logout')?.addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../../pages/login.html';
+    });
+  </script>
 </body>
+
 </html>

@@ -184,29 +184,30 @@
 
       try {
 
-        const { count: qcmCount } =
+        const { data: results } =
           await supabaseClient
-            .from('qcm')
-            .select('*', {
-              count: 'exact',
-              head: true
-            });
+            .from('qcm_results')
+            .select('score, total')
+            .eq('user_id', user.id);
 
-        document.getElementById('stat-qcm').textContent =
-          qcmCount || 0;
+        const count = results?.length || 0;
+        document.getElementById('stat-qcm').textContent = count;
 
-        document.getElementById('stat-score').textContent =
-          '0%';
+        if (count > 0) {
+          const avgScore = Math.round(
+            results.reduce((sum, r) => sum + (r.score / r.total) * 100, 0) / count
+          );
+          document.getElementById('stat-score').textContent = avgScore + '%';
+        } else {
+          document.getElementById('stat-score').textContent = '—';
+        }
 
       } catch (err) {
 
         console.error(err);
 
-        document.getElementById('stat-qcm').textContent =
-          '0';
-
-        document.getElementById('stat-score').textContent =
-          '0%';
+        document.getElementById('stat-qcm').textContent = '0';
+        document.getElementById('stat-score').textContent = '—';
       }
 
     })();

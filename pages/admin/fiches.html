@@ -79,16 +79,15 @@
 
 <body>
   <div class="dashboard">
-    <!-- SIDEBAR ADMIN -->
     <aside class="sidebar">
       <span class="sidebar-logo">Bac<span>·</span>Général <span class="admin-badge">Admin</span></span>
 
       <nav class="sidebar-nav">
         <span class="sidebar-section">Contenu</span>
-        <a href="dashboard.html" class="sidebar-link active">
+        <a href="dashboard.html" class="sidebar-link">
           <span class="icon">📊</span> Vue d'ensemble
         </a>
-        <a href="fiches.html" class="sidebar-link">
+        <a href="fiches.html" class="sidebar-link active">
           <span class="icon">📋</span> Fiches de cours
         </a>
         <a href="qcm.html" class="sidebar-link">
@@ -119,124 +118,63 @@
       </nav>
     </aside>
 
-    <!-- MAIN -->
     <main class="main-content">
       <div class="page-header">
-        <h1>Tableau de bord Admin</h1>
-        <p>Gère le contenu et les utilisateurs de Bac-Général</p>
+        <h1>Gestion des fiches PDF</h1>
+        <p>Ajout et gestion des cours.</p>
       </div>
 
-      <!-- STATS -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Élèves inscrits</div>
-          <div class="stat-value" id="stat-users">—</div>
-          <div class="stat-sub">comptes actifs</div>
+      <div class="form-card">
+        <h2>Ajouter une fiche</h2>
+        <div class="grid">
+          <div>
+            <label>Titre du chapitre</label>
+            <input id="titre">
+            <label>Matière</label>
+            <select id="matiere">
+              <option>Mathématiques</option>
+              <option>Physique-Chimie</option>
+              <option>SVT</option>
+              <option>Français</option>
+              <option>Histoire-Géographie</option>
+              <option>Philosophie</option>
+              <option>SES</option>
+              <option>Langues</option>
+            </select>
+            <label>Niveau</label>
+            <select id="niveau">
+              <option>Seconde</option>
+              <option>Première</option>
+              <option>Terminale</option>
+            </select>
+          </div>
+          <div>
+            <label>Résumé</label>
+            <textarea id="resume" rows="6"></textarea>
+            <label>PDF</label>
+            <input type="file" id="pdf" accept=".pdf">
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Fiches publiées</div>
-          <div class="stat-value" id="stat-fiches">—</div>
-          <div class="stat-sub">toutes matières</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">QCM publiés</div>
-          <div class="stat-value" id="stat-qcm">—</div>
-          <div class="stat-sub">exercices en ligne</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Annales</div>
-          <div class="stat-value" id="stat-annales">—</div>
-          <div class="stat-sub">sujets corrigés</div>
-        </div>
+        <br>
+        <button class="btn" id="publishBtn">Publier la fiche</button>
+        <div id="msg"></div>
       </div>
 
-      <!-- DERNIERS INSCRITS -->
-      <div class="section-actions">
-        <span class="admin-section-title">Derniers inscrits</span>
-        <a href="users.html" style="font-size:0.875rem; color:var(--accent); font-weight:500;">Voir tous →</a>
-      </div>
-      <div class="table-wrapper">
+      <div class="table-card">
+        <h2>Fiches publiées</h2>
         <table>
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Email</th>
-              <th>Inscrit le</th>
-              <th>Rôle</th>
+              <th>Titre</th>
+              <th>Matière</th>
+              <th>Niveau</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="users-table">
-            <tr>
-              <td colspan="4" style="color:var(--muted); text-align:center; padding:2rem;">Chargement…</td>
-            </tr>
-          </tbody>
+          <tbody id="fichesBody"></tbody>
         </table>
       </div>
-
-      <!-- ACTIONS RAPIDES -->
-      <div class="section-actions">
-        <span class="admin-section-title">Actions rapides</span>
-      </div>
-      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <a href="fiches.html?action=new" class="btn-add">+ Nouvelle fiche</a>
-        <a href="qcm.html?action=new" class="btn-add" style="background:var(--ink);">+ Nouveau QCM</a>
-        <a href="annales.html?action=new" class="btn-add" style="background:#2a6e2a;">+ Publier une annale</a>
-        <a href="ressources.html?action=new" class="btn-add" style="background:#1565c0;">+ Ajouter une ressource</a>
-      </div>
     </main>
-  </div>
-
-  <div class="form-card">
-    <h2>Ajouter une fiche</h2>
-    <div class="grid">
-      <div>
-        <label>Titre du chapitre</label>
-        <input id="titre">
-        <label>Matière</label>
-        <select id="matiere">
-          <option>Mathématiques</option>
-          <option>Physique-Chimie</option>
-          <option>SVT</option>
-          <option>Français</option>
-          <option>Histoire-Géographie</option>
-          <option>Philosophie</option>
-          <option>SES</option>
-          <option>Langues</option>
-        </select>
-        <label>Niveau</label>
-        <select id="niveau">
-          <option>Seconde</option>
-          <option>Première</option>
-          <option>Terminale</option>
-        </select>
-      </div>
-      <div>
-        <label>Résumé</label>
-        <textarea id="resume" rows="6"></textarea>
-        <label>PDF</label>
-        <input type="file" id="pdf" accept=".pdf">
-      </div>
-    </div>
-    <br>
-    <button class="btn" id="publishBtn">Publier la fiche</button>
-    <div id="msg"></div>
-  </div>
-
-  <div class="table-card">
-    <h2>Fiches publiées</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Titre</th>
-          <th>Matière</th>
-          <th>Niveau</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="fichesBody"></tbody>
-    </table>
-  </div>
-  </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>

@@ -75,53 +75,53 @@
       <p>Des ressources pour chaque discipline du bac général</p>
     </div>
     <div class="matieres-grid">
-      <a href="pages/fiches.html?matiere=maths" class="matiere-card">
+      <a href="pages/fiches.html?matiere=maths" class="matiere-card" data-matiere="Mathématiques">
         <span class="matiere-icon">📐</span>
         <h3>Mathématiques</h3>
         <p>Analyse, algèbre, probabilités</p>
-        <span class="matiere-count">120 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=physique" class="matiere-card">
+      <a href="pages/fiches.html?matiere=physique" class="matiere-card" data-matiere="Physique-Chimie">
         <span class="matiere-icon">⚛️</span>
         <h3>Physique-Chimie</h3>
         <p>Mécanique, thermodynamique, chimie</p>
-        <span class="matiere-count">95 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=svt" class="matiere-card">
+      <a href="pages/fiches.html?matiere=svt" class="matiere-card" data-matiere="SVT">
         <span class="matiere-icon">🧬</span>
         <h3>SVT</h3>
         <p>Génétique, évolution, écologie</p>
-        <span class="matiere-count">88 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=francais" class="matiere-card">
+      <a href="pages/fiches.html?matiere=francais" class="matiere-card" data-matiere="Français">
         <span class="matiere-icon">📖</span>
         <h3>Français</h3>
         <p>Littérature, grammaire, oral</p>
-        <span class="matiere-count">72 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=histoire" class="matiere-card">
+      <a href="pages/fiches.html?matiere=histoire" class="matiere-card" data-matiere="Histoire-Géographie">
         <span class="matiere-icon">🏛️</span>
         <h3>Histoire-Géo</h3>
         <p>Périodes, espaces, enjeux</p>
-        <span class="matiere-count">110 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=philo" class="matiere-card">
+      <a href="pages/fiches.html?matiere=philo" class="matiere-card" data-matiere="Philosophie">
         <span class="matiere-icon">🦉</span>
         <h3>Philosophie</h3>
         <p>Auteurs, notions, méthodes</p>
-        <span class="matiere-count">64 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=ses" class="matiere-card">
+      <a href="pages/fiches.html?matiere=ses" class="matiere-card" data-matiere="SES">
         <span class="matiere-icon">📊</span>
         <h3>SES</h3>
         <p>Économie, sociologie, science politique</p>
-        <span class="matiere-count">80 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
-      <a href="pages/fiches.html?matiere=langues" class="matiere-card">
+      <a href="pages/fiches.html?matiere=langues" class="matiere-card" data-matiere="Langues">
         <span class="matiere-icon">🌍</span>
         <h3>Langues</h3>
         <p>Anglais, espagnol, allemand</p>
-        <span class="matiere-count">55 fiches</span>
+        <span class="matiere-count">…</span>
       </a>
     </div>
   </section>
@@ -171,5 +171,33 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+  (async () => {
+    const { data, error } = await supabaseClient
+      .from('fiches')
+      .select('matiere')
+      .eq('publiee', true);
+
+    if (error || !data) return;
+
+    // Compter par matière
+    const counts = {};
+    data.forEach(f => { counts[f.matiere] = (counts[f.matiere] || 0) + 1; });
+
+    // Mettre à jour chaque carte
+    document.querySelectorAll('.matiere-card[data-matiere]').forEach(card => {
+      const matiere = card.dataset.matiere;
+      const n = counts[matiere] || 0;
+      card.querySelector('.matiere-count').textContent = n + (n > 1 ? ' fiches' : ' fiche');
+    });
+
+    // Mettre à jour le total "500+ fiches"
+    const total = data.length;
+    const totalEl = document.querySelector('.stat strong');
+    if (totalEl && total > 0) totalEl.textContent = total + '+';
+  })();
+  </script>
 </body>
 </html>

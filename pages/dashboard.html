@@ -111,25 +111,7 @@
         Accès rapide
       </h2>
 
-      <div class="matieres-grid" style="max-width:none;">
-
-        <a href="fiches.html?matiere=maths" class="matiere-card">
-          <span class="matiere-icon">📐</span>
-          <h3>Mathématiques</h3>
-          <p>Reprendre là où j'en étais</p>
-        </a>
-
-        <a href="fiches.html?matiere=physique" class="matiere-card">
-          <span class="matiere-icon">⚛️</span>
-          <h3>Physique-Chimie</h3>
-          <p>Reprendre là où j'en étais</p>
-        </a>
-
-        <a href="fiches.html?matiere=francais" class="matiere-card">
-          <span class="matiere-icon">📖</span>
-          <h3>Français</h3>
-          <p>Reprendre là où j'en étais</p>
-        </a>
+      <div class="matieres-grid" style="max-width:none;" id="matieres-grid">
 
         <a href="qcm.html" class="matiere-card">
           <span class="matiere-icon">🎯</span>
@@ -215,11 +197,52 @@
     document
       .getElementById('btn-logout')
       .addEventListener('click', async (e) => {
-
         e.preventDefault();
         await signOut();
-
       });
+
+    // ── Matières dynamiques
+    const MATIERES_CONFIG = {
+      'Mathématiques':     { icon: '📐', slug: 'maths' },
+      'Physique-Chimie':   { icon: '⚛️', slug: 'physique' },
+      'SVT':               { icon: '🧬', slug: 'svt' },
+      'Français':          { icon: '📖', slug: 'francais' },
+      'Histoire-Géographie': { icon: '🏛️', slug: 'histoire' },
+      'Philosophie':       { icon: '🦉', slug: 'philo' },
+      'SES':               { icon: '📊', slug: 'ses' },
+      'Langues':           { icon: '🌍', slug: 'langues' },
+    };
+
+    (async () => {
+      const { data } = await supabaseClient
+        .from('fiches')
+        .select('matiere')
+        .eq('publiee', true);
+
+      if (!data) return;
+
+      const counts = {};
+      data.forEach(f => { counts[f.matiere] = (counts[f.matiere] || 0) + 1; });
+
+      const grid = document.getElementById('matieres-grid');
+      const qcmCard = grid.querySelector('a[href="qcm.html"]');
+
+      Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([matiere, count]) => {
+          const cfg = MATIERES_CONFIG[matiere] || { icon: '📚', slug: encodeURIComponent(matiere) };
+          const card = document.createElement('a');
+          card.href = `fiches.html?matiere=${cfg.slug}`;
+          card.className = 'matiere-card';
+          card.innerHTML = `
+            <span class="matiere-icon">${cfg.icon}</span>
+            <h3>${matiere}</h3>
+            <p>Reprendre là où j'en étais</p>
+            <span class="matiere-count">${count} fiche${count > 1 ? 's' : ''}</span>
+          `;
+          grid.insertBefore(card, qcmCard);
+        });
+    })();
   </script>
 
 </body>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion des QCM — Admin</title>
+<link rel="stylesheet" href="../../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+.admin-badge{background:var(--accent);color:#fff;font-size:.7rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;letter-spacing:.05em;text-transform:uppercase;margin-left:.5rem}
+.form-card,.table-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem}
+.form-card h2,.table-card h2{font-family:var(--font-display);font-size:1.15rem;margin-bottom:1.2rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+label{display:block;margin:.75rem 0 .3rem;font-weight:600;font-size:.875rem}
+input,select,textarea{width:100%;padding:.65rem 1rem;border:1px solid var(--border);border-radius:10px;font-family:var(--font-body);font-size:.875rem;background:var(--white)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.btn{background:var(--accent);color:#fff;border:none;padding:.65rem 1.4rem;border-radius:999px;font-family:var(--font-body);font-weight:600;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--accent-hover)}
+.btn-secondary{background:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+th{background:#faf5ef;text-align:left;padding:.75rem 1rem;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:.8rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper)}
+.btn-sm{border:none;border-radius:8px;padding:.3rem .7rem;font-size:.8rem;font-weight:600;cursor:pointer;font-family:var(--font-body)}
+.btn-del{background:#fdecea;color:#c62828}
+.btn-edit{background:#f0f0f0;color:#333}
+.badge-publie{background:#e6f4ea;color:#2a6e2a;font-size:.75rem;font-weight:600;padding:.2rem .6rem;border-radius:100px}
+.badge-brouillon{background:#f5f5f5;color:#666;font-size:.75rem;font-weight:600;padding:.2rem .6rem;border-radius:100px}
+
+/* Questions builder */
+.questions-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:1rem}
+.question-block{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.question-block h4{font-size:.875rem;font-weight:700;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem}
+.option-row{display:flex;align-items:center;gap:.5rem}
+.option-row input[type="radio"]{width:auto;flex-shrink:0}
+.option-row input[type="text"]{flex:1}
+.btn-add-q{background:var(--paper);border:1px dashed var(--border);color:var(--muted);border-radius:10px;padding:.6rem;width:100%;cursor:pointer;font-family:var(--font-body);font-weight:600;transition:.15s}
+.btn-add-q:hover{border-color:var(--accent);color:var(--accent)}
+.remove-q{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem}
+
+/* Aperçu KaTeX */
+.math-field-wrap{position:relative}
+.math-preview{min-height:2rem;padding:.4rem .75rem;background:#f0f4ff;border:1px solid #c7d4f7;border-radius:8px;font-size:.875rem;margin-top:.25rem;display:none;line-height:1.6}
+.math-preview.active{display:block}
+.math-hint{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.math-hint code{background:#f0f0f0;padding:.1rem .3rem;border-radius:4px;font-size:.7rem}
+
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:#fff;padding:.75rem 1.25rem;border-radius:12px;font-size:.875rem;font-weight:500;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:2000}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:#2a6e2a}
+.toast.error{background:#c62828}
+.empty{text-align:center;padding:2.5rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="dashboard">
+  <aside class="sidebar">
+    <span class="sidebar-logo">Bac<span>·</span>Général <span class="admin-badge">Admin</span></span>
+    <nav class="sidebar-nav">
+      <span class="sidebar-section">Contenu</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Vue d'ensemble</a>
+      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
+      <a href="qcm.html" class="sidebar-link active"><span class="icon">🎯</span> QCM</a>
+      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
+      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+      <span class="sidebar-section">Utilisateurs</span>
+      <a href="users.html" class="sidebar-link"><span class="icon">👥</span> Élèves</a>
+      <a href="stats.html" class="sidebar-link"><span class="icon">📈</span> Statistiques</a>
+      <span class="sidebar-section">Compte</span>
+      <a href="../../index.html" class="sidebar-link"><span class="icon">🌐</span> Voir le site</a>
+      <a href="#" class="sidebar-link" id="btn-logout"><span class="icon">🚪</span> Déconnexion</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Gestion des QCM</h1>
+      <p>Créer et gérer les exercices à choix multiples</p>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <div class="form-card">
+      <h2 id="form-title">Nouveau QCM</h2>
+      <input type="hidden" id="edit-id">
+      <div class="grid">
+        <div>
+          <label>Titre</label>
+          <input id="titre" placeholder="Ex : Les fonctions dérivées">
+          <label>Matière</label>
+          <select id="matiere">
+            <option>Mathématiques</option>
+            <option>Physique-Chimie</option>
+            <option>SVT</option>
+            <option>Français</option>
+            <option>Histoire-Géographie</option>
+            <option>Philosophie</option>
+            <option>SES</option>
+            <option>Langues</option>
+          </select>
+          <label>Publié</label>
+          <select id="publie">
+            <option value="true">Oui</option>
+            <option value="false">Non (brouillon)</option>
+          </select>
+          <!-- Aide LaTeX -->
+          <div style="margin-top:1.25rem;background:#faf5ef;border:1px solid var(--border);border-radius:10px;padding:.85rem">
+            <p style="font-size:.8rem;font-weight:700;margin-bottom:.5rem">💡 Formules mathématiques</p>
+            <p style="font-size:.75rem;color:var(--muted);line-height:1.5">
+              Entoure les formules avec <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$…$</code> pour du LaTeX inline.<br>
+              Un aperçu s'affiche en temps réel sous chaque champ.
+            </p>
+            <p style="font-size:.74rem;color:var(--muted);margin-top:.5rem;line-height:1.7">
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$x^2$</code> → x²<br>
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$\frac{a}{b}$</code> → fraction<br>
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$\sqrt{x}$</code> → racine<br>
+              <code style="background:#fff;padding:.1rem .3rem;border-radius:4px">$\vec{AB}$</code> → vecteur
+            </p>
+          </div>
+        </div>
+        <div>
+          <!-- Questions builder -->
+          <label>Questions <span style="font-weight:400;color:var(--muted)">(min. 1)</span></label>
+          <div class="questions-list" id="questions-list"></div>
+          <button class="btn-add-q" id="btn-add-q">+ Ajouter une question</button>
+        </div>
+      </div>
+      <br>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">
+        <button class="btn" id="btn-save">Publier le QCM</button>
+        <button class="btn btn-secondary" id="btn-reset" style="display:none">Annuler l'édition</button>
+      </div>
+      <div id="msg" style="margin-top:.75rem;font-size:.875rem"></div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <h2>QCM publiés</h2>
+      <table>
+        <thead><tr><th>Titre</th><th>Matière</th><th>Questions</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="qcm-body"><tr><td colspan="5" class="empty">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../../js/supabase-config.js"></script>
+<script>
+let questionCount = 0;
+
+// ── Auth guard
+(async () => {
+  const user = await requireAdmin();
+  if (!user) return;
+  addQuestion();
+  loadQcm();
+})();
+
+// ── Toast
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Rendu KaTeX dans un élément preview
+function renderPreview(text, previewEl) {
+  if (!text.includes('$')) { previewEl.classList.remove('active'); return; }
+  previewEl.classList.add('active');
+  try {
+    previewEl.innerHTML = '';
+    // Rendu inline : remplacer $...$ par du KaTeX
+    const parts = text.split(/(\$[^$]+\$)/g);
+    parts.forEach(part => {
+      if (part.startsWith('$') && part.endsWith('$')) {
+        const span = document.createElement('span');
+        try {
+          katex.render(part.slice(1, -1), span, { throwOnError: false });
+        } catch(e) {
+          span.textContent = part;
+        }
+        previewEl.appendChild(span);
+      } else {
+        previewEl.appendChild(document.createTextNode(part));
+      }
+    });
+  } catch(e) {
+    previewEl.textContent = text;
+  }
+}
+
+// ── Attacher aperçu KaTeX à un input
+function attachMathPreview(input, previewEl) {
+  input.addEventListener('input', () => renderPreview(input.value, previewEl));
+}
+
+// ── Question builder
+function addQuestion(data = {}) {
+  questionCount++;
+  const idx = questionCount;
+  const opts = data.options || ['', '', '', ''];
+  const correct = data.correct_index ?? 0;
+
+  const block = document.createElement('div');
+  block.className = 'question-block';
+  block.dataset.idx = idx;
+  block.innerHTML = `
+    <h4>Question ${idx} <button class="remove-q" onclick="this.closest('.question-block').remove()">✕</button></h4>
+    <div class="math-field-wrap">
+      <input placeholder="Énoncé — utilisez $…$ pour les maths" class="q-text" value="${escHtml(data.question||'')}">
+      <div class="math-preview"></div>
+    </div>
+    <div class="options-grid" style="margin-top:.6rem">
+      ${opts.map((o, i) => `
+        <div class="option-row">
+          <input type="radio" name="correct-${idx}" value="${i}" ${i === correct ? 'checked' : ''}>
+          <div class="math-field-wrap" style="flex:1">
+            <input type="text" class="q-opt" placeholder="Option ${i+1}" value="${escHtml(o)}">
+            <div class="math-preview"></div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <label style="margin-top:.6rem">Explication <span style="font-weight:400;color:var(--muted)">(optionnelle)</span></label>
+    <div class="math-field-wrap">
+      <input placeholder="Explication — $…$ pour les maths" class="q-expl" value="${escHtml(data.explication||'')}">
+      <div class="math-preview"></div>
+    </div>
+  `;
+
+  document.getElementById('questions-list').appendChild(block);
+
+  // Attacher les aperçus KaTeX
+  const inputs = block.querySelectorAll('.math-field-wrap');
+  inputs.forEach(wrap => {
+    const inp = wrap.querySelector('input');
+    const prev = wrap.querySelector('.math-preview');
+    attachMathPreview(inp, prev);
+    // Déclencher si déjà une valeur (édition)
+    if (inp.value) renderPreview(inp.value, prev);
+  });
+}
+
+function escHtml(s) { return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+document.getElementById('btn-add-q').addEventListener('click', () => addQuestion());
+
+// ── Collect questions
+function collectQuestions() {
+  const blocks = document.querySelectorAll('.question-block');
+  const questions = [];
+  for (const b of blocks) {
+    const question = b.querySelector('.q-text').value.trim();
+    const opts = [...b.querySelectorAll('.q-opt')].map(i => i.value.trim());
+    const correct_index = parseInt(b.querySelector('input[type="radio"]:checked')?.value ?? 0);
+    const explication = b.querySelector('.q-expl').value.trim();
+    if (!question) continue;
+    questions.push({ question, options: opts, correct_index, explication });
+  }
+  return questions;
+}
+
+// ── Save
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const titre = document.getElementById('titre').value.trim();
+  const matiere = document.getElementById('matiere').value;
+  const publie = document.getElementById('publie').value === 'true';
+  const questions = collectQuestions();
+  const editId = document.getElementById('edit-id').value;
+
+  if (!titre) { toast('Titre requis', 'error'); return; }
+  if (!questions.length) { toast('Ajoute au moins une question', 'error'); return; }
+
+  const payload = { titre, matiere, questions, publie };
+  let error;
+
+  if (editId) {
+    ({ error } = await supabaseClient.from('qcm').update(payload).eq('id', editId));
+  } else {
+    ({ error } = await supabaseClient.from('qcm').insert(payload));
+  }
+
+  if (error) { toast(error.message, 'error'); return; }
+  toast(editId ? '✅ QCM mis à jour' : '✅ QCM publié');
+  resetForm();
+  loadQcm();
+});
+
+// ── Reset form
+function resetForm() {
+  document.getElementById('titre').value = '';
+  document.getElementById('publie').value = 'true';
+  document.getElementById('edit-id').value = '';
+  document.getElementById('questions-list').innerHTML = '';
+  document.getElementById('form-title').textContent = 'Nouveau QCM';
+  document.getElementById('btn-save').textContent = 'Publier le QCM';
+  document.getElementById('btn-reset').style.display = 'none';
+  questionCount = 0;
+  addQuestion();
+}
+document.getElementById('btn-reset').addEventListener('click', resetForm);
+
+// ── Load table
+async function loadQcm() {
+  const { data, error } = await supabaseClient.from('qcm').select('*').order('created_at', { ascending: false });
+  const body = document.getElementById('qcm-body');
+  if (error) { body.innerHTML = `<tr><td colspan="5" class="empty">${error.message}</td></tr>`; return; }
+  if (!data.length) { body.innerHTML = '<tr><td colspan="5" class="empty">Aucun QCM pour le moment.</td></tr>'; return; }
+  body.innerHTML = data.map(q => `
+    <tr>
+      <td><strong>${q.titre}</strong></td>
+      <td>${q.matiere}</td>
+      <td>${(q.questions||[]).length} question(s)</td>
+      <td>${q.publie ? '<span class="badge-publie">Publié</span>' : '<span class="badge-brouillon">Brouillon</span>'}</td>
+      <td style="display:flex;gap:.4rem">
+        <button class="btn-sm btn-edit" onclick="editQcm('${q.id}')">✏️ Modifier</button>
+        <button class="btn-sm btn-del" onclick="deleteQcm('${q.id}')">🗑️ Supprimer</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── Edit
+async function editQcm(id) {
+  const { data } = await supabaseClient.from('qcm').select('*').eq('id', id).single();
+  if (!data) return;
+  document.getElementById('edit-id').value = data.id;
+  document.getElementById('titre').value = data.titre;
+  document.getElementById('matiere').value = data.matiere;
+  document.getElementById('publie').value = String(data.publie);
+  document.getElementById('questions-list').innerHTML = '';
+  questionCount = 0;
+  (data.questions || []).forEach(q => addQuestion(q));
+  document.getElementById('form-title').textContent = 'Modifier le QCM';
+  document.getElementById('btn-save').textContent = 'Enregistrer';
+  document.getElementById('btn-reset').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Delete
+async function deleteQcm(id) {
+  if (!confirm('Supprimer ce QCM ?')) return;
+  const { error } = await supabaseClient.from('qcm').delete().eq('id', id);
+  if (error) { toast(error.message, 'error'); return; }
+  toast('🗑️ QCM supprimé');
+  loadQcm();
+}
+
+document.getElementById('btn-logout').addEventListener('click', e => { e.preventDefault(); signOut(); });
+</script>
+</body>
+</html>

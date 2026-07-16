@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM — Bac-Général</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<style>
+.main-content { padding: 40px; }
+.page-header { margin-bottom: 40px; }
+.page-header h1 { font-size: 3rem; margin-bottom: 10px; }
+.page-header p { color: var(--muted); }
+
+/* ── Liste des QCM ── */
+#view-list { display: block; }
+#view-quiz { display: none; }
+#view-result { display: none; }
+
+.qcm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.qcm-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  cursor: pointer;
+  transition: .25s;
+}
+.qcm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.08);
+}
+.qcm-card .badge {
+  display: inline-block;
+  background: #f6e4d5;
+  color: var(--accent);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: .82rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.qcm-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+.qcm-card .meta {
+  color: var(--muted);
+  font-size: .85rem;
+}
+.qcm-card .start-btn {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: .55rem 1.2rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: .875rem;
+  cursor: pointer;
+  transition: background .2s;
+}
+.qcm-card .start-btn:hover { background: var(--accent-hover); }
+
+/* ── Quiz ── */
+.quiz-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.quiz-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  flex: 1;
+}
+.btn-back {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .5rem 1rem;
+  font-family: var(--font-body);
+  font-size: .875rem;
+  cursor: pointer;
+  color: var(--muted);
+  transition: .2s;
+}
+.btn-back:hover { border-color: var(--ink); color: var(--ink); }
+
+.progress-bar-wrap {
+  background: var(--border);
+  border-radius: 999px;
+  height: 6px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width .4s ease;
+}
+.progress-label {
+  font-size: .82rem;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.question-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.question-text {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.option-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--paper);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: .95rem;
+  text-align: left;
+  transition: .2s;
+  width: 100%;
+}
+.option-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #fef4ec;
+}
+.option-btn .opt-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .8rem;
+  flex-shrink: 0;
+  transition: .2s;
+}
+.option-btn.correct {
+  border-color: #2a6e2a;
+  background: #e6f4ea;
+}
+.option-btn.correct .opt-letter {
+  background: #2a6e2a;
+  color: #fff;
+}
+.option-btn.wrong {
+  border-color: #c62828;
+  background: #fdecea;
+}
+.option-btn.wrong .opt-letter {
+  background: #c62828;
+  color: #fff;
+}
+.option-btn:disabled { cursor: default; }
+
+.explication-box {
+  margin-top: 18px;
+  background: #f0f4ff;
+  border: 1px solid #c7d4f7;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: .875rem;
+  color: #2c3e7a;
+  display: none;
+}
+.explication-box.active { display: block; }
+
+.btn-next {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: .7rem 1.6rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: background .2s;
+  margin-top: 8px;
+  display: none;
+}
+.btn-next.active { display: inline-flex; }
+.btn-next:hover { background: var(--accent-hover); }
+
+/* ── Résultats ── */
+.result-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  max-width: 640px;
+  margin: 0 auto 32px;
+  text-align: center;
+}
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-family: var(--font-display);
+}
+.score-circle.good { background: #e6f4ea; border: 4px solid #2a6e2a; color: #2a6e2a; }
+.score-circle.mid  { background: #fff8e1; border: 4px solid #f59e0b; color: #b45309; }
+.score-circle.bad  { background: #fdecea; border: 4px solid #c62828; color: #c62828; }
+.score-circle .score-num { font-size: 2rem; font-weight: 900; line-height: 1; }
+.score-circle .score-sub { font-size: .75rem; font-weight: 400; }
+.result-card h2 { font-family: var(--font-display); font-size: 1.6rem; margin-bottom: 8px; }
+.result-card p { color: var(--muted); margin-bottom: 24px; }
+
+.result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-retry {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: .7rem 1.6rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-retry:hover { background: var(--accent-hover); }
+.btn-list {
+  background: none;
+  border: 2px solid var(--border);
+  padding: .7rem 1.6rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+.btn-list:hover { border-color: var(--ink); }
+
+.review-list { display: flex; flex-direction: column; gap: 16px; max-width: 720px; }
+.review-item {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+}
+.review-item .r-question {
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: .95rem;
+}
+.review-item .r-answer {
+  font-size: .875rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.r-answer.correct { background: #e6f4ea; color: #2a6e2a; }
+.r-answer.wrong   { background: #fdecea; color: #c62828; }
+.r-expl { font-size: .82rem; color: var(--muted); margin-top: 8px; }
+
+.loading { text-align: center; padding: 80px; color: var(--muted); }
+.empty   { text-align: center; padding: 60px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
+    <nav class="sidebar-nav">
+      <span class="sidebar-section">Révisions</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
+      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
+      <a href="qcm.html" class="sidebar-link active"><span class="icon">🎯</span> QCM</a>
+      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
+      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+      <span class="sidebar-section">Mon compte</span>
+      <a href="profil.html" class="sidebar-link"><span class="icon">👤</span> Mon profil</a>
+      <a href="#" class="sidebar-link" id="btn-logout"><span class="icon">🚪</span> Déconnexion</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- ── VUE LISTE ── -->
+    <div id="view-list">
+      <div class="page-header">
+        <h1>🎯 QCM</h1>
+        <p>Entraîne-toi sur les exercices disponibles.</p>
+      </div>
+      <div id="qcm-grid" class="qcm-grid loading">Chargement…</div>
+    </div>
+
+    <!-- ── VUE QUIZ ── -->
+    <div id="view-quiz">
+      <div class="quiz-header">
+        <button class="btn-back" id="btn-back-list">← Retour</button>
+        <h2 id="quiz-title"></h2>
+      </div>
+      <div class="progress-label">
+        Question <span id="q-current">1</span> sur <span id="q-total">1</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="question-card">
+        <div class="question-text" id="q-text"></div>
+        <div class="options-list" id="options-list"></div>
+        <div class="explication-box" id="explication-box"></div>
+      </div>
+      <button class="btn-next" id="btn-next">Suivant →</button>
+    </div>
+
+    <!-- ── VUE RÉSULTAT ── -->
+    <div id="view-result">
+      <div class="page-header">
+        <h1>Résultats</h1>
+      </div>
+      <div class="result-card">
+        <div class="score-circle" id="score-circle">
+          <span class="score-num" id="score-num">0/0</span>
+          <span class="score-sub">bonnes réponses</span>
+        </div>
+        <h2 id="result-title"></h2>
+        <p id="result-msg"></p>
+        <div class="result-actions">
+          <button class="btn-retry" id="btn-retry">🔁 Recommencer</button>
+          <button class="btn-list" id="btn-back-result">← Tous les QCM</button>
+        </div>
+      </div>
+      <h3 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:16px;">Détail des réponses</h3>
+      <div class="review-list" id="review-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/supabase-config.js"></script>
+<script>
+let currentQcm = null;
+let currentUser = null;
+let qIndex = 0;
+let score = 0;
+let answers = []; // { question, chosen, correct_index, options, explication }
+
+const letters = ['A','B','C','D'];
+
+// ── Init
+(async () => {
+  currentUser = await requireAuth();
+  if (!currentUser) return;
+  loadList();
+})();
+
+// ── Vues
+function show(view) {
+  ['list','quiz','result'].forEach(v =>
+    document.getElementById('view-' + v).style.display = v === view ? 'block' : 'none'
+  );
+}
+
+// ── Charger la liste
+async function loadList() {
+  const grid = document.getElementById('qcm-grid');
+  const { data, error } = await supabaseClient
+    .from('qcm').select('*').eq('publie', true).order('created_at', { ascending: false });
+
+  if (error) { grid.innerHTML = `<p class="empty">${error.message}</p>`; return; }
+  if (!data.length) { grid.innerHTML = '<p class="empty">Aucun QCM disponible pour le moment.</p>'; return; }
+
+  grid.className = 'qcm-grid';
+  grid.innerHTML = data.map(q => `
+    <div class="qcm-card">
+      <div class="badge">${q.matiere}</div>
+      <h3>${q.titre}</h3>
+      <p class="meta">${(q.questions||[]).length} question${(q.questions||[]).length > 1 ? 's' : ''}</p>
+      <button class="start-btn" onclick="startQuiz('${q.id}')">Commencer →</button>
+    </div>
+  `).join('');
+}
+
+// ── Démarrer un QCM
+async function startQuiz(id) {
+  const { data, error } = await supabaseClient.from('qcm').select('*').eq('id', id).single();
+  if (error || !data) { alert('Impossible de charger ce QCM.'); return; }
+
+  currentQcm = data;
+  qIndex = 0;
+  score = 0;
+  answers = [];
+
+  document.getElementById('quiz-title').textContent = data.titre;
+  document.getElementById('q-total').textContent = data.questions.length;
+  show('quiz');
+  renderQuestion();
+}
+
+// ── Afficher une question
+function renderQuestion() {
+  const q = currentQcm.questions[qIndex];
+  const total = currentQcm.questions.length;
+
+  document.getElementById('q-current').textContent = qIndex + 1;
+  document.getElementById('progress-fill').style.width = ((qIndex / total) * 100) + '%';
+
+  // Texte (KaTeX sera rendu automatiquement)
+  document.getElementById('q-text').textContent = q.question;
+
+  // Options
+  const list = document.getElementById('options-list');
+  list.innerHTML = q.options.map((opt, i) => `
+    <button class="option-btn" onclick="selectOption(${i})" data-index="${i}">
+      <span class="opt-letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </button>
+  `).join('');
+
+  // Réinitialiser
+  document.getElementById('explication-box').className = 'explication-box';
+  document.getElementById('explication-box').textContent = '';
+  const btnNext = document.getElementById('btn-next');
+  btnNext.className = 'btn-next';
+  btnNext.textContent = qIndex === total - 1 ? 'Voir les résultats' : 'Suivant →';
+
+  // Relancer KaTeX sur la nouvelle question
+  if (window.renderMathInElement) {
+    renderMathInElement(document.getElementById('view-quiz'), {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+    });
+  }
+}
+
+// ── Sélectionner une option
+function selectOption(chosen) {
+  const q = currentQcm.questions[qIndex];
+  const btns = document.querySelectorAll('.option-btn');
+
+  // Désactiver tous les boutons
+  btns.forEach(b => b.disabled = true);
+
+  // Colorier
+  btns[chosen].classList.add(chosen === q.correct_index ? 'correct' : 'wrong');
+  if (chosen !== q.correct_index) {
+    btns[q.correct_index].classList.add('correct');
+  }
+
+  if (chosen === q.correct_index) score++;
+
+  // Explication
+  if (q.explication) {
+    const box = document.getElementById('explication-box');
+    box.textContent = '💡 ' + q.explication;
+    box.className = 'explication-box active';
+  }
+
+  // Mémoriser
+  answers.push({ question: q.question, chosen, correct_index: q.correct_index, options: q.options, explication: q.explication });
+
+  // Bouton suivant
+  document.getElementById('btn-next').className = 'btn-next active';
+}
+
+// ── Suivant
+document.getElementById('btn-next').addEventListener('click', () => {
+  qIndex++;
+  if (qIndex < currentQcm.questions.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+});
+
+// ── Résultats
+async function showResult() {
+  const total = currentQcm.questions.length;
+  const pct = Math.round((score / total) * 100);
+
+  // Cercle score
+  const circle = document.getElementById('score-circle');
+  circle.className = 'score-circle ' + (pct >= 70 ? 'good' : pct >= 40 ? 'mid' : 'bad');
+  document.getElementById('score-num').textContent = score + '/' + total;
+
+  // Message
+  document.getElementById('result-title').textContent = currentQcm.titre;
+  document.getElementById('result-msg').textContent =
+    pct >= 70 ? '🎉 Excellent travail !' :
+    pct >= 40 ? '👍 Pas mal, continue à réviser !' :
+    '💪 Ne lâche pas, relis tes fiches et réessaie !';
+
+  // Détail
+  document.getElementById('review-list').innerHTML = answers.map((a, i) => `
+    <div class="review-item">
+      <div class="r-question">Q${i+1}. ${a.question}</div>
+      <div class="r-answer ${a.chosen === a.correct_index ? 'correct' : 'wrong'}">
+        ${a.chosen === a.correct_index ? '✓' : '✗'} Ta réponse : ${a.options[a.chosen] || '—'}
+      </div>
+      ${a.chosen !== a.correct_index ? `<div class="r-answer correct">✓ Bonne réponse : ${a.options[a.correct_index]}</div>` : ''}
+      ${a.explication ? `<div class="r-expl">💡 ${a.explication}</div>` : ''}
+    </div>
+  `).join('');
+
+  show('result');
+
+  // Sauvegarder le résultat
+  if (currentUser) {
+    await saveQcmResult(currentUser.id, currentQcm.id, score, total);
+  }
+
+  if (window.renderMathInElement) {
+    renderMathInElement(document.getElementById('view-result'), {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+    });
+  }
+}
+
+// ── Navigation
+document.getElementById('btn-back-list').addEventListener('click', () => { show('list'); });
+document.getElementById('btn-back-result').addEventListener('click', () => { show('list'); });
+document.getElementById('btn-retry').addEventListener('click', () => startQuiz(currentQcm.id));
+
+document.getElementById('btn-logout').addEventListener('click', async (e) => {
+  e.preventDefault();
+  await signOut();
+});
+</script>
+</body>
+</html>

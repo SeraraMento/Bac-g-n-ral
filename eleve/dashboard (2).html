@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-admin">Admin</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">Tableau de bord <span>Administrateur</span></h1>
+  <div id="alert-box"></div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-number" id="stat-comptes">—</div><div class="stat-label">Comptes actifs</div></div>
+    <div class="stat-card success"><div class="stat-number" id="stat-eleves">—</div><div class="stat-label">Élèves</div></div>
+    <div class="stat-card info"><div class="stat-number" id="stat-profs">—</div><div class="stat-label">Professeurs</div></div>
+    <div class="stat-card warning"><div class="stat-number" id="stat-classes">—</div><div class="stat-label">Classes</div></div>
+    <div class="stat-card danger"><div class="stat-number" id="stat-disabled">—</div><div class="stat-label">Comptes désactivés</div></div>
+  </div>
+  <div class="card">
+    <h2>Derniers comptes créés</h2>
+    <div class="table-wrap">
+      <table><thead><tr><th>Identifiant</th><th>Nom</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody id="tbody-last"><tr><td colspan="5" class="loading-spinner">Chargement…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['admin'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('admin', '../');
+  loadStats();
+})();
+
+async function loadStats() {
+  const { count: total } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('disabled', false);
+  const { count: eleves } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'eleve').eq('disabled', false);
+  const { count: profs } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'prof').eq('disabled', false);
+  const { count: classes } = await supabase.from('classes').select('*', { count: 'exact', head: true });
+  const { count: disabled } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('disabled', true);
+  document.getElementById('stat-comptes').textContent = total || 0;
+  document.getElementById('stat-eleves').textContent = eleves || 0;
+  document.getElementById('stat-profs').textContent = profs || 0;
+  document.getElementById('stat-classes').textContent = classes || 0;
+  document.getElementById('stat-disabled').textContent = disabled || 0;
+  const { data: last } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(10);
+  renderLast(last || []);
+}
+
+function renderLast(list) {
+  const tbody = document.getElementById('tbody-last');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>Aucun compte</p></td></tr>'; return; }
+  tbody.innerHTML = list.map(p => '<tr><td>' + p.identifiant + '</td><td>' + p.prenom + ' ' + p.nom + '</td><td><span class="badge badge-' + p.role + '">' + (p.role === 'prof' ? 'Professeur' : p.role === 'eleve' ? 'Élève' : 'Admin') + '</span></td><td><span class="badge ' + (p.disabled ? 'badge-disabled' : 'badge-active') + '">' + (p.disabled ? 'Désactivé' : 'Actif') + '</span></td><td class="actions"><a href="gestion-comptes.html" class="btn btn-sm btn-outline">Gérer</a></td></tr>').join('');
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

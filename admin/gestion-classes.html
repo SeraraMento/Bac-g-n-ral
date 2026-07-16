@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Classes — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-admin">Admin</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">Gestion des <span>Classes</span></h1>
+  <div id="alert-box"></div>
+  <div class="card">
+    <h2>Créer une classe</h2>
+    <form id="form-classe" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+      <div class="form-group" style="margin:0;"><label>Nom</label><input type="text" id="cl-nom" class="form-control" placeholder="6ème A" required></div>
+      <div class="form-group" style="margin:0;"><label>Niveau</label><input type="text" id="cl-niveau" class="form-control" placeholder="6ème"></div>
+      <div class="form-group" style="margin:0;"><label>Année</label><input type="text" id="cl-annee" class="form-control" value="2025-2026"></div>
+      <button type="submit" class="btn btn-accent">Ajouter</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Toutes les classes</h2>
+    <div class="table-wrap">
+      <table><thead><tr><th>Nom</th><th>Niveau</th><th>Année</th><th>Élèves</th><th>Actions</th></tr></thead>
+      <tbody id="tbody-classes"><tr><td colspan="5" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Affecter des élèves aux classes</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Classe</label>
+        <select id="sel-classe" class="form-control" onchange="loadElevesOfClass()"><option value="">— Choisir —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Élève à ajouter</label>
+        <select id="sel-eleve" class="form-control"><option value="">— Choisir —</option></select>
+      </div>
+      <div style="padding-top:24px;"><button class="btn btn-accent" onclick="addEleveToClass()">Affecter</button></div>
+    </div>
+    <div id="div-classe-eleves"><div class="text-sm text-muted">Sélectionnez une classe</div></div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let allEleves = [];
+let allClasses = [];
+
+(function() {
+  if (!requireAuth(['admin'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('admin', '../');
+  loadClasses();
+  loadAllEleves();
+})();
+
+async function loadAllEleves() {
+  const { data } = await supabase.from('profiles').select('id, identifiant, nom, prenom').eq('role', 'eleve').eq('disabled', false).order('nom');
+  allEleves = data || [];
+  const sel = document.getElementById('sel-eleve');
+  allEleves.forEach(e => { const o = document.createElement('option'); o.value = e.id; o.textContent = e.prenom + ' ' + e.nom + ' (' + e.identifiant + ')'; sel.appendChild(o); });
+}
+
+async function loadClasses() {
+  const { data: classes } = await supabase.from('classes').select('*').order('nom');
+  allClasses = classes || [];
+  const sel = document.getElementById('sel-classe');
+  classes && classes.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nom; sel.appendChild(o); });
+  renderClasses(classes || []);
+}
+
+function renderClasses(classes) {
+  const tbody = document.getElementById('tbody-classes');
+  if (!classes.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">🏫</div><p>Aucune classe créée</p></td></tr>'; return; }
+  tbody.innerHTML = classes.map(c => '<tr><td><strong>' + c.nom + '</strong></td><td>' + (c.niveau || '—') + '</td><td>' + (c.annee || '2025-2026') + '</td><td id="td-count-' + c.id + '">…</td><td class="actions"><button class="btn btn-xs btn-danger" onclick="deleteClasse(\'' + c.id + '\')">Supprimer</button></td></tr>').join('');
+  classes.forEach(async c => {
+    const { count } = await supabase.from('eleve_classes').select('*', { count: 'exact', head: true }).eq('classe_id', c.id);
+    document.getElementById('td-count-' + c.id).textContent = count || 0 + ' élève(s)';
+  });
+}
+
+document.getElementById('form-classe').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const payload = { nom: document.getElementById('cl-nom').value.trim(), niveau: document.getElementById('cl-niveau').value.trim(), annee: document.getElementById('cl-annee').value.trim() || '2025-2026' };
+  try {
+    await supabase.from('classes').insert(payload);
+    showAlert('Classe créée !', 'success');
+    document.getElementById('form-classe').reset();
+    document.getElementById('cl-annee').value = '2025-2026';
+    loadClasses();
+  } catch(err) { showAlert('Erreur: ' + err.message, 'danger'); }
+});
+
+async function deleteClasse(id) {
+  if (!confirmAction('Supprimer cette classe ?')) return;
+  await supabase.from('eleve_classes').delete().eq('classe_id', id);
+  await supabase.from('classes').delete().eq('id', id);
+  showAlert('Classe supprimée', 'success');
+  loadClasses();
+}
+
+async function loadElevesOfClass() {
+  const classeId = document.getElementById('sel-classe').value;
+  const div = document.getElementById('div-classe-eleves');
+  if (!classeId) { div.innerHTML = '<div class="text-sm text-muted">Sélectionnez une classe</div>'; return; }
+  const { data: ec } = await supabase.from('eleve_classes').select('eleve_id, profiles(*)').eq('classe_id', classeId);
+  const elevesClasse = (ec || []).map(e => e.profiles).filter(Boolean);
+  if (!elevesClasse.length) { div.innerHTML = '<div class="text-sm text-muted">Aucun élève dans cette classe</div>'; return; }
+  div.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;">' + elevesClasse.map(e => '<div style="background:#f0f4f8;border-radius:6px;padding:6px 12px;font-size:.85rem;">' + e.prenom + ' ' + e.nom + ' <button style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:.9rem;" onclick="removeEleveFromClass(\'' + e.id + '\',\'' + classeId + '\')">×</button></div>').join('') + '</div>';
+}
+
+async function addEleveToClass() {
+  const classeId = document.getElementById('sel-classe').value;
+  const eleveId = document.getElementById('sel-eleve').value;
+  if (!classeId || !eleveId) { showAlert('Sélectionnez une classe et un élève', 'warning'); return; }
+  try {
+    const { error } = await supabase.from('eleve_classes').insert({ eleve_id: eleveId, classe_id: classeId });
+    if (error && error.code !== '23505') throw error;
+    showAlert('Élève affecté à la classe !', 'success');
+    loadElevesOfClass();
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+
+async function removeEleveFromClass(eleveId, classeId) {
+  await supabase.from('eleve_classes').delete().eq('eleve_id', eleveId).eq('classe_id', classeId);
+  showAlert('Élève retiré de la classe', 'success');
+  loadElevesOfClass();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

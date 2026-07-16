@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge">Professeur</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <div class="flex-between mb-16">
+    <h1 class="page-title">Gestion <span>QCM</span></h1>
+    <button class="btn btn-accent" onclick="openCreateModal()">+ Nouveau QCM</button>
+  </div>
+  <div id="alert-box"></div>
+  <div id="qcms-list"><div class="loading-spinner">Chargement…</div></div>
+</main>
+
+<!-- MODAL CREATE QCM -->
+<div class="modal-overlay hidden" id="modal-create">
+  <div class="modal">
+    <div class="modal-header">Créer un QCM <button class="close-btn" onclick="closeCreateModal()">×</button></div>
+    <div class="modal-body">
+      <form id="form-qcm-base">
+        <div class="form-group"><label>Titre</label><input type="text" id="q-titre" class="form-control" required></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Matière</label>
+            <select id="q-matiere" class="form-control" required><option value="">— Choisir —</option></select>
+          </div>
+          <div class="form-group">
+            <label>Durée (minutes)</label>
+            <input type="number" id="q-duree" class="form-control" value="30" min="5" max="180">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Seuil de réussite (%)</label>
+            <input type="number" id="q-seuil" class="form-control" value="50" min="0" max="100">
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;padding-top:24px;gap:8px;">
+            <input type="checkbox" id="q-unique" checked style="width:18px;height:18px;">
+            <label for="q-unique" style="margin:0;font-weight:normal;">Une seule tentative par élève</label>
+          </div>
+        </div>
+        <div class="form-group"><label>Description</label><textarea id="q-desc" class="form-control" rows="2"></textarea></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeCreateModal()">Annuler</button>
+      <button class="btn btn-accent" onclick="saveQCMBase()">Continuer → Ajouter les questions</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADD QUESTIONS -->
+<div class="modal-overlay hidden" id="modal-questions">
+  <div class="modal" style="max-width:750px;">
+    <div class="modal-header">Ajouter les questions <button class="close-btn" onclick="closeQuestionsModal()">×</button></div>
+    <div class="modal-body">
+      <div id="questions-container"></div>
+      <button class="btn btn-outline" onclick="addQuestion()" style="margin-top:12px;">+ Ajouter une question</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeQuestionsModal()">Annuler</button>
+      <button class="btn btn-accent" onclick="saveQuestions()" id="btn-save-qcm">Enregistrer le QCM</button>
+    </div>
+  </div>
+</div>
+
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let currentQcmId = null;
+let qcmMatieres = [];
+
+(function() {
+  if (!requireAuth(['prof'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('prof', '../');
+  loadQCMs();
+  loadMatieresSelect();
+})();
+
+async function loadMatieresSelect() {
+  const profId = getUser().id;
+  const { data: pm } = await supabase.from('prof_matieres').select('matiere_id, matieres(*)').eq('prof_id', profId);
+  if (!pm) return;
+  const sel = document.getElementById('q-matiere');
+  pm.forEach(p => { if (p.matieres) { const o = document.createElement('option'); o.value = p.matieres.id; o.textContent = p.matieres.nom; sel.appendChild(o); qcmMatieres.push(p.matieres); }});
+}
+
+async function loadQCMs() {
+  const profId = getUser().id;
+  const { data: qcms } = await supabase.from('qcm').select('*, matieres(nom), qcm_questions(id)').eq('prof_id', profId).order('created_at', { ascending: false });
+  renderQCMs(qcms || []);
+}
+
+function renderQCMs(list) {
+  const div = document.getElementById('qcms-list');
+  if (!list.length) {
+    div.innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">📝</div><p>Aucun QCM créé. Cliquez sur "+ Nouveau QCM" pour commencer.</p></div></div>';
+    return;
+  }
+  let html = '';
+  list.forEach(q => {
+    html += '<div class="card"><div class="flex-between"><div><h2>' + q.titre + '</h2><span class="text-sm text-muted">' + (q.matieres ? q.matieres.nom : '—') + ' · ' + q.duree_minutes + ' min · Seuil ' + q.seuil_reussite + '% · ' + (q.qcm_questions ? q.qcm_questions.length : 0) + ' questions</span></div><div class="btn-group" style="margin:0;"><a href="notes.html?qcm=' + q.id + '" class="btn btn-sm btn-primary">Résultats</a><button class="btn btn-sm btn-danger" onclick="deleteQCM(\'' + q.id + '\')">Supprimer</button></div></div></div>';
+  });
+  div.innerHTML = html;
+}
+
+function openCreateModal() {
+  document.getElementById('modal-create').classList.remove('hidden');
+  document.getElementById('form-qcm-base').reset();
+  document.getElementById('q-unique').checked = true;
+}
+
+function closeCreateModal() { document.getElementById('modal-create').classList.add('hidden'); }
+function closeQuestionsModal() { document.getElementById('modal-questions').classList.add('hidden'); }
+
+let questionCount = 0;
+function addQuestion() {
+  questionCount++;
+  const container = document.getElementById('questions-container');
+  const qId = 'q' + questionCount;
+  const div = document.createElement('div');
+  div.className = 'qcm-question';
+  div.id = 'div-' + qId;
+  div.innerHTML = '<h3>Question ' + questionCount + '</h3><div class="form-group"><label>Question</label><textarea class="form-control" id="txt-' + qId + '" rows="2" required></textarea></div>' +
+    '<div class="form-group"><label>4 choix (cochez la bonne réponse)</label>' +
+    '<div style="display:grid;gap:8px;">' +
+    ['<div style="display:flex;align-items:center;gap:8px;"><input type="radio" name="br-' + qId + '" value="0" required> <input type="text" class="form-control" id="c0-' + qId + '" placeholder="Choix A" style="flex:1;"></div>', '<div style="display:flex;align-items:center;gap:8px;"><input type="radio" name="br-' + qId + '" value="1"> <input type="text" class="form-control" id="c1-' + qId + '" placeholder="Choix B" style="flex:1;"></div>', '<div style="display:flex;align-items:center;gap:8px;"><input type="radio" name="br-' + qId + '" value="2"> <input type="text" class="form-control" id="c2-' + qId + '" placeholder="Choix C" style="flex:1;"></div>', '<div style="display:flex;align-items:center;gap:8px;"><input type="radio" name="br-' + qId + '" value="3"> <input type="text" class="form-control" id="c3-' + qId + '" placeholder="Choix D" style="flex:1;"></div>'].join('') +
+    '</div></div><div class="form-group"><label>Points</label><input type="number" class="form-control" id="pts-' + qId + '" value="1" min="1" max="10" style="width:80px;"></div><hr style="margin:16px 0;border-color:var(--border);">';
+  container.appendChild(div);
+}
+
+async function saveQCMBase() {
+  const payload = {
+    prof_id: getUser().id,
+    matiere_id: document.getElementById('q-matiere').value,
+    titre: document.getElementById('q-titre').value.trim(),
+    description: document.getElementById('q-desc').value.trim(),
+    duree_minutes: parseInt(document.getElementById('q-duree').value) || 30,
+    seuil_reussite: parseInt(document.getElementById('q-seuil').value) || 50,
+    unique_attempt: document.getElementById('q-unique').checked
+  };
+  try {
+    const { data, error } = await supabase.from('qcm').insert(payload).select().single();
+    if (error) throw error;
+    currentQcmId = data.id;
+    closeCreateModal();
+    questionCount = 0;
+    document.getElementById('questions-container').innerHTML = '';
+    addQuestion();
+    document.getElementById('modal-questions').classList.remove('hidden');
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+
+async function saveQuestions() {
+  const questions = [];
+  for (let i = 1; i <= questionCount; i++) {
+    const qId = 'q' + i;
+    const txt = document.getElementById('txt-' + qId);
+    if (!txt || !txt.value.trim()) continue;
+    const choix = [
+      document.getElementById('c0-' + qId).value.trim(),
+      document.getElementById('c1-' + qId).value.trim(),
+      document.getElementById('c2-' + qId).value.trim(),
+      document.getElementById('c3-' + qId).value.trim()
+    ];
+    const selected = document.querySelector('input[name="br-' + qId + '"]:checked');
+    if (!selected) { showAlert('Cochez la bonne réponse pour la question ' + i, 'warning'); return; }
+    questions.push({
+      qcm_id: currentQcmId,
+      question: txt.value.trim(),
+      choix,
+      bonne_reponse: parseInt(selected.value),
+      points: parseInt(document.getElementById('pts-' + qId).value) || 1,
+      ordre: i
+    });
+  }
+  if (!questions.length) { showAlert('Ajoutez au moins une question', 'warning'); return; }
+  try {
+    await supabase.from('qcm_questions').insert(questions);
+    showAlert('QCM créé avec ' + questions.length + ' question(s) !', 'success');
+    closeQuestionsModal();
+    loadQCMs();
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+
+async function deleteQCM(id) {
+  if (!confirmAction('Supprimer ce QCM et toutes ses questions ?')) return;
+  await supabase.from('qcm_questions').delete().eq('qcm_id', id);
+  await supabase.from('qcm').delete().eq('id', id);
+  showAlert('QCM supprimé', 'success');
+  loadQCMs();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

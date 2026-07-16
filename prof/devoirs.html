@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devoirs — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge">Professeur</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <div class="flex-between mb-16">
+    <h1 class="page-title">Mes <span>Devoirs</span></h1>
+    <button class="btn btn-accent" onclick="openModal()">+ Nouveau devoir</button>
+  </div>
+  <div id="alert-box"></div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Titre</th><th>Matière</th><th>Date limite</th><th>Fichiers</th><th>Actions</th></tr></thead>
+        <tbody id="tbody-devoirs"><tr><td colspan="5" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL CREATE / EDIT DEVOIR -->
+<div class="modal-overlay hidden" id="modal-devoir">
+  <div class="modal">
+    <div class="modal-header">Nouveau devoir <button class="close-btn" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <form id="form-devoir">
+        <input type="hidden" id="devoir-id">
+        <div class="form-group">
+          <label for="d-titre">Titre</label>
+          <input type="text" id="d-titre" class="form-control" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="d-matiere">Matière</label>
+            <select id="d-matiere" class="form-control" required><option value="">— Choisir —</option></select>
+          </div>
+          <div class="form-group">
+            <label for="d-date">Date limite</label>
+            <input type="datetime-local" id="d-date" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="d-desc">Description</label>
+          <textarea id="d-desc" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Joindre des fichiers (optionnel)</label>
+          <input type="file" id="d-files" class="form-control" multiple accept=".pdf,.doc,.docx,.png,.jpg,.zip">
+          <small class="form-hint">PDF, DOC, images, ZIP (max 10 Mo par fichier)</small>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-accent" onclick="saveDevoir()" id="btn-save-devoir">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['prof'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('prof', '../');
+  loadMatieresSelect();
+  loadDevoirs();
+})();
+
+let allMatieres = [];
+
+async function loadMatieresSelect() {
+  const profId = getUser().id;
+  const { data: pm } = await supabase.from('prof_matieres').select('matiere_id, matieres(*)').eq('prof_id', profId);
+  if (!pm) return;
+  const sel = document.getElementById('d-matiere');
+  pm.forEach(p => {
+    if (p.matieres) {
+      const o = document.createElement('option');
+      o.value = p.matieres.id;
+      o.textContent = p.matieres.nom;
+      sel.appendChild(o);
+      allMatieres.push(p.matieres);
+    }
+  });
+}
+
+async function loadDevoirs() {
+  const profId = getUser().id;
+  const { data: devoirs } = await supabase.from('devoirs').select('*, matieres(nom), devoir_fichiers(id)').eq('prof_id', profId).order('created_at', { ascending: false });
+  renderDevoirs(devoirs || []);
+}
+
+function renderDevoirs(list) {
+  const tbody = document.getElementById('tbody-devoirs');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">📚</div><p>Aucun devoir créé</p></td></tr>'; return; }
+  tbody.innerHTML = list.map(d => '<tr><td><strong>' + d.titre + '</strong>' + (d.description ? '<br><span class="text-sm text-muted">' + d.description + '</span>' : '') + '</td><td>' + (d.matieres ? d.matieres.nom : '—') + '</td><td>' + formatDate(d.date_limite) + '</td><td>' + (d.devoir_fichiers && d.devoir_fichiers.length ? '<span class="badge badge-info">' + d.devoir_fichiers.length + ' fichier(s)</span>' : '—') + '</td><td class="actions"><button class="btn btn-sm btn-primary" onclick="editDevoir(\'' + d.id + '\')">Modifier</button><button class="btn btn-sm btn-danger" onclick="deleteDevoir(\'' + d.id + '\')">Supprimer</button></td></tr>').join('');
+}
+
+function openModal(devoir) {
+  document.getElementById('modal-devoir').classList.remove('hidden');
+  if (devoir) {
+    document.getElementById('devoir-id').value = devoir.id;
+    document.getElementById('d-titre').value = devoir.titre || '';
+    document.getElementById('d-matiere').value = devoir.matiere_id || '';
+    document.getElementById('d-date').value = devoir.date_limite ? devoir.date_limite.slice(0, 16) : '';
+    document.getElementById('d-desc').value = devoir.description || '';
+  } else {
+    document.getElementById('form-devoir').reset();
+    document.getElementById('devoir-id').value = '';
+  }
+}
+
+function closeModal() { document.getElementById('modal-devoir').classList.add('hidden'); }
+
+async function saveDevoir() {
+  const btn = document.getElementById('btn-save-devoir');
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement…';
+  const profId = getUser().id;
+  const payload = {
+    prof_id: profId,
+    matiere_id: document.getElementById('d-matiere').value,
+    titre: document.getElementById('d-titre').value.trim(),
+    description: document.getElementById('d-desc').value.trim(),
+    date_limite: document.getElementById('d-date').value || null
+  };
+  const id = document.getElementById('devoir-id').value;
+  try {
+    let devoirId = id;
+    if (id) {
+      await supabase.from('devoirs').update(payload).eq('id', id);
+    } else {
+      const { data: newD } = await supabase.from('devoirs').insert(payload).select().single();
+      if (newD) devoirId = newD.id;
+    }
+
+    // Upload files if any
+    const files = document.getElementById('d-files').files;
+    if (files.length && devoirId) {
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        const path = 'devoirs/' + devoirId + '/' + f.name;
+        const { error: upErr } = await supabase.storage.from('devoirs_fichiers').upload(path, f);
+        if (!upErr) {
+          const { data: urlData } = supabase.storage.from('devoirs_fichiers').getPublicUrl(path);
+          await supabase.from('devoir_fichiers').insert({
+            devoir_id: devoirId, nom_fichier: f.name, url: urlData.publicUrl, taille: f.size, type_mime: f.type
+          });
+        }
+      }
+    }
+    showAlert(id ? 'Devoir modifié !' : 'Devoir créé !', 'success');
+    closeModal();
+    loadDevoirs();
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+  btn.disabled = false;
+  btn.textContent = 'Enregistrer';
+}
+
+async function editDevoir(id) {
+  const { data: d } = await supabase.from('devoirs').select('*').eq('id', id).single();
+  if (d) openModal(d);
+}
+
+async function deleteDevoir(id) {
+  if (!confirmAction('Supprimer ce devoir ?')) return;
+  await supabase.from('devoirs').delete().eq('id', id);
+  showAlert('Devoir supprimé', 'success');
+  loadDevoirs();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

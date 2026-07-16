@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Notes — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-eleve">Élève</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">📊 Mes <span>Notes</span></h1>
+  <div id="alert-box"></div>
+  <div class="card">
+    <div class="flex-between mb-16">
+      <h2>Toutes mes notes</h2>
+      <div>
+        <select id="filter-matiere" class="form-control" style="width:auto;display:inline-block;" onchange="renderNotes()">
+          <option value="">Toutes matières</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Matière</th><th>Titre</th><th>Note</th><th>%</th><th>Remarque</th></tr></thead>
+        <tbody id="tbody-notes"><tr><td colspan="6" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+    <div id="div-moyenne" style="margin-top:20px;text-align:center;font-size:1.2rem;font-weight:700;"></div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let allNotes = [];
+
+(function() {
+  if (!requireAuth(['eleve'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('eleve', '../');
+  loadNotes();
+})();
+
+async function loadNotes() {
+  const eleveId = getUser().id;
+  const { data: notes } = await supabase.from('notes').select('*, matieres(id, nom)').eq('eleve_id', eleveId).order('created_at', { ascending: false });
+  allNotes = notes || [];
+
+  // Fill matiere filter
+  const matieres = [...new Map((notes || []).map(n => [n.matieres ? n.matieres.id : null, n.matieres]).filter(([k]) => k).values()).values()];
+  const sel = document.getElementById('filter-matiere');
+  matieres.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nom; sel.appendChild(o); });
+
+  renderNotes();
+}
+
+function renderNotes() {
+  const filter = document.getElementById('filter-matiere').value;
+  const list = filter ? allNotes.filter(n => n.matieres && n.matieres.id === filter) : allNotes;
+  const tbody = document.getElementById('tbody-notes');
+
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-icon">📊</div><p>Aucune note</p></td></tr>';
+    document.getElementById('div-moyenne').innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  list.forEach(n => {
+    const pct = Math.round((parseFloat(n.valeur) / parseFloat(n.bareme || 20)) * 100);
+    html += '<tr><td>' + formatDate(n.created_at) + '</td><td>' + (n.matieres ? n.matieres.nom : '—') + '</td><td>' + n.titre + '</td><td><strong style="color:' + (pct >= 50 ? 'var(--success)' : 'var(--danger)') + ';">' + n.valeur + '/' + n.bareme + '</strong></td><td>' + pct + '%</td><td class="text-sm text-muted">' + (n.remarque || '—') + '</td></tr>';
+  });
+  tbody.innerHTML = html;
+
+  // Moyenne
+  const moy = allNotes.reduce((s, n) => s + parseFloat(n.valeur), 0) / allNotes.length;
+  const moyPct = Math.round((moy / 20) * 100);
+  document.getElementById('div-moyenne').innerHTML = '📊 Moyenne générale : <span style="color:' + (moy >= 10 ? 'var(--success)' : 'var(--danger)') + ';">' + moy.toFixed(2) + '/20</span> (' + moyPct + '%) — <span class="text-sm text-muted">' + allNotes.length + ' note(s)</span>';
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

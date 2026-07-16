@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Matières — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge">Professeur</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <div class="flex-between mb-16">
+    <h1 class="page-title">Mes <span>Matières</span></h1>
+  </div>
+  <div id="alert-box"></div>
+  <div class="card">
+    <h2>Matières enseignées</h2>
+    <div id="div-matieres"><div class="loading-spinner">Chargement…</div></div>
+  </div>
+  <div class="card">
+    <h2>Toutes les matières (assignation)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nom</th><th>Couleur</th><th>Actions</th></tr></thead>
+        <tbody id="tbody-all-matieres"><tr><td colspan="3" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['prof'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('prof', '../');
+  loadMatieres();
+})();
+
+async function loadMatieres() {
+  const profId = getUser().id;
+  const { data: mesMatieres } = await supabase.from('prof_matieres').select('*, matieres(*), classes(*)').eq('prof_id', profId);
+  const { data: allMatieres } = await supabase.from('matieres').select('*').order('nom');
+  const { data: classes } = await supabase.from('classes').select('*').order('nom');
+
+  const div = document.getElementById('div-matieres');
+  if (!mesMatieres || !mesMatieres.length) {
+    div.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div><p>Aucune matière assignée. Demandez à un administrateur de vous assigner des matières.</p></div>';
+  } else {
+    let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">';
+    mesMatieres.forEach(mm => {
+      html += '<div style="background:#f8f9fa;border-radius:8px;padding:16px;border-left:4px solid ' + (mm.matieres ? mm.matieres.couleur : '#3498db') + ';"><strong>' + (mm.matieres ? mm.matieres.nom : '—') + '</strong><br><span class="text-sm text-muted">' + (mm.classes ? mm.classes.nom : 'Toutes classes') + '</span></div>';
+    });
+    html += '</div>';
+    div.innerHTML = html;
+  }
+
+  const tbody = document.getElementById('tbody-all-matieres');
+  if (!allMatieres || !allMatieres.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><p>Aucune matière disponible</p></td></tr>'; return; }
+  tbody.innerHTML = allMatieres.map(m => {
+    const assigned = mesMatieres && mesMatieres.some(mm => mm.matiere_id === m.id);
+    return '<tr><td><span style="display:inline-block;width:14px;height:14px;background:' + m.couleur + ';border-radius:50%;vertical-align:middle;margin-right:8px;"></span>' + m.nom + '</td><td>' + m.couleur + '</td><td class="actions">' + (assigned ? '<span class="badge badge-active">Assignée</span>' : '<span class="badge badge-pending">Non assignée</span>') + '</td></tr>';
+  }).join('');
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

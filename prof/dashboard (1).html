@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Élève — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-eleve">Élève</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">Bienvenue, <span id="welcome-name"></span> 👋</h1>
+  <div id="alert-box"></div>
+  <div class="stats-grid">
+    <div class="stat-card success"><div class="stat-number" id="stat-devoirs">—</div><div class="stat-label">Devoirs en cours</div></div>
+    <div class="stat-card info"><div class="stat-number" id="stat-qcm">—</div><div class="stat-label">QCM disponibles</div></div>
+    <div class="stat-card warning"><div class="stat-number" id="stat-msgs">—</div><div class="stat-label">Messages non lus</div></div>
+    <div class="stat-card"><div class="stat-number" id="stat-moyenne">—</div><div class="stat-label">Moyenne /20</div></div>
+  </div>
+  <div class="card">
+    <h2>📚 Devoirs à faire</h2>
+    <div id="div-devoirs"><div class="loading-spinner">Chargement…</div></div>
+  </div>
+  <div class="card">
+    <h2>📝 QCM disponibles</h2>
+    <div id="div-qcms"><div class="loading-spinner">Chargement…</div></div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['eleve'])) return;
+  const user = getUser();
+  document.getElementById('user-name').textContent = user.prenom + ' ' + user.nom;
+  document.getElementById('welcome-name').textContent = user.prenom;
+  buildNavbar('eleve', '../');
+  loadDashboard();
+})();
+
+async function loadDashboard() {
+  try {
+    const eleveId = getUser().id;
+
+    // Get classes of this eleve
+    const { data: ec } = await supabase.from('eleve_classes').select('classe_id').eq('eleve_id', eleveId);
+    const classeIds = (ec || []).map(e => e.classe_id);
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Devoirs for this eleve's classes
+    let devCount = 0, devHtml = '';
+    if (classeIds.length) {
+      const { data: devoirList } = await supabase.from('devoirs').select('*, matieres(nom)').in('classe_id', classeIds.length ? classeIds : ['__none__']).gte('date_limite', today).order('date_limite').limit(5);
+      devCount = devoirList ? devoirList.length : 0;
+      if (devoirList && devoirList.length) {
+        devHtml = '<div class="table-wrap"><table><thead><tr><th>Titre</th><th>Matière</th><th>Date limite</th></tr></thead><tbody>';
+        devoirList.forEach(d => { devHtml += '<tr><td><strong>' + d.titre + '</strong></td><td>' + (d.matieres ? d.matieres.nom : '—') + '</td><td>' + formatDate(d.date_limite) + '</td></tr>'; });
+        devHtml += '</tbody></table></div>';
+      }
+    }
+    document.getElementById('stat-devoirs').textContent = devCount || 0;
+    document.getElementById('div-devoirs').innerHTML = devCount ? devHtml : '<div class="empty-state"><div class="empty-icon">📚</div><p>Aucun devoir en cours</p></div>';
+
+    // QCM available
+    const { data: qcms } = await supabase.from('qcm').select('*, matieres(nom)').order('created_at', { ascending: false }).limit(5);
+    let qcmHtml = '';
+    if (qcms && qcms.length) {
+      qcmHtml = '<div class="table-wrap"><table><thead><tr><th>Titre</th><th>Matière</th><th>Actions</th></tr></thead><tbody>';
+      qcms.forEach(q => { qcmHtml += '<tr><td><strong>' + q.titre + '</strong></td><td>' + (q.matieres ? q.matieres.nom : '—') + '</td><td><a href="qcm.html?id=' + q.id + '" class="btn btn-sm btn-accent">Passer le QCM</a></td></tr>'; });
+      qcmHtml += '</tbody></table></div>';
+    }
+    document.getElementById('stat-qcm').textContent = qcms ? qcms.length : 0;
+    document.getElementById('div-qcms').innerHTML = qcms && qcms.length ? qcmHtml : '<div class="empty-state"><div class="empty-icon">📝</div><p>Aucun QCM disponible</p></div>';
+
+    // Messages non lus
+    const { count: unRead } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('eleve_id', eleveId).eq('lu', false);
+    document.getElementById('stat-msgs').textContent = unRead || 0;
+
+    // Moyenne générale
+    const { data: notes } = await supabase.from('notes').select('valeur').eq('eleve_id', eleveId);
+    if (notes && notes.length) {
+      const moy = (notes.reduce((s, n) => s + parseFloat(n.valeur), 0) / notes.length).toFixed(1);
+      document.getElementById('stat-moyenne').textContent = moy;
+    }
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

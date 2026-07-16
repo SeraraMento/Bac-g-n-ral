@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professeur — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info">
+    <span id="user-name"></span>
+    <span class="badge" id="user-role"></span>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+</header>
+<main>
+  <h1 class="page-title">Bienvenue, <span id="welcome-name"></span> 👋</h1>
+  <div id="alert-box"></div>
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-number" id="stat-matieres">—</div><div class="stat-label">Matières</div></div>
+    <div class="stat-card success"><div class="stat-number" id="stat-devoirs">—</div><div class="stat-label">Devoirs créés</div></div>
+    <div class="stat-card info"><div class="stat-number" id="stat-qcm">—</div><div class="stat-label">QCM créés</div></div>
+    <div class="stat-card warning"><div class="stat-number" id="stat-messages">—</div><div class="stat-label">Messages</div></div>
+  </div>
+  <div class="card">
+    <h2>Devoirs récents</h2>
+    <div class="table-wrap">
+      <table id="table-devoirs">
+        <thead><tr><th>Titre</th><th>Matière</th><th>Date limite</th><th>Actions</th></tr></thead>
+        <tbody id="tbody-devoirs"><tr><td colspan="4" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Derniers QCM</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Titre</th><th>Matière</th><th>Questions</th><th>Seuil</th><th>Actions</th></tr></thead>
+        <tbody id="tbody-qcm"><tr><td colspan="5" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>© Mon École — Plateforme éducative</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['prof'])) return;
+  const user = getUser();
+  document.getElementById('user-name').textContent = user.prenom + ' ' + user.nom;
+  document.getElementById('user-role').textContent = 'Professeur';
+  document.getElementById('welcome-name').textContent = user.prenom;
+  buildNavbar('prof', '../');
+  loadDashboard();
+})();
+
+async function loadDashboard() {
+  try {
+    const profId = getUser().id;
+    const { count: matCount } = await supabase.from('prof_matieres').select('*', { count: 'exact', head: true }).eq('prof_id', profId);
+    const { count: devCount } = await supabase.from('devoirs').select('*', { count: 'exact', head: true }).eq('prof_id', profId);
+    const { count: qcmCount } = await supabase.from('qcm').select('*', { count: 'exact', head: true }).eq('prof_id', profId);
+    const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('prof_id', profId);
+    document.getElementById('stat-matieres').textContent = matCount || 0;
+    document.getElementById('stat-devoirs').textContent = devCount || 0;
+    document.getElementById('stat-qcm').textContent = qcmCount || 0;
+    document.getElementById('stat-messages').textContent = msgCount || 0;
+
+    const { data: devoirs } = await supabase.from('devoirs').select('*, matieres(nom)').eq('prof_id', profId).order('created_at', { ascending: false }).limit(5);
+    renderDevoirs(devoirs || []);
+
+    const { data: qcms } = await supabase.from('qcm').select('*, matieres(nom), qcm_questions(id)').eq('prof_id', profId).order('created_at', { ascending: false }).limit(5);
+    renderQCM(qcms || []);
+  } catch(e) { showAlert('Erreur chargement: ' + e.message, 'danger'); }
+}
+
+function renderDevoirs(list) {
+  const tbody = document.getElementById('tbody-devoirs');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-icon">📚</div><p>Aucun devoir</p></td></tr>'; return; }
+  tbody.innerHTML = list.map(d => '<tr><td>' + d.titre + '</td><td>' + (d.matieres ? d.matieres.nom : '—') + '</td><td>' + formatDate(d.date_limite) + '</td><td class="actions"><a href="devoirs.html" class="btn btn-sm btn-outline">Gérer</a></td></tr>').join('');
+}
+
+function renderQCM(list) {
+  const tbody = document.getElementById('tbody-qcm');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">📝</div><p>Aucun QCM</p></td></tr>'; return; }
+  tbody.innerHTML = list.map(q => '<tr><td>' + q.titre + '</td><td>' + (q.matieres ? q.matieres.nom : '—') + '</td><td>' + (q.qcm_questions ? q.qcm_questions.length : 0) + '</td><td>' + q.seuil_reussite + '%</td><td class="actions"><a href="qcm.html" class="btn btn-sm btn-outline">Gérer</a><a href="notes.html" class="btn btn-sm btn-primary">Résultats</a></td></tr>').join('');
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

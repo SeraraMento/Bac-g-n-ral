@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge">Professeur</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">Notes & <span>Résultats QCM</span></h1>
+  <div id="alert-box"></div>
+  <div class="tabs" id="notes-tabs">
+    <button class="tab-btn active" onclick="switchTab('notes')">📊 Saisie de notes</button>
+    <button class="tab-btn" onclick="switchTab('resultats')">📝 Résultats QCM</button>
+  </div>
+  <div id="tab-notes" class="tab-content active">
+    <div class="card">
+      <h2>Attribuer une note</h2>
+      <form id="form-note">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Matière</label>
+            <select id="note-matiere" class="form-control" required><option value="">— Choisir —</option></select>
+          </div>
+          <div class="form-group">
+            <label>Élève</label>
+            <select id="note-eleve" class="form-control" required><option value="">— Choisir —</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Titre de l'évaluation</label>
+            <input type="text" id="note-titre" class="form-control" placeholder="Contrôle Chapitre 3" required>
+          </div>
+          <div class="form-group">
+            <label>Note (/20)</label>
+            <input type="number" id="note-valeur" class="form-control" step="0.5" min="0" max="20" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Remarque (optionnel)</label>
+          <input type="text" id="note-remark" class="form-control" placeholder="Commentaire...">
+        </div>
+        <button type="submit" class="btn btn-accent">Enregistrer la note</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Dernières notes attribuées</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Élève</th><th>Matière</th><th>Titre</th><th>Note</th><th>Actions</th></tr></thead>
+          <tbody id="tbody-notes"><tr><td colspan="5" class="loading-spinner">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="tab-resultats" class="tab-content">
+    <div class="form-group mb-16">
+      <label>Sélectionner un QCM</label>
+      <select id="select-qcm-result" class="form-control" onchange="loadQcmResults()"><option value="">— Choisir un QCM —</option></select>
+    </div>
+    <div id="div-qcm-results"></div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let eleves = [];
+
+(function() {
+  if (!requireAuth(['prof'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('prof', '../');
+  loadMatieresSelect();
+  loadQcmSelect();
+  loadNotes();
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('qcm')) { switchTab('resultats'); document.getElementById('select-qcm-result').value = params.get('qcm'); loadQcmResults(); }
+})();
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+async function loadMatieresSelect() {
+  const profId = getUser().id;
+  const { data: pm } = await supabase.from('prof_matieres').select('matiere_id, matieres(*)').eq('prof_id', profId);
+  const sel = document.getElementById('note-matiere');
+  if (!pm) return;
+  pm.forEach(p => { if (p.matieres) { const o = document.createElement('option'); o.value = p.matieres.id; o.textContent = p.matieres.nom; sel.appendChild(o); }});
+
+  // Load eleves from all classes the prof teaches
+  const { data: classes } = await supabase.from('classes').select('id').order('nom');
+  if (!classes) return;
+  const { data: ecList } = await supabase.from('eleve_classes').select('eleve_id, profiles(*)').in('classe_id', classes.map(c => c.id));
+  eleves = (ecList || []).map(ec => ec.profiles).filter(Boolean);
+  const selE = document.getElementById('note-eleve');
+  eleves.forEach(e => { const o = document.createElement('option'); o.value = e.id; o.textContent = e.prenom + ' ' + e.nom; selE.appendChild(o); });
+}
+
+async function loadQcmSelect() {
+  const profId = getUser().id;
+  const { data: qcms } = await supabase.from('qcm').select('id, titre, matieres(nom)').eq('prof_id', profId).order('created_at', { ascending: false });
+  const sel = document.getElementById('select-qcm-result');
+  if (!qcms) return;
+  qcms.forEach(q => { const o = document.createElement('option'); o.value = q.id; o.textContent = q.titre + ' (' + (q.matieres ? q.matieres.nom : '') + ')'; sel.appendChild(o); });
+}
+
+async function loadNotes() {
+  const profId = getUser().id;
+  const { data: notes } = await supabase.from('notes').select('*, matieres(nom), profiles!notes_eleve_id_fkey(nom, prenom)').eq('prof_id', profId).order('created_at', { ascending: false }).limit(20);
+  const tbody = document.getElementById('tbody-notes');
+  if (!notes || !notes.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">📊</div><p>Aucune note attribuée</p></td></tr>'; return; }
+  tbody.innerHTML = notes.map(n => '<tr><td>' + (n.profiles ? n.profiles.prenom + ' ' + n.profiles.nom : '—') + '</td><td>' + (n.matieres ? n.matieres.nom : '—') + '</td><td>' + n.titre + '</td><td><strong>' + n.valeur + '/20</strong></td><td class="actions"><button class="btn btn-xs btn-danger" onclick="deleteNote(\'' + n.id + '\')">×</button></td></tr>').join('');
+}
+
+document.getElementById('form-note').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const profId = getUser().id;
+  const payload = { prof_id: profId, matiere_id: document.getElementById('note-matiere').value, eleve_id: document.getElementById('note-eleve').value, titre: document.getElementById('note-titre').value.trim(), valeur: parseFloat(document.getElementById('note-valeur').value), remarque: document.getElementById('note-remark').value.trim() };
+  try {
+    await supabase.from('notes').insert(payload);
+    showAlert('Note enregistrée !', 'success');
+    document.getElementById('form-note').reset();
+    loadNotes();
+  } catch(err) { showAlert('Erreur: ' + err.message, 'danger'); }
+});
+
+async function deleteNote(id) {
+  if (!confirmAction('Supprimer cette note ?')) return;
+  await supabase.from('notes').delete().eq('id', id);
+  showAlert('Note supprimée', 'success');
+  loadNotes();
+}
+
+async function loadQcmResults() {
+  const qcmId = document.getElementById('select-qcm-result').value;
+  const div = document.getElementById('div-qcm-results');
+  if (!qcmId) { div.innerHTML = ''; return; }
+  const { data: res } = await supabase.from('qcm_resultats').select('*, profiles(nom, prenom)').eq('qcm_id', qcmId).order('pourcentage', { ascending: false });
+  if (!res || !res.length) { div.innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">📝</div><p>Aucun élève n\'a encore passé ce QCM.</p></div></div>'; return; }
+  let html = '<div class="card"><h2>Résultats — ' + res.length + ' élève(s)</h2><div class="table-wrap"><table><thead><tr><th>Élève</th><th>Score</th><th>%</th><th>/20</th><th>Temps</th><th>Date</th></tr></thead><tbody>';
+  res.forEach(r => { html += '<tr><td>' + (r.profiles ? r.profiles.prenom + ' ' + r.profiles.nom : '—') + '</td><td>' + r.score + '/' + r.score_max + '</td><td><span class="' + (r.pourcentage >= 50 ? 'text-success' : 'text-danger') + '">' + r.pourcentage + '%</span></td><td>' + r.note_sur_20 + '</td><td>' + Math.floor((r.temps_secondes || 0) / 60) + 'min</td><td>' + formatDateTime(r.completed_at) + '</td></tr>'; });
+  html += '</tbody></table></div></div>';
+  div.innerHTML = html;
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

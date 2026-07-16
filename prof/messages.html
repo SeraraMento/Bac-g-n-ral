@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge">Professeur</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <div class="flex-between mb-16">
+    <h1 class="page-title">✉️ <span>Messages</span></h1>
+    <button class="btn btn-accent" onclick="openModal()">+ Nouveau message</button>
+  </div>
+  <div id="alert-box"></div>
+  <div class="card">
+    <h2>Messages envoyés</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Objet</th><th>Destinataire</th><th>Actions</th></tr></thead>
+        <tbody id="tbody-msgs"><tr><td colspan="4" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay hidden" id="modal-msg">
+  <div class="modal">
+    <div class="modal-header">Nouveau message <button class="close-btn" onclick="closeModal()">×</button></div>
+    <div class="modal-body">
+      <form id="form-msg">
+        <div class="form-group">
+          <label>Envoyer à</label>
+          <select id="msg-type" class="form-control" onchange="updateDestSelect()" required>
+            <option value="">— Choisir —</option>
+            <option value="classe">Une classe entière</option>
+            <option value="eleve">Un élève</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label id="lbl-dest">Classe / Élève</label>
+          <select id="msg-dest" class="form-control" required><option value="">— Choisir —</option></select>
+        </div>
+        <div class="form-group"><label>Objet</label><input type="text" id="msg-obj" class="form-control" placeholder="Objet du message"></div>
+        <div class="form-group"><label>Message</label><textarea id="msg-contenu" class="form-control" rows="5" required></textarea></div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-accent" onclick="sendMessage()">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let allClasses = [];
+let allEleves = [];
+
+(function() {
+  if (!requireAuth(['prof'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('prof', '../');
+  loadMessages();
+  loadDestData();
+})();
+
+async function loadDestData() {
+  const { data: cl } = await supabase.from('classes').select('*').order('nom');
+  allClasses = cl || [];
+  const { data: el } = await supabase.from('profiles').select('id, nom, prenom').eq('role', 'eleve').eq('disabled', false).order('nom');
+  allEleves = el || [];
+}
+
+function updateDestSelect() {
+  const type = document.getElementById('msg-type').value;
+  const sel = document.getElementById('msg-dest');
+  const lbl = document.getElementById('lbl-dest');
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  if (type === 'classe') {
+    lbl.textContent = 'Classe';
+    allClasses.forEach(c => { const o = document.createElement('option'); o.value = 'cl:' + c.id; o.textContent = c.nom; sel.appendChild(o); });
+  } else if (type === 'eleve') {
+    lbl.textContent = 'Élève';
+    allEleves.forEach(e => { const o = document.createElement('option'); o.value = 'el:' + e.id; o.textContent = e.prenom + ' ' + e.nom; sel.appendChild(o); });
+  }
+}
+
+async function loadMessages() {
+  const profId = getUser().id;
+  const { data: msgs } = await supabase.from('messages').select('*, classes(nom), profiles(nom,prenom)').eq('prof_id', profId).order('created_at', { ascending: false }).limit(30);
+  const tbody = document.getElementById('tbody-msgs');
+  if (!msgs || !msgs.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-icon">✉️</div><p>Aucun message envoyé</p></td></tr>'; return; }
+  tbody.innerHTML = msgs.map(m => '<tr><td>' + formatDate(m.created_at) + '</td><td><strong>' + (m.objet || '(sans objet)') + '</strong><br><span class="text-sm text-muted">' + m.contenu.substring(0,60) + '…</span></td><td>' + (m.destinataire_type === 'classe' ? (m.classes ? '📚 ' + m.classes.nom : '—') : (m.profiles ? '👤 ' + m.profiles.prenom + ' ' + m.profiles.nom : '—')) + '</td><td class="actions"><button class="btn btn-xs btn-danger" onclick="deleteMsg(\'' + m.id + '\')">×</button></td></tr>').join('');
+}
+
+function openModal() { document.getElementById('modal-msg').classList.remove('hidden'); document.getElementById('form-msg').reset(); document.getElementById('msg-dest').innerHTML = '<option value="">— Choisir —</option>'; }
+function closeModal() { document.getElementById('modal-msg').classList.add('hidden'); }
+
+async function sendMessage() {
+  const type = document.getElementById('msg-type').value;
+  const destVal = document.getElementById('msg-dest').value;
+  if (!type || !destVal) { showAlert('Remplissez tous les champs', 'warning'); return; }
+  const payload = { prof_id: getUser().id, destinataire_type: type, objet: document.getElementById('msg-obj').value.trim(), contenu: document.getElementById('msg-contenu').value.trim() };
+  if (type === 'classe') payload.classe_id = destVal.replace('cl:', '');
+  else payload.eleve_id = destVal.replace('el:', '');
+  try {
+    await supabase.from('messages').insert(payload);
+    showAlert('Message envoyé !', 'success');
+    closeModal();
+    loadMessages();
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+
+async function deleteMsg(id) {
+  if (!confirmAction('Supprimer ce message ?')) return;
+  await supabase.from('messages').delete().eq('id', id);
+  showAlert('Message supprimé', 'success');
+  loadMessages();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devoirs — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-eleve">Élève</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">📚 Mes <span>Devoirs</span></h1>
+  <div id="alert-box"></div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('aFaire',this)">À faire</button>
+    <button class="tab-btn" onclick="switchTab('termines',this)">Terminés</button>
+  </div>
+  <div id="tab-aFaire"></div>
+  <div id="tab-termines" class="hidden"></div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['eleve'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('eleve', '../');
+  loadDevoirs();
+})();
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-aFaire').classList.toggle('hidden', tab !== 'aFaire');
+  document.getElementById('tab-termines').classList.toggle('hidden', tab !== 'termines');
+}
+
+async function loadDevoirs() {
+  const eleveId = getUser().id;
+  const { data: ec } = await supabase.from('eleve_classes').select('classe_id').eq('eleve_id', eleveId);
+  const classeIds = (ec || []).map(e => e.classe_id);
+  if (!classeIds.length) {
+    document.getElementById('tab-aFaire').innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">📚</div><p>Vous n\'êtes inscrit dans aucune classe.</p></div></div>';
+    return;
+  }
+  const today = new Date().toISOString();
+  const { data: devsAFaire } = await supabase.from('devoirs').select('*, matieres(nom), devoir_fichiers(*)').in('classe_id', classeIds).gte('date_limite', today.slice(0,10)).order('date_limite');
+  const { data: devsTerm } = await supabase.from('devoirs').select('*, matieres(nom), devoir_fichiers(*)').in('classe_id', classeIds).lt('date_limite', today.slice(0,10)).order('date_limite', { ascending: false }).limit(20);
+
+  const renderList = (list, emptyMsg) => {
+    if (!list || !list.length) return '<div class="card"><div class="empty-state"><div class="empty-icon">📚</div><p>' + emptyMsg + '</p></div></div>';
+    let html = '<div class="card"><div style="display:grid;gap:16px;">';
+    list.forEach(d => {
+      html += '<div style="border:1px solid var(--border);border-radius:8px;padding:16px;background:#fff;">';
+      html += '<div class="flex-between"><div><h3 style="color:var(--primary);font-size:1rem;">' + d.titre + '</h3><span class="badge badge-eleve">' + (d.matieres ? d.matieres.nom : '') + '</span> <span class="text-sm text-muted">📅 ' + formatDate(d.date_limite) + '</span></div>';
+      if (d.devoir_fichiers && d.devoir_fichiers.length) {
+        html += '<div>';
+        d.devoir_fichiers.forEach(f => { html += '<a href="' + f.url + '" target="_blank" class="btn btn-sm btn-outline" style="margin-left:4px;">📎 ' + f.nom_fichier + '</a>'; });
+        html += '</div>';
+      }
+      html += '</div>';
+      if (d.description) html += '<p class="text-sm mt-8">' + d.description + '</p>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+    return html;
+  };
+
+  document.getElementById('tab-aFaire').innerHTML = renderList(devsAFaire, 'Aucun devoir à faire ! 🎉');
+  document.getElementById('tab-termines').innerHTML = renderList(devsTerm, 'Aucun devoir terminé.');
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

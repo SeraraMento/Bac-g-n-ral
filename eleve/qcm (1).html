@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-eleve">Élève</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">📝 <span>QCM</span></h1>
+  <div id="alert-box"></div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('passer',this)" id="tab-btn-passer">Passer un QCM</button>
+    <button class="tab-btn" onclick="switchTab('resultats',this)" id="tab-btn-resultats">Mes résultats</button>
+  </div>
+  <div id="content-passer"></div>
+  <div id="content-resultats" class="hidden"></div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let currentQcm = null;
+let questions = [];
+let timer = null;
+let startTime = null;
+
+(function() {
+  if (!requireAuth(['eleve'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('eleve', '../');
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('id')) { loadQCM(params.get('id')); }
+  else { loadQCMList(); }
+  loadResults();
+})();
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('content-passer').classList.toggle('hidden', tab !== 'passer');
+  document.getElementById('content-resultats').classList.toggle('hidden', tab !== 'resultats');
+  if (btn) btn.classList.add('active');
+}
+
+async function loadQCMList() {
+  const { data: qcms } = await supabase.from('qcm').select('*, matieres(nom)').order('created_at', { ascending: false });
+  if (!qcms || !qcms.length) {
+    document.getElementById('content-passer').innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">📝</div><p>Aucun QCM disponible pour le moment.</p></div></div>';
+    return;
+  }
+  const eleveId = getUser().id;
+  let html = '<div class="card"><h2>QCM disponibles</h2><div class="table-wrap"><table><thead><tr><th>Titre</th><th>Matière</th><th>Durée</th><th>Actions</th></tr></thead><tbody>';
+  for (const q of qcms) {
+    const { data: res } = await supabase.from('qcm_resultats').select('id').eq('qcm_id', q.id).eq('eleve_id', eleveId).maybeSingle();
+    const deja = res ? '<span class="badge badge-active">✓ Passé</span>' : (q.unique_attempt ? '<span class="badge badge-pending">À faire</span>' : '<span class="badge badge-pending">À faire</span>');
+    html += '<tr><td><strong>' + q.titre + '</strong><br><span class="text-sm text-muted">' + (q.description || '') + '</span></td><td>' + (q.matieres ? q.matieres.nom : '—') + '</td><td>' + q.duree_minutes + ' min</td><td>' + (res ? '<span class="text-muted text-sm">Déjà passé</span>' : '<button class="btn btn-sm btn-accent" onclick="loadQCM(\'' + q.id + '\')">Commencer</button>') + '</td></tr>';
+  }
+  html += '</tbody></table></div></div>';
+  document.getElementById('content-passer').innerHTML = html;
+}
+
+async function loadQCM(qcmId) {
+  const { data: qcm } = await supabase.from('qcm').select('*, matieres(nom)').eq('id', qcmId).single();
+  if (!qcm) { showAlert('QCM introuvable', 'danger'); return; }
+  const { data: qs } = await supabase.from('qcm_questions').select('*').eq('qcm_id', qcmId).order('ordre');
+  if (!qs || !qs.length) { showAlert('Ce QCM n\'a pas de questions', 'danger'); return; }
+
+  // Check already passed
+  const { data: existing } = await supabase.from('qcm_resultats').select('id').eq('qcm_id', qcmId).eq('eleve_id', getUser().id).maybeSingle();
+  if (existing && qcm.unique_attempt) {
+    document.getElementById('content-passer').innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">✅</div><p>Vous avez déjà passé ce QCM (tentative unique).</p></div></div>';
+    return;
+  }
+
+  currentQcm = qcm;
+  questions = qs;
+  startTime = Date.now();
+
+  // Timer
+  const totalSecs = qcm.duree_minutes * 60;
+  let remaining = totalSecs;
+  timer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) { clearInterval(timer); submitQCM(); }
+    const m = Math.floor(remaining / 60), s = remaining % 60;
+    document.getElementById('timer').textContent = '⏱ ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+
+  let html = '<div class="card"><div class="flex-between mb-16"><h2>' + qcm.titre + ' <span class="text-sm text-muted">— ' + (qcm.matieres ? qcm.matieres.nom : '') + '</span></h2><strong id="timer" style="color:var(--danger);font-size:1.2rem;"></strong></div>';
+  questions.forEach((q, i) => {
+    html += '<div class="qcm-question"><h3>Question ' + (i+1) + ' <span class="text-muted text-sm">(' + q.points + ' pt)</span></h3>';
+    html += '<p style="margin-bottom:10px;font-weight:600;">' + q.question + '</p>';
+    html += '<div class="qcm-choices">';
+    const choix = q.choix;
+    for (let c = 0; c < choix.length; c++) {
+      html += '<label class="qcm-choice"><input type="radio" name="q' + i + '" value="' + c + '"> ' + String.fromCharCode(65+c) + '. ' + choix[c] + '</label>';
+    }
+    html += '</div></div>';
+  });
+  html += '<button class="btn btn-success" style="margin-top:20px;width:100%;" onclick="submitQCM()">Valider mes réponses</button></div>';
+  document.getElementById('content-passer').innerHTML = html;
+  document.getElementById('tab-btn-passer').classList.add('active');
+  document.getElementById('tab-btn-resultats').classList.remove('active');
+}
+
+async function submitQCM() {
+  if (timer) { clearInterval(timer); timer = null; }
+  const answers = {};
+  let answered = 0;
+  questions.forEach((q, i) => {
+    const sel = document.querySelector('input[name="q' + i + '"]:checked');
+    answers[i] = sel ? parseInt(sel.value) : -1;
+    if (sel) answered++;
+  });
+  if (answered === 0) { showAlert('Répondez à au moins une question', 'warning'); return; }
+  if (!confirmAction('Valider ' + answered + ' réponse(s) ?')) return;
+
+  let score = 0, maxScore = 0;
+  questions.forEach((q, i) => {
+    maxScore += q.points;
+    if (answers[i] === q.bonne_reponse) score += q.points;
+  });
+  const pourcentage = Math.round((score / maxScore) * 100);
+  const note_sur_20 = parseFloat(((score / maxScore) * 20).toFixed(1));
+  const temps_secondes = Math.round((Date.now() - startTime) / 1000);
+
+  try {
+    await supabase.from('qcm_resultats').insert({
+      qcm_id: currentQcm.id,
+      eleve_id: getUser().id,
+      score, score_max: maxScore,
+      pourcentage, note_sur_20,
+      temps_secondes,
+      reponses: answers
+    });
+    showResultats(score, maxScore, pourcentage, note_sur_20, answers);
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+
+function showResultats(score, maxScore, pourcentage, note_sur_20, answers) {
+  const reussi = pourcentage >= currentQcm.seuil_reussite;
+  let html = '<div class="card"><h2>📊 Résultats du QCM</h2>';
+  html += '<div style="text-align:center;padding:20px;">';
+  html += '<div style="font-size:3rem;margin-bottom:10px;">' + (reussi ? '🎉' : '😕') + '</div>';
+  html += '<div style="font-size:2rem;font-weight:800;color:' + (reussi ? 'var(--success)' : 'var(--danger)') + ';">' + score + '/' + maxScore + '</div>';
+  html += '<div style="font-size:1.2rem;margin:8px 0;">' + pourcentage + '% — Note : ' + note_sur_20 + '/20</div>';
+  html += '<span class="badge ' + (reussi ? 'badge-active' : 'badge-disabled') + '" style="font-size:1rem;padding:6px 16px;">' + (reussi ? '✓ Réussi (seuil : ' + currentQcm.seuil_reussite + '%)' : '✗ Non réussi (seuil : ' + currentQcm.seuil_reussite + '%)') + '</span>';
+  html += '</div><hr style="margin:20px 0;border-color:var(--border);"><h3>Détail des réponses</h3>';
+  questions.forEach((q, i) => {
+    const ok = answers[i] === q.bonne_reponse;
+    html += '<div class="qcm-question"><h3>Question ' + (i+1) + '</h3>';
+    html += '<p><strong>' + q.question + '</strong></p>';
+    for (let c = 0; c < q.choix.length; c++) {
+      let cls = 'qcm-choice';
+      if (c === q.bonne_reponse) cls += ' correct';
+      else if (c === answers[i]) cls += ' incorrect';
+      html += '<div class="' + cls + '">' + String.fromCharCode(65+c) + '. ' + q.choix[c] + (c === q.bonne_reponse ? ' ✓' : '') + '</div>';
+    }
+  });
+  html += '<button class="btn btn-primary mt-16" onclick="loadQCMList()">← Retour aux QCM</button></div>';
+  document.getElementById('content-passer').innerHTML = html;
+}
+
+async function loadResults() {
+  const eleveId = getUser().id;
+  const { data: results } = await supabase.from('qcm_resultats').select('*, qcm(titre, matieres(nom))').eq('eleve_id', eleveId).order('completed_at', { ascending: false });
+  const div = document.getElementById('content-resultats');
+  if (!results || !results.length) {
+    div.innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">📊</div><p>Aucun résultat de QCM pour le moment.</p></div></div>';
+    return;
+  }
+  let html = '<div class="card"><h2>Mes résultats</h2><div class="table-wrap"><table><thead><tr><th>QCM</th><th>Matière</th><th>Score</th><th>%</th><th>/20</th><th>Date</th></tr></thead><tbody>';
+  results.forEach(r => { html += '<tr><td>' + (r.qcm ? r.qcm.titre : '—') + '</td><td>' + (r.qcm && r.qcm.matieres ? r.qcm.matieres.nom : '—') + '</td><td>' + r.score + '/' + r.score_max + '</td><td class="' + (r.pourcentage >= 50 ? 'text-success' : 'text-danger') + '">' + r.pourcentage + '%</td><td>' + r.note_sur_20 + '</td><td>' + formatDateTime(r.completed_at) + '</td></tr>'; });
+  html += '</tbody></table></div></div>';
+  div.innerHTML = html;
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

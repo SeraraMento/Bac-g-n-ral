@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-eleve">Élève</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">✉️ Mes <span>Messages</span></h1>
+  <div id="alert-box"></div>
+  <div id="messages-list"><div class="loading-spinner">Chargement…</div></div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['eleve'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('eleve', '../');
+  loadMessages();
+})();
+
+async function loadMessages() {
+  const eleveId = getUser().id;
+  const { data: msgs } = await supabase.from('messages').select('*, profiles(nom, prenom)').eq('eleve_id', eleveId).order('created_at', { ascending: false });
+  const div = document.getElementById('messages-list');
+  if (!msgs || !msgs.length) {
+    div.innerHTML = '<div class="card"><div class="empty-state"><div class="empty-icon">✉️</div><p>Aucun message pour vous.</p></div></div>';
+    return;
+  }
+  let html = '';
+  msgs.forEach(m => {
+    html += '<div class="card" style="border-left:4px solid ' + (m.lu ? 'var(--border)' : 'var(--accent)') + ';">';
+    html += '<div class="flex-between mb-8"><div><strong>' + (m.objet || '(sans objet)') + '</strong> <span class="badge badge-' + (m.lu ? 'pending' : 'active') + '">' + (m.lu ? 'Lu' : 'Non lu') + '</span></div><span class="text-sm text-muted">' + formatDateTime(m.created_at) + '</span></div>';
+    html += '<p>' + m.contenu.replace(/\n/g, '<br>') + '</p>';
+    html += '<div class="text-sm text-muted mt-8">— ' + (m.profiles ? m.profiles.prenom + ' ' + m.profiles.nom : 'Professeur') + '</div>';
+    if (!m.lu) { html += '<button class="btn btn-sm btn-outline mt-8" onclick="markLu(\'' + m.id + '\')">Marquer comme lu</button>'; }
+    html += '</div>';
+  });
+  div.innerHTML = html;
+}
+
+async function markLu(msgId) {
+  const eleveId = getUser().id;
+  await supabase.from('messages').update({ lu: true }).eq('id', msgId);
+  await supabase.from('messages_lu').insert({ message_id: msgId, eleve_id: eleveId });
+  showAlert('Message marqué comme lu', 'success');
+  loadMessages();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

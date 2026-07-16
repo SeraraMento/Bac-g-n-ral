@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-eleve">Élève</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">📅 <span>Agenda</span></h1>
+  <div id="alert-box"></div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showView('cal',this)" id="tab-cal">📆 Calendrier</button>
+    <button class="tab-btn" onclick="showView('list',this)" id="tab-list">📋 Liste</button>
+  </div>
+  <div id="view-calendar">
+    <div class="card">
+      <div class="flex-between mb-16">
+        <button class="btn btn-outline btn-sm" onclick="changeMonth(-1)">←</button>
+        <h2 id="month-label" style="font-size:1.1rem;color:var(--primary);"></h2>
+        <button class="btn btn-outline btn-sm" onclick="changeMonth(1)">→</button>
+      </div>
+      <div id="calendar-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;"></div>
+    </div>
+  </div>
+  <div id="view-list" class="hidden">
+    <div class="card">
+      <div class="table-wrap">
+        <table><thead><tr><th>Date</th><th>Titre</th><th>Description</th><th>Type</th></tr></thead>
+        <tbody id="tbody-agenda"><tr><td colspan="4" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let events = [];
+let curM = new Date().getMonth();
+let curY = new Date().getFullYear();
+
+(function() {
+  if (!requireAuth(['eleve'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('eleve', '../');
+  loadAgenda();
+})();
+
+async function loadAgenda() {
+  const { data } = await supabase.from('agenda').select('*').order('date_event');
+  events = data || [];
+  renderCalendar();
+  renderList();
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendar-grid');
+  const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  document.getElementById('month-label').textContent = months[curM] + ' ' + curY;
+  const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  let html = days.map(d => '<div style="background:var(--primary);color:#fff;padding:8px;font-weight:600;font-size:.82rem;border-radius:6px;">' + d + '</div>').join('');
+  const firstDay = new Date(curY, curM, 1).getDay();
+  const adjusted = firstDay === 0 ? 6 : firstDay - 1;
+  const daysIn = new Date(curY, curM + 1, 0).getDate();
+  for (let i = 0; i < adjusted; i++) html += '<div></div>';
+  for (let d = 1; d <= daysIn; d++) {
+    const ds = curY + '-' + String(curM+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const dayEv = events.filter(e => e.date_event && e.date_event.startsWith(ds));
+    const isToday = ds === new Date().toISOString().slice(0,10);
+    html += '<div style="border:1px solid var(--border);border-radius:6px;padding:8px;min-height:80px;background:' + (isToday ? '#eaf4ff' : '#fff') + ';font-size:.8rem;">';
+    html += '<strong style="color:var(--primary);">' + d + '</strong>';
+    dayEv.forEach(e => { html += '<div style="margin-top:4px;background:' + e.couleur + ';color:#fff;border-radius:4px;padding:2px 4px;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + e.titre + '</div>'; });
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function changeMonth(delta) {
+  curM += delta;
+  if (curM > 11) { curM = 0; curY++; }
+  if (curM < 0) { curM = 11; curY--; }
+  renderCalendar();
+}
+
+function renderList() {
+  const tbody = document.getElementById('tbody-agenda');
+  const upcoming = events.filter(e => new Date(e.date_event) >= new Date()).sort((a,b) => new Date(a.date_event) - new Date(b.date_event));
+  if (!upcoming.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-icon">📅</div><p>Aucun événement à venir</p></td></tr>'; return; }
+  tbody.innerHTML = upcoming.map(e => '<tr><td>' + formatDate(e.date_event) + '</td><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + e.couleur + ';margin-right:6px;"></span>' + e.titre + '</td><td>' + (e.description || '') + '</td><td><span class="badge" style="background:' + e.couleur + ';color:#fff;">' + (e.type || 'événement') + '</span></td></tr>').join('');
+}
+
+function showView(view, btn) {
+  document.getElementById('view-calendar').classList.toggle('hidden', view !== 'cal');
+  document.getElementById('view-list').classList.toggle('hidden', view !== 'list');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

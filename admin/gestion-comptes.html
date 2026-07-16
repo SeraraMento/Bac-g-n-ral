@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Comptes — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-admin">Admin</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">Gestion des <span>Comptes</span></h1>
+  <div id="alert-box"></div>
+  <div class="card">
+    <h2>Tous les comptes</h2>
+    <div class="flex-between mb-16">
+      <select id="filter-role" class="form-control" style="width:auto;" onchange="loadComptes()">
+        <option value="">Tous les rôles</option>
+        <option value="eleve">Élèves</option>
+        <option value="prof">Professeurs</option>
+        <option value="admin">Admins</option>
+        <option value="disabled">Désactivés</option>
+      </select>
+      <input type="text" id="search-ident" class="form-control" style="width:200px;" placeholder="Rechercher…" oninput="loadComptes()">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Identifiant</th><th>Nom</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="tbody-comptes"><tr><td colspan="5" class="loading-spinner">Chargement…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+(function() {
+  if (!requireAuth(['admin'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('admin', '../');
+  loadComptes();
+})();
+
+async function loadComptes() {
+  const role = document.getElementById('filter-role').value;
+  const search = document.getElementById('search-ident').value.trim();
+  let query = supabase.from('profiles').select('*').order('created_at', { ascending: false });
+  if (role === 'disabled') query = query.eq('disabled', true);
+  else if (role) query = query.eq('role', role).eq('disabled', false);
+  else query = query.eq('disabled', false);
+  const { data: comptes } = await query;
+  let list = comptes || [];
+  if (search) list = list.filter(c => (c.identifiant + ' ' + c.nom + ' ' + c.prenom).toLowerCase().includes(search.toLowerCase()));
+  renderComptes(list);
+}
+
+function renderComptes(list) {
+  const tbody = document.getElementById('tbody-comptes');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-icon">👤</div><p>Aucun compte trouvé</p></td></tr>'; return; }
+  tbody.innerHTML = list.map(p => '<tr><td><strong>' + p.identifiant + '</strong></td><td>' + (p.prenom || '') + ' ' + (p.nom || '') + '</td><td><span class="badge badge-' + p.role + '">' + (p.role === 'prof' ? 'Professeur' : p.role === 'eleve' ? 'Élève' : 'Admin') + '</span></td><td><span class="badge ' + (p.disabled ? 'badge-disabled' : 'badge-active') + '">' + (p.disabled ? 'Désactivé' : 'Actif') + '</span></td><td class="actions"><button class="btn btn-sm ' + (p.disabled ? 'btn-success' : 'btn-danger') + '" onclick="toggleDisabled(\'' + p.id + '\', ' + !p.disabled + ')">' + (p.disabled ? 'Réactiver' : 'Désactiver') + '</button></td></tr>').join('');
+}
+
+async function toggleDisabled(id, disabled) {
+  await supabase.from('profiles').update({ disabled }).eq('id', id);
+  showAlert(disabled ? 'Compte désactivé' : 'Compte réactivé', 'success');
+  loadComptes();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

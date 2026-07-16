@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Matières — Mon École</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🎓 Mon <span>École</span></div>
+  <nav id="dynamic-nav"></nav>
+  <div class="user-info"><span id="user-name"></span><span class="badge badge-admin">Admin</span><button class="btn-logout" onclick="logout()">Déconnexion</button></div>
+</header>
+<main>
+  <h1 class="page-title">Gestion des <span>Matières</span></h1>
+  <div id="alert-box"></div>
+  <div class="card">
+    <h2>Créer une matière</h2>
+    <form id="form-matiere" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="form-group" style="margin:0;"><label>Nom</label><input type="text" id="m-nom" class="form-control" placeholder="Mathématiques" required></div>
+      <div class="form-group" style="margin:0;"><label>Couleur</label><input type="color" id="m-couleur" class="form-control" value="#3498db" style="width:60px;"></div>
+      <button type="submit" class="btn btn-accent">Ajouter</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Toutes les matières</h2>
+    <div class="table-wrap">
+      <table><thead><tr><th>Nom</th><th>Couleur</th><th>Professeurs assignés</th><th>Actions</th></tr></thead>
+      <tbody id="tbody-matieres"><tr><td colspan="4" class="loading-spinner">Chargement…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Assigner un professeur à une matière</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Professeur</label>
+        <select id="sel-prof" class="form-control"><option value="">— Choisir —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Matière</label>
+        <select id="sel-matiere" class="form-control"><option value="">— Choisir —</option></select>
+      </div>
+      <div class="form-group">
+        <label>Classe</label>
+        <select id="sel-classe-pm" class="form-control"><option value="">— Toutes classes —</option></select>
+      </div>
+      <div style="padding-top:24px;"><button class="btn btn-accent" onclick="assignProfMatiere()">Assigner</button></div>
+    </div>
+    <div id="div-assignments"></div>
+  </div>
+</main>
+<footer>© Mon École</footer>
+<script src="../js/supabase-client.js"></script><script src="../js/utils.js"></script>
+<script>
+let allProfesseurs = [];
+let allMatieres = [];
+let allClasses = [];
+
+(function() {
+  if (!requireAuth(['admin'])) return;
+  document.getElementById('user-name').textContent = getUser().prenom + ' ' + getUser().nom;
+  buildNavbar('admin', '../');
+  loadAll();
+})();
+
+async function loadAll() {
+  const [{ data: profs }, { data: matieres }, { data: classes }, { data: assignments }] = await Promise.all([
+    supabase.from('profiles').select('id, identifiant, nom, prenom').eq('role', 'prof').eq('disabled', false).order('nom'),
+    supabase.from('matieres').select('*').order('nom'),
+    supabase.from('classes').select('*').order('nom'),
+    supabase.from('prof_matieres').select('*, matieres(*), profiles!prof_matieres_prof_id_fkey(nom,prenom), classes(*)').order('created_at', { ascending: false })
+  ]);
+  allProfesseurs = profs || [];
+  allMatieres = matieres || [];
+  allClasses = classes || [];
+
+  const selProf = document.getElementById('sel-prof');
+  allProfesseurs.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.prenom + ' ' + p.nom; selProf.appendChild(o); });
+
+  const selMat = document.getElementById('sel-matiere');
+  allMatieres.forEach(m => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.nom; selMat.appendChild(o); });
+
+  const selCl = document.getElementById('sel-classe-pm');
+  allClasses.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.nom; selCl.appendChild(o); });
+
+  renderMatieres(matieres || []);
+  renderAssignments(assignments || []);
+}
+
+function renderMatieres(matieres) {
+  const tbody = document.getElementById('tbody-matieres');
+  if (!matieres.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><div class="empty-icon">📖</div><p>Aucune matière créée</p></td></tr>'; return; }
+  tbody.innerHTML = matieres.map(m => '<tr><td><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + m.couleur + ';margin-right:8px;"></span><strong>' + m.nom + '</strong></td><td>' + m.couleur + '</td><td id="td-pm-' + m.id + '">…</td><td class="actions"><button class="btn btn-xs btn-danger" onclick="deleteMatiere(\'' + m.id + '\')">Supprimer</button></td></tr>').join('');
+  matieres.forEach(async m => {
+    const { count } = await supabase.from('prof_matieres').select('*', { count: 'exact', head: true }).eq('matiere_id', m.id);
+    document.getElementById('td-pm-' + m.id).textContent = count || 0;
+  });
+}
+
+function renderAssignments(assignments) {
+  const div = document.getElementById('div-assignments');
+  if (!assignments.length) { div.innerHTML = '<div class="text-sm text-muted mt-16">Aucune assignation pour le moment</div>'; return; }
+  div.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">' + assignments.map(a => '<div style="background:#f0f4f8;border-radius:6px;padding:6px 12px;font-size:.82rem;">' + (a.profiles ? a.profiles.prenom + ' ' + a.profiles.nom : '?') + ' → ' + (a.matieres ? a.matieres.nom : '?') + ' (' + (a.classes ? a.classes.nom : 'Toutes') + ') <button style="background:none;border:none;color:var(--danger);cursor:pointer;" onclick="removeAssignment(\'' + a.id + '\')">×</button></div>').join('') + '</div>';
+}
+
+document.getElementById('form-matiere').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const payload = { nom: document.getElementById('m-nom').value.trim(), couleur: document.getElementById('m-couleur').value };
+  try { await supabase.from('matieres').insert(payload); showAlert('Matière créée !', 'success'); document.getElementById('form-matiere').reset(); loadAll(); }
+  catch(err) { showAlert('Erreur: ' + err.message, 'danger'); }
+});
+
+async function deleteMatiere(id) {
+  if (!confirmAction('Supprimer cette matière ?')) return;
+  await supabase.from('prof_matieres').delete().eq('matiere_id', id);
+  await supabase.from('matieres').delete().eq('id', id);
+  showAlert('Matière supprimée', 'success');
+  loadAll();
+}
+
+async function assignProfMatiere() {
+  const profId = document.getElementById('sel-prof').value;
+  const matiereId = document.getElementById('sel-matiere').value;
+  const classeId = document.getElementById('sel-classe-pm').value || null;
+  if (!profId || !matiereId) { showAlert('Sélectionnez un professeur et une matière', 'warning'); return; }
+  try {
+    const { error } = await supabase.from('prof_matieres').insert({ prof_id: profId, matiere_id: matiereId, classe_id: classeId });
+    if (error && error.code !== '23505') throw error;
+    showAlert('Professeur assigné !', 'success');
+    const [{ data: assignments }] = await Promise.all([supabase.from('prof_matieres').select('*, matieres(*), profiles!prof_matieres_prof_id_fkey(nom,prenom), classes(*)').order('created_at', { ascending: false })]);
+    renderAssignments(assignments || []);
+  } catch(e) { showAlert('Erreur: ' + e.message, 'danger'); }
+}
+
+async function removeAssignment(id) {
+  await supabase.from('prof_matieres').delete().eq('id', id);
+  showAlert('Assignation supprimée', 'success');
+  loadAll();
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

@@ -34,6 +34,7 @@
       <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
       <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
       <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+
       <span class="sidebar-section">Mon compte</span>
       <a href="profil.html" class="sidebar-link active"><span class="icon">👤</span> Mon profil</a>
       <a href="#" class="sidebar-link" id="btn-logout-sidebar"><span class="icon">🚪</span> Déconnexion</a>
@@ -43,198 +44,278 @@
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <div class="page-header">
-      <h1>👤 Mon profil</h1>
+      <h1>Mon profil</h1>
       <p>Gérez vos informations, consultez votre progression et personnalisez votre expérience.</p>
     </div>
 
     <!-- INFOS PERSONNELLES -->
-    <div class="form-card">
-      <h2>📋 Informations personnelles</h2>
-      <div class="profile-info-grid">
-        <div class="profile-field">
-          <label>Nom complet</label>
-          <div id="user-fullname" class="profile-value">Chargement...</div>
+    <section class="profile-section">
+      <div class="profile-header">
+        <div class="profile-icon">👤</div>
+        <h2>Informations personnelles</h2>
+      </div>
+
+      <div class="profile-info">
+        <div class="info-item">
+          <span class="info-label">Nom complet</span>
+          <span class="info-value" id="profile-fullname">—</span>
         </div>
-        <div class="profile-field">
-          <label>Email</label>
-          <div id="user-email" class="profile-value">Chargement...</div>
+        <div class="info-item">
+          <span class="info-label">Email</span>
+          <span class="info-value" id="profile-email">—</span>
         </div>
-        <div class="profile-field">
-          <label>Rôle</label>
-          <div id="user-role" class="profile-value">Chargement...</div>
+        <div class="info-item">
+          <span class="info-label">Rôle</span>
+          <span class="info-value" id="profile-role">—</span>
         </div>
-        <div class="profile-field">
-          <label>Membre depuis</label>
-          <div id="user-joined" class="profile-value">Chargement...</div>
+        <div class="info-item">
+          <span class="info-label">Membre depuis</span>
+          <span class="info-value" id="profile-joined">—</span>
         </div>
       </div>
-      <button class="btn-primary" id="btn-edit-profile" style="margin-top:1rem;">Modifier mon profil</button>
-    </div>
+
+      <button class="btn-primary" id="btn-edit-profile">Modifier mon profil</button>
+    </section>
 
     <!-- PROGRESSION -->
-    <div class="form-card">
-      <h2>📊 Ma progression</h2>
-      <div class="progress-stats">
-        <div class="stat-card">
-          <div class="stat-label">Fiches lues</div>
-          <div class="stat-value" id="stat-fiches-lues">0</div>
-          <div class="stat-sub">sur <span id="total-fiches">0</span> fiches disponibles</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">QCM terminés</div>
-          <div class="stat-value" id="stat-qcm-termine">0</div>
-          <div class="stat-sub">sur <span id="total-qcm">0</span> QCM disponibles</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Score moyen</div>
-          <div class="stat-value" id="stat-score-moyen">0<span style="font-size:1.5rem;">%</span></div>
-          <div class="stat-sub">sur les QCM réalisés</div>
-        </div>
+    <section class="profile-section">
+      <div class="profile-header">
+        <div class="profile-icon">📊</div>
+        <h2>Ma progression</h2>
       </div>
-    </div>
 
-    <!-- DERNIÈRES ACTIVITÉS -->
-    <div class="form-card">
-      <h2>📅 Dernières activités</h2>
-      <div id="last-activities" class="activities-list">
-        <!-- Les activités seront chargées ici -->
-        <p style="text-align:center; color:var(--muted);">Aucune activité récente.</p>
+      <div class="progress-grid">
+        <!-- Fiches lues -->
+        <div class="progress-card">
+          <div class="progress-header">
+            <span class="progress-title">Fiches lues</span>
+            <span class="progress-badge">📚</span>
+          </div>
+          <div class="progress-stat">
+            <span class="stat-number" id="stat-fiches-lues">0</span>
+            <span class="stat-total">sur <span id="total-fiches">0</span> fiches disponibles</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fiches"></div>
+          </div>
+        </div>
+
+        <!-- QCM terminés -->
+        <div class="progress-card">
+          <div class="progress-header">
+            <span class="progress-title">QCM terminés</span>
+            <span class="progress-badge">🎯</span>
+          </div>
+          <div class="progress-stat">
+            <span class="stat-number" id="stat-qcm-finis">0</span>
+            <span class="stat-total">sur <span id="total-qcm">0</span> QCM disponibles</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-qcm"></div>
+          </div>
+        </div>
+
+        <!-- Score moyen -->
+        <div class="progress-card">
+          <div class="progress-header">
+            <span class="progress-title">Score moyen</span>
+            <span class="progress-badge">🏆</span>
+          </div>
+          <div class="progress-stat">
+            <span class="stat-number" id="stat-score-moyen">0</span><span class="stat-percent">%</span>
+            <span class="stat-total">sur les QCM réalisés</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-score"></div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- DERNIERES ACTIVITES -->
+    <section class="profile-section">
+      <div class="profile-header">
+        <div class="profile-icon">📝</div>
+        <h2>Dernières activités</h2>
+      </div>
+      <div class="activities-container">
+        <p id="activities-message">Chargement des activités...</p>
+        <div id="activities-list" class="activities-list"></div>
+      </div>
+    </section>
   </main>
 
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
   <script>
-    // Variables globales
-    let userId = null;
-    let progressionData = null;
-    let fichesData = [];
-    let qcmData = [];
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Récupérer l'utilisateur connecté
+      const user = await requireAuth();
+      if (!user) return;
 
-    // Charger les données au démarrage
-    async function loadProfile() {
-      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-      if (userError || !user) {
+      // Charger les données du profil
+      await loadProfile(user.id);
+
+      // Charger la progression
+      await loadProgress(user.id);
+
+      // Charger les activités
+      await loadActivities(user.id);
+
+      // Gérer la déconnexion
+      document.getElementById('btn-logout').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await signOut();
         window.location.href = '../index.html';
-        return;
-      }
+      });
 
-      userId = user.id;
+      document.getElementById('btn-logout-sidebar').addEventListener('click', async (e) => {
+        e.preventDefault();
+        await signOut();
+        window.location.href = '../index.html';
+      });
 
-      // Récupérer le profil
-      const { data: profile, error: profileError } = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      // Gérer le clic sur modifier le profil
+      document.getElementById('btn-edit-profile').addEventListener('click', () => {
+        alert('Fonctionnalité à venir !');
+      });
+    });
 
-      if (profileError) {
-        console.error(profileError);
-      } else {
-        document.getElementById('user-fullname').textContent = profile.full_name || 'Non renseigné';
-        document.getElementById('user-email').textContent = user.email;
-        document.getElementById('user-role').textContent = profile.role === 'admin' ? 'Administrateur' : 'Élève';
-        document.getElementById('user-joined').textContent = new Date(profile.created_at).toLocaleDateString('fr-FR');
-      }
+    async function loadProfile(userId) {
+      try {
+        const { data: profile, error } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      // Récupérer la progression
-      await loadProgression();
+        if (error) throw error;
 
-      // Récupérer les fiches et QCM
-      await loadFiches();
-      await loadQcm();
-
-      // Afficher les stats
-      updateStats();
-    }
-
-    // Charger la progression de l'utilisateur
-    async function loadProgression() {
-      const { data, error } = await supabaseClient
-        .from('progression')
-        .select('*')
-        .eq('user_id', userId);
-
-      if (error) {
-        console.error(error);
-      } else {
-        progressionData = data;
+        // Afficher les informations
+        document.getElementById('profile-fullname').textContent = profile.full_name || '—';
+        document.getElementById('profile-email').textContent = profile.email || '—';
+        document.getElementById('profile-role').textContent = profile.role === 'admin' ? 'Administrateur' : 'Élève';
+        document.getElementById('profile-joined').textContent = new Date(profile.created_at).toLocaleDateString('fr-FR');
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
       }
     }
 
-    // Charger les fiches disponibles
-    async function loadFiches() {
-      const { data, error } = await supabaseClient
-        .from('fiches')
-        .select('*');
+    async function loadProgress(userId) {
+      try {
+        // Récupérer le nombre total de fiches
+        const { count: totalFiches } = await supabaseClient
+          .from('fiches')
+          .select('*', { count: 'exact', head: true });
 
-      if (error) {
-        console.error(error);
-      } else {
-        fichesData = data;
-      }
-    }
+        // Récupérer le nombre de fiches lues par l'utilisateur
+        const { count: fichesLues } = await supabaseClient
+          .from('progression')
+          .select('*', { count: 'exact' })
+          .eq('user_id', userId);
 
-    // Charger les QCM disponibles
-    async function loadQcm() {
-      const { data, error } = await supabaseClient
-        .from('qcm')
-        .select('*');
+        // Récupérer le nombre total de QCM
+        const { count: totalQcm } = await supabaseClient
+          .from('qcm')
+          .select('*', { count: 'exact', head: true });
 
-      if (error) {
-        console.error(error);
-      } else {
-        qcmData = data;
-      }
-    }
+        // Récupérer les résultats des QCM de l'utilisateur
+        const { data: qcmResults, error } = await supabaseClient
+          .from('qcm_results')
+          .select('score, total')
+          .eq('user_id', userId);
 
-    // Mettre à jour les statistiques
-    function updateStats() {
-      if (!progressionData || !fichesData || !qcmData) return;
+        let qcmFinis = 0;
+        let totalScore = 0;
+        let totalQcmRealises = 0;
 
-      // Fiches lues
-      const fichesLues = progressionData.length;
-      document.getElementById('stat-fiches-lues').textContent = fichesLues;
+        if (qcmResults && qcmResults.length > 0) {
+          qcmFinis = qcmResults.length;
+          qcmResults.forEach(result => {
+            totalScore += (result.score / result.total) * 100;
+            totalQcmRealises += result.total;
+          });
+        }
 
-      // Total fiches
-      const totalFiches = fichesData.length;
-      document.getElementById('total-fiches').textContent = totalFiches;
+        const scoreMoyen = qcmFinis > 0 ? Math.round(totalScore / qcmFinis) : 0;
 
-      // QCM terminés
-      const qcmTermines = progressionData.filter(p => p.qcm_id).length;
-      document.getElementById('stat-qcm-termine').textContent = qcmTermines;
-
-      // Total QCM
-      const totalQcm = qcmData.length;
-      document.getElementById('total-qcm').textContent = totalQcm;
-
-      // Score moyen (simplifié pour l'exemple)
-      const scores = progressionData
-        .filter(p => p.score !== undefined)
-        .map(p => p.score);
-
-      if (scores.length > 0) {
-        const scoreMoyen = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        // Mettre à jour l'interface
+        document.getElementById('stat-fiches-lues').textContent = fichesLues || 0;
+        document.getElementById('total-fiches').textContent = totalFiches || 0;
+        document.getElementById('stat-qcm-finis').textContent = qcmFinis || 0;
+        document.getElementById('total-qcm').textContent = totalQcm || 0;
         document.getElementById('stat-score-moyen').textContent = scoreMoyen;
+
+        // Calculer les pourcentages pour les barres de progression
+        const progressFiches = totalFiches > 0 ? Math.min((fichesLues / totalFiches) * 100, 100) : 0;
+        const progressQcm = totalQcm > 0 ? Math.min((qcmFinis / totalQcm) * 100, 100) : 0;
+        const progressScore = 100; // Toujours 100% pour le score
+
+        document.getElementById('progress-fiches').style.width = `${progressFiches}%`;
+        document.getElementById('progress-qcm').style.width = `${progressQcm}%`;
+        document.getElementById('progress-score').style.width = `${progressScore}%`;
+
+        // Changer la couleur des barres en fonction du pourcentage
+        if (progressFiches < 30) {
+          document.getElementById('progress-fiches').style.backgroundColor = '#e74c3c';
+        } else if (progressFiches < 70) {
+          document.getElementById('progress-fiches').style.backgroundColor = '#f39c12';
+        } else {
+          document.getElementById('progress-fiches').style.backgroundColor = '#2ecc71';
+        }
+
+        if (progressQcm < 30) {
+          document.getElementById('progress-qcm').style.backgroundColor = '#e74c3c';
+        } else if (progressQcm < 70) {
+          document.getElementById('progress-qcm').style.backgroundColor = '#f39c12';
+        } else {
+          document.getElementById('progress-qcm').style.backgroundColor = '#2ecc71';
+        }
+
+      } catch (error) {
+        console.error('Erreur lors du chargement de la progression:', error);
       }
     }
 
-    // Déconnexion
-    document.getElementById('btn-logout').addEventListener('click', async (e) => {
-      e.preventDefault();
-      await signOut();
-      window.location.href = '../index.html';
-    });
-    document.getElementById('btn-logout-sidebar').addEventListener('click', async (e) => {
-      e.preventDefault();
-      await signOut();
-      window.location.href = '../index.html';
-    });
+    async function loadActivities(userId) {
+      try {
+        // Récupérer les 5 dernières activités
+        const { data: activities, error } = await supabaseClient
+          .from('qcm_results')
+          .select('completed_at, score, total')
+          .eq('user_id', userId)
+          .order('completed_at', { ascending: false })
+          .limit(5);
 
-    // Charger le profil au démarrage
-    document.addEventListener('DOMContentLoaded', loadProfile);
+        const activitiesList = document.getElementById('activities-list');
+        const activitiesMessage = document.getElementById('activities-message');
+
+        if (error || !activities || activities.length === 0) {
+          activitiesMessage.textContent = 'Aucune activité récente.';
+          return;
+        }
+
+        activitiesMessage.style.display = 'none';
+
+        activities.forEach(activity => {
+          const activityItem = document.createElement('div');
+          activityItem.className = 'activity-item';
+          activityItem.innerHTML = `
+            <div class="activity-icon">🎯</div>
+            <div class="activity-content">
+              <p><strong>QCM terminé</strong> le ${new Date(activity.completed_at).toLocaleDateString('fr-FR')}</p>
+              <p>Score: ${activity.score}/${activity.total}</p>
+            </div>
+          `;
+          activitiesList.appendChild(activityItem);
+        });
+
+      } catch (error) {
+        console.error('Erreur lors du chargement des activités:', error);
+        document.getElementById('activities-message').textContent = 'Erreur lors du chargement des activités.';
+      }
+    }
   </script>
 </body>
 </html>

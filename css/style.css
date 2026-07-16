@@ -556,3 +556,146 @@ img{
     font-size:3rem;
   }
 }
+/* ======================
+   PROFIL PAGE
+====================== */
+
+.profile-section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-icon {
+  font-size: 2rem;
+}
+
+.profile-info {
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  margin-bottom: 1rem;
+}
+
+.info-label {
+  display: block;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.progress-card {
+  background: #faf8f4;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.progress-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.progress-badge {
+  font-size: 1.2rem;
+}
+
+.progress-stat {
+  margin-bottom: 1rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-total {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+.stat-percent {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.activities-container {
+  margin-top: 1rem;
+}
+
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  background: #faf8f4;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+}
+
+.activity-content p {
+  margin: 0;
+  color: var(--ink);
+}
+
+.activity-content strong {
+  color: var(--accent);
+}

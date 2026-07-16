@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Annales - Bac-Général</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
@@ -15,12 +15,12 @@
     <div class="nav-links">
       <a href="fiches.html">Fiches</a>
       <a href="qcm.html">QCM</a>
-      <a href="annales.html">Annales</a>
+      <a href="annales.html" class="active">Annales</a>
       <a href="ressources.html">Ressources</a>
     </div>
     <div class="nav-auth">
-      <a href="login.html" class="btn-login">Connexion</a>
-      <a href="register.html" class="btn-register">S'inscrire</a>
+      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
+      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
     </div>
   </nav>
 
@@ -29,46 +29,112 @@
     <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
     <nav class="sidebar-nav">
       <span class="sidebar-section">Révisions</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
       <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
       <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
       <a href="annales.html" class="sidebar-link active"><span class="icon">📝</span> Annales</a>
       <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+
+      <span class="sidebar-section">Informations</span>
+      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">⚖️</span> Mentions légales</a>
+      <a href="contact.html" class="sidebar-link"><span class="icon">📧</span> Contact</a>
     </nav>
   </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <div class="page-header">
-      <h1>📝 Annales corrigées</h1>
-      <p>Sujets et corrections des années précédentes.</p>
+      <h1>Annales du Bac Général</h1>
+      <p>Téléchargez les sujets et corrigés officiels des années précédentes pour vous entraîner efficacement.</p>
     </div>
 
-    <div class="matiere">
-      <h2>📐 Mathématiques</h2>
-      <div class="annale-grid">
-        <div class="annale-card">
-          <h3>Bac 2025 - Maths (Spé)</h3>
-          <p>Sujet et corrigé officiel.</p>
-          <a href="#" class="btn-ghost">Télécharger →</a>
-        </div>
-        <div class="annale-card">
-          <h3>Bac 2024 - Maths (Spé)</h3>
-          <p>Sujet et corrigé officiel.</p>
-          <a href="#" class="btn-ghost">Télécharger →</a>
-        </div>
-      </div>
-    </div>
+    <!-- SECTION ANNALES -->
+    <section class="profile-section">
+      <h2><span class="icon">📚</span> Sujets et corrigés disponibles</h2>
 
-    <div class="matiere">
-      <h2>⚛️ Physique-Chimie</h2>
-      <div class="annale-grid">
+      <div class="annales-grid">
+        <!-- Maths -->
         <div class="annale-card">
-          <h3>Bac 2025 - Physique-Chimie</h3>
-          <p>Sujet et corrigé officiel.</p>
-          <a href="#" class="btn-ghost">Télécharger →</a>
+          <div class="annale-header">
+            <h3>Mathématiques</h3>
+            <span class="annale-year">2025</span>
+          </div>
+          <div class="annale-content">
+            <p>Sujet complet avec corrigé détaillé</p>
+            <div class="annale-actions">
+              <a href="#" class="btn-download">Télécharger le sujet</a>
+              <a href="#" class="btn-download">Télécharger le corrigé</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Physique-Chimie -->
+        <div class="annale-card">
+          <div class="annale-header">
+            <h3>Physique-Chimie</h3>
+            <span class="annale-year">2025</span>
+          </div>
+          <div class="annale-content">
+            <p>Sujet complet avec corrigé détaillé</p>
+            <div class="annale-actions">
+              <a href="#" class="btn-download">Télécharger le sujet</a>
+              <a href="#" class="btn-download">Télécharger le corrigé</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SVT -->
+        <div class="annale-card">
+          <div class="annale-header">
+            <h3>SVT</h3>
+            <span class="annale-year">2025</span>
+          </div>
+          <div class="annale-content">
+            <p>Sujet complet avec corrigé détaillé</p>
+            <div class="annale-actions">
+              <a href="#" class="btn-download">Télécharger le sujet</a>
+              <a href="#" class="btn-download">Télécharger le corrigé</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Français -->
+        <div class="annale-card">
+          <div class="annale-header">
+            <h3>Français</h3>
+            <span class="annale-year">2025</span>
+          </div>
+          <div class="annale-content">
+            <p>Sujet complet avec corrigé détaillé</p>
+            <div class="annale-actions">
+              <a href="#" class="btn-download">Télécharger le sujet</a>
+              <a href="#" class="btn-download">Télécharger le corrigé</a>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- SECTION INFOS -->
+    <section class="profile-section">
+      <h2><span class="icon">ℹ️</span> Informations importantes</h2>
+      <div class="info-box">
+        <p>✅ Les annales sont fournies à titre indicatif et ne remplacent pas les sujets officiels du bac.</p>
+        <p>✅ Les corrigés sont rédigés par des professeurs et peuvent contenir des erreurs.</p>
+        <p>✅ Pour des annales plus anciennes, consultez le site officiel de l'<a href="https://www.education.gouv.fr" target="_blank" style="color: var(--accent);">Éducation Nationale</a>.</p>
+      </div>
+    </section>
   </main>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Logique de déconnexion (similaire à profil.html)
+    document.getElementById('btn-logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      // Ici tu peux ajouter la logique de déconnexion si tu utilises Supabase
+      alert('Déconnexion simulée (à implémenter avec Supabase)');
+      // window.location.href = '../index.html';
+    });
+  </script>
 </body>
 </html>

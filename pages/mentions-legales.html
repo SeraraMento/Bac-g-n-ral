@@ -19,44 +19,86 @@
       <a href="ressources.html">Ressources</a>
     </div>
     <div class="nav-auth">
-      <a href="login.html" class="btn-login">Connexion</a>
-      <a href="register.html" class="btn-register">S'inscrire</a>
+      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
+      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
     </div>
   </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
+    <nav class="sidebar-nav">
+      <span class="sidebar-section">Révisions</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
+      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
+      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
+      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
+      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+
+      <span class="sidebar-section">Informations</span>
+      <a href="mentions-legales.html" class="sidebar-link active"><span class="icon">⚖️</span> Mentions légales</a>
+      <a href="contact.html" class="sidebar-link"><span class="icon">📧</span> Contact</a>
+    </nav>
+  </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <div class="page-header">
-      <h1>⚖️ Mentions légales</h1>
-      <p>Informations légales concernant le site Bac-Général.</p>
+      <h1>Mentions légales</h1>
+      <p>Informations légales concernant l'utilisation de ce site.</p>
     </div>
 
-    <div class="form-card">
-      <h2>Éditeur du site</h2>
-      <div class="legal-info">
-        <p><strong>Nom :</strong> Bac-Général</p>
-        <p><strong>Site web :</strong> https://bac-g-n-ral.vercel.app</p>
-        <p><strong>Contact :</strong> contact@bac-general.fr</p>
+    <section class="profile-section">
+      <h2><span class="icon">⚖️</span> Éditeur du site</h2>
+      <div class="info-box">
+        <p><strong>Nom du site :</strong> Bac-Général</p>
+        <p><strong>Éditeur :</strong> [Ton nom ou pseudo]</p>
+        <p><strong>Adresse :</strong> [Ton adresse si tu veux]</p>
+        <p><strong>Email :</strong> [Ton email]</p>
+        <p><strong>Téléphone :</strong> [Ton téléphone si tu veux]</p>
       </div>
-    </div>
+    </section>
 
-    <div class="form-card">
-      <h2>Hébergement</h2>
-      <div class="legal-info">
-        <p>Ce site est hébergé par <strong>Vercel</strong>.</p>
-        <p>Adresse : 340 S Lemon Ave #4133, Walnut, CA 91789</p>
+    <section class="profile-section">
+      <h2><span class="icon">📜</span> Propriété intellectuelle</h2>
+      <div class="info-box">
+        <p>Tous les contenus de ce site (textes, images, vidéos, logos, etc.) sont protégés par le droit d'auteur.</p>
+        <p>Toute reproduction, représentation, modification, publication, transmission, dénaturation, totale ou partielle du site ou de l'un de ses éléments, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation expresse de l'éditeur.</p>
       </div>
-    </div>
+    </section>
 
-    <div class="form-card">
-      <h2>Propriété intellectuelle</h2>
-      <div class="legal-info">
-        <p>Tous les contenus (fiches, QCM, annales) sont la propriété de Bac-Général.</p>
-        <p>Les marques et logos cités appartiennent à leurs propriétaires respectifs.</p>
+    <section class="profile-section">
+      <h2><span class="icon">🔒</span> Données personnelles</h2>
+      <div class="info-box">
+        <p>Ce site utilise Supabase pour gérer l'authentification et stocker les données utilisateurs.</p>
+        <p>Les données personnelles collectées (nom, email) sont utilisées uniquement pour la gestion du compte utilisateur.</p>
+        <p>Conformément au RGPD, vous pouvez demander la suppression de vos données en nous contactant à l'adresse suivante : [Ton email].</p>
       </div>
-    </div>
+    </section>
 
-    <a href="../index.html" class="btn-ghost" style="display:inline-block; margin-top:1rem;">← Retour à l'accueil</a>
+    <section class="profile-section">
+      <h2><span class="icon">📄</span> Cookies</h2>
+      <div class="info-box">
+        <p>Ce site utilise des cookies pour améliorer l'expérience utilisateur et analyser le trafic.</p>
+        <p>Vous pouvez désactiver les cookies dans les paramètres de votre navigateur, mais cela peut affecter certaines fonctionnalités du site.</p>
+      </div>
+    </section>
+
+    <section class="profile-section">
+      <h2><span class="icon">🔗</span> Liens externes</h2>
+      <div class="info-box">
+        <p>Ce site peut contenir des liens vers des sites externes (YouTube, Afterclasse, etc.).</p>
+        <p>Nous ne sommes pas responsables du contenu de ces sites externes et ne garantissons pas leur disponibilité ou leur exactitude.</p>
+      </div>
+    </section>
   </main>
+
+  <!-- SCRIPTS -->
+  <script>
+    document.getElementById('btn-logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Déconnexion simulée');
+    });
+  </script>
 </body>
 </html>

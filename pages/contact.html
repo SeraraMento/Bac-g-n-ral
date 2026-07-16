@@ -19,54 +19,85 @@
       <a href="ressources.html">Ressources</a>
     </div>
     <div class="nav-auth">
-      <a href="login.html" class="btn-login">Connexion</a>
-      <a href="register.html" class="btn-register">S'inscrire</a>
+      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
+      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
     </div>
   </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
+    <nav class="sidebar-nav">
+      <span class="sidebar-section">Révisions</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
+      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
+      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
+      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
+      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+
+      <span class="sidebar-section">Informations</span>
+      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">⚖️</span> Mentions légales</a>
+      <a href="contact.html" class="sidebar-link active"><span class="icon">📧</span> Contact</a>
+    </nav>
+  </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <div class="page-header">
-      <h1>📧 Contactez-nous</h1>
-      <p>Une question ? Une suggestion ? Contactez-nous !</p>
+      <h1>Contactez-nous</h1>
+      <p>Vous avez une question, une suggestion ou un problème ? N'hésitez pas à nous contacter !</p>
     </div>
 
-    <div class="form-card">
-      <h2>Formulaire de contact</h2>
-      <form id="contact-form" class="contact-form">
+    <section class="profile-section">
+      <h2><span class="icon">📧</span> Formulaire de contact</h2>
+      <form class="contact-form">
         <div class="form-group">
-          <label>Nom</label>
-          <input type="text" id="name" placeholder="Jean Dupont" required>
+          <label for="name">Nom *</label>
+          <input type="text" id="name" name="name" required>
         </div>
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="email" placeholder="jean.dupont@example.com" required>
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required>
         </div>
         <div class="form-group">
-          <label>Message</label>
-          <textarea id="message" rows="5" placeholder="Votre message..." required></textarea>
+          <label for="subject">Sujet *</label>
+          <input type="text" id="subject" name="subject" required>
         </div>
-        <button type="submit" class="btn-primary">Envoyer</button>
+        <div class="form-group">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn-edit">Envoyer</button>
       </form>
-      <div id="contact-msg" class="contact-msg"></div>
-    </div>
+    </section>
+
+    <section class="profile-section">
+      <h2><span class="icon">📍</span> Autres moyens de contact</h2>
+      <div class="info-box">
+        <p><strong>Email :</strong> contact@bac-general.fr</p>
+        <p><strong>Téléphone :</strong> [Ton numéro si tu veux]</p>
+        <p><strong>Réseaux sociaux :</strong></p>
+        <ul style="list-style: none; padding-left: 0;">
+          <li>📱 <a href="#" style="color: var(--accent);">Instagram</a></li>
+          <li>📘 <a href="#" style="color: var(--accent);">Facebook</a></li>
+          <li>🐦 <a href="#" style="color: var(--accent);">Twitter</a></li>
+        </ul>
+      </div>
+    </section>
   </main>
 
   <!-- SCRIPTS -->
   <script>
-    document.getElementById('contact-form').addEventListener('submit', async (e) => {
+    document.getElementById('btn-logout').addEventListener('click', (e) => {
       e.preventDefault();
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const message = document.getElementById('message').value;
+      alert('Déconnexion simulée');
+    });
 
-      // Ici, tu peux envoyer un email via Supabase Edge Functions ou un service comme Formspree
-      document.getElementById('contact-msg').innerHTML = `
-        <div class="alert alert-success">
-          Merci pour votre message ! Nous vous répondrons rapidement.
-        </div>
-      `;
-      document.getElementById('contact-form').reset();
+    // Gestion du formulaire de contact
+    document.querySelector('.contact-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Message envoyé ! (Cette fonctionnalité est à implémenter avec un backend)');
+      e.target.reset();
     });
   </script>
 </body>

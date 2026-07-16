@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ressources - Bac-Général</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
@@ -16,11 +16,11 @@
       <a href="fiches.html">Fiches</a>
       <a href="qcm.html">QCM</a>
       <a href="annales.html">Annales</a>
-      <a href="ressources.html">Ressources</a>
+      <a href="ressources.html" class="active">Ressources</a>
     </div>
     <div class="nav-auth">
-      <a href="login.html" class="btn-login">Connexion</a>
-      <a href="register.html" class="btn-register">S'inscrire</a>
+      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
+      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
     </div>
   </nav>
 
@@ -29,60 +29,127 @@
     <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
     <nav class="sidebar-nav">
       <span class="sidebar-section">Révisions</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
       <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
       <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
       <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
       <a href="ressources.html" class="sidebar-link active"><span class="icon">🎬</span> Ressources</a>
-      <span class="sidebar-section">Liens utiles</span>
-      <a href="#" class="sidebar-link"><span class="icon">🔗</span> Khan Academy</a>
-      <a href="#" class="sidebar-link"><span class="icon">🔗</span> Afterclasse</a>
+
+      <span class="sidebar-section">Informations</span>
+      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">⚖️</span> Mentions légales</a>
+      <a href="contact.html" class="sidebar-link"><span class="icon">📧</span> Contact</a>
     </nav>
   </aside>
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
     <div class="page-header">
-      <h1>🎬 Ressources externes</h1>
-      <p>Vidéos, cours en ligne et outils pour t'aider à réviser.</p>
+      <h1>Ressources complémentaires</h1>
+      <p>Vidéos, podcasts, sites recommandés et outils pour optimiser tes révisions.</p>
     </div>
 
-    <div class="matiere">
-      <h2>📚 Mathématiques</h2>
-      <div class="ressource-grid">
-        <div class="ressource-card">
-          <h3>Khan Academy - Maths</h3>
-          <p>Cours et exercices interactifs pour tous les niveaux.</p>
-          <a href="https://fr.khanacademy.org/math" target="_blank" class="btn-ghost">Voir →</a>
-        </div>
-        <div class="ressource-card">
-          <h3>Yvan Monka - Maths</h3>
-          <p>Vidéos pédagogiques pour le lycée.</p>
-          <a href="https://www.youtube.com/c/YvanMonkaMaths" target="_blank" class="btn-ghost">Voir →</a>
-        </div>
-      </div>
-    </div>
+    <!-- SECTION VIDEOS -->
+    <section class="profile-section">
+      <h2><span class="icon">🎥</span> Chaînes YouTube recommandées</h2>
 
-    <div class="matiere">
-      <h2>⚛️ Physique-Chimie</h2>
-      <div class="ressource-grid">
-        <div class="ressource-card">
-          <h3>Culture Sciences Physique</h3>
-          <p>Ressources pour la physique et la chimie.</p>
-          <a href="https://culturesciencesphysique.ens-lyon.fr/" target="_blank" class="btn-ghost">Voir →</a>
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-header">
+            <h3>Yvan Monka</h3>
+            <span class="resource-type">Maths</span>
+          </div>
+          <div class="resource-content">
+            <p>Cours clairs et exercices corrigés pour les maths.</p>
+            <a href="https://www.youtube.com/c/YvanMonka" target="_blank" class="btn-external">Voir la chaîne</a>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="matiere">
-      <h2>📖 Français</h2>
-      <div class="ressource-grid">
-        <div class="ressource-card">
-          <h3>Lumni - Français</h3>
-          <p>Vidéos et articles pour le bac de français.</p>
-          <a href="https://www.lumni.fr/discipline/francais" target="_blank" class="btn-ghost">Voir →</a>
+        <div class="resource-card">
+          <div class="resource-header">
+            <h3>Les Bons Profs</h3>
+            <span class="resource-type">Toutes matières</span>
+          </div>
+          <div class="resource-content">
+            <p>Ressources pour toutes les matières du bac général.</p>
+            <a href="https://www.youtube.com/c/LesBonsProfs" target="_blank" class="btn-external">Voir la chaîne</a>
+          </div>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-header">
+            <h3>KiffelesMaths</h3>
+            <span class="resource-type">Maths</span>
+          </div>
+          <div class="resource-content">
+            <p>Méthodes et astuces pour réussir en maths.</p>
+            <a href="https://www.youtube.com/c/KiffelesMaths" target="_blank" class="btn-external">Voir la chaîne</a>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- SECTION SITES -->
+    <section class="profile-section">
+      <h2><span class="icon">🌐</span> Sites utiles</h2>
+
+      <div class="resources-grid">
+        <div class="resource-card">
+          <div class="resource-header">
+            <h3>Afterclasse</h3>
+            <span class="resource-type">Fiches & QCM</span>
+          </div>
+          <div class="resource-content">
+            <p>Fiches de révision et QCM interactifs pour toutes les matières.</p>
+            <a href="https://www.afterclasse.fr" target="_blank" class="btn-external">Visiter Afterclasse</a>
+          </div>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-header">
+            <h3>Kartable</h3>
+            <span class="resource-type">Cours & Exercices</span>
+          </div>
+          <div class="resource-content">
+            <p>Cours complets et exercices corrigés pour le bac.</p>
+            <a href="https://www.kartable.fr" target="_blank" class="btn-external">Visiter Kartable</a>
+          </div>
+        </div>
+
+        <div class="resource-card">
+          <div class="resource-header">
+            <h3>Lumni</h3>
+            <span class="resource-type">Vidéos éducatives</span>
+          </div>
+          <div class="resource-content">
+            <p>Vidéos éducatives et documentaires pour approfondir tes connaissances.</p>
+            <a href="https://www.lumni.fr" target="_blank" class="btn-external">Visiter Lumni</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION OUTILS -->
+    <section class="profile-section">
+      <h2><span class="icon">🛠️</span> Outils et applications</h2>
+      <div class="info-box">
+        <ul style="list-style: none; padding-left: 0;">
+          <li>✅ <strong>Anki</strong> : Pour créer des flashcards et mémoriser tes cours</li>
+          <li>✅ <strong>Forest</strong> : Pour rester concentré pendant tes sessions de révision</li>
+          <li>✅ <strong>Notion</strong> : Pour organiser tes notes et ton planning de révisions</li>
+          <li>✅ <strong>Google Calendar</strong> : Pour planifier tes révisions et tes examens</li>
+        </ul>
+      </div>
+    </section>
   </main>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Logique de déconnexion
+    document.getElementById('btn-logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Déconnexion simulée (à implémenter avec Supabase)');
+      // window.location.href = '../index.html';
+    });
+  </script>
 </body>
 </html>

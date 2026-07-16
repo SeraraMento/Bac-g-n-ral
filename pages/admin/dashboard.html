@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <script>
-  // Vérifier si l'utilisateur est connecté et admin
+  // Vérifier si l'utilisateur est connecter et admin
   document.addEventListener('DOMContentLoaded', async () => {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) {

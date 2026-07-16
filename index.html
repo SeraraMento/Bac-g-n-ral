@@ -3,32 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon École - Connexion</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Mon École — Connexion</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Login page specific styles */
+        .login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 20px;
+        }
+        .login-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.2);
+        }
+        .login-box .logo-area {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .login-box .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .login-box .logo-area p {
+            color: var(--text-light);
+            font-size: .9rem;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-light);
+            border-radius: 8px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        .tab-btn.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .login-box .btn-accent {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 1rem;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: .85rem;
+            color: var(--text-light);
+        }
+        .login-footer a {
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>🎓 Mon École</h1>
-        <p>Plateforme éducative</p>
-        <form id="loginForm">
-            <div>
-                <label>Identifiant</label>
-                <input type="text" id="identifiant" placeholder="admin2026" required>
+    <div class="login-page">
+        <div class="login-box">
+            <div class="logo-area">
+                <h1>Mon <span>École</span></h1>
+                <p>Plateforme éducative</p>
             </div>
-            <div>
-                <label>Mot de passe</label>
-                <input type="password" id="password" placeholder="••••••••" required>
+
+            <!-- Tabs -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('login')">Connexion</button>
+                <button class="tab-btn" onclick="switchTab('register')">Inscription</button>
             </div>
-            <button type="submit">Connexion</button>
-        </form>
-        <p id="error" style="color: red; margin-top: 10px;"></p>
-        <p style="text-align: center; margin-top: 20px;">
-            Pas encore de compte ? <a href="register.html">S'inscrire</a>
-        </p>
+
+            <!-- Login Form -->
+            <div id="tab-login" class="tab-content active">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="votre@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Mot de passe</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-accent" id="btn-login">
+                        Se connecter
+                    </button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="tab-register" class="tab-content">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="reg-nom">Nom complet</label>
+                        <input type="text" id="reg-nom" class="form-control" placeholder="Jean Dupont" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Email</label>
+                        <input type="email" id="reg-email" class="form-control" placeholder="votre@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Mot de passe</label>
+                        <input type="password" id="reg-password" class="form-control" placeholder="Min. 6 caractères" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-role">Vous êtes</label>
+                        <select id="reg-role" class="form-control" required>
+                            <option value="">Sélectionnez...</option>
+                            <option value="eleve">Élève</option>
+                            <option value="prof">Professeur</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-accent" id="btn-register">
+                        Créer un compte
+                    </button>
+                </form>
+            </div>
+
+            <div class="login-footer">
+                <a href="dashboard.html">Accéder au tableau de bord →</a>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-client.js"></script>
-    <script src="js/login.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="utils.js"></script>
+    <script src="login.js"></script>
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('tab-login').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('tab-register').classList.add('active');
+            }
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>

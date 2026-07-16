@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Admin | Bac Général 2026</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../assets/images/logo.png" type="image/png">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Espace Administrateur</h1>
+            <p class="subtitle">Connectez-vous pour gérer le site</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn-login">Se connecter</button>
+            </form>
+
+            <div class="login-footer">
+                <a href="../index.html">← Retour au site</a>
+                <p class="error-message" id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Simulation de vérification (à remplacer par une vraie auth)
+            if (username === 'admin' && password === 'Bac2026Admin!') {
+                // Stocker la session (simulation)
+                localStorage.setItem('adminLoggedIn', 'true');
+                // Rediriger vers le dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                errorMessage.textContent = 'Identifiants incorrects. (Utilisez : admin / Bac2026Admin!)';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

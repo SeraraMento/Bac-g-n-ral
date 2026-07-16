@@ -33,22 +33,22 @@
 
     <div class="form-card">
       <h2>Formulaire de contact</h2>
-      <form id="contact-form">
+      <form id="contact-form" class="contact-form">
         <div class="form-group">
           <label>Nom</label>
-          <input type="text" id="name" required>
+          <input type="text" id="name" placeholder="Jean Dupont" required>
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" id="email" required>
+          <input type="email" id="email" placeholder="jean.dupont@example.com" required>
         </div>
         <div class="form-group">
           <label>Message</label>
-          <textarea id="message" rows="5" required></textarea>
+          <textarea id="message" rows="5" placeholder="Votre message..." required></textarea>
         </div>
         <button type="submit" class="btn-primary">Envoyer</button>
       </form>
-      <div id="contact-msg" style="margin-top:1rem;"></div>
+      <div id="contact-msg" class="contact-msg"></div>
     </div>
   </main>
 
@@ -61,7 +61,11 @@
       const message = document.getElementById('message').value;
 
       // Ici, tu peux envoyer un email via Supabase Edge Functions ou un service comme Formspree
-      document.getElementById('contact-msg').textContent = "Merci pour votre message ! Nous vous répondrons rapidement.";
+      document.getElementById('contact-msg').innerHTML = `
+        <div class="alert alert-success">
+          Merci pour votre message ! Nous vous répondrons rapidement.
+        </div>
+      `;
       document.getElementById('contact-form').reset();
     });
   </script>

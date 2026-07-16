@@ -44,22 +44,61 @@
   <main class="main-content">
     <div class="page-header">
       <h1>👤 Mon profil</h1>
-      <p>Gérez vos informations et préférences.</p>
+      <p>Gérez vos informations, consultez votre progression et personnalisez votre expérience.</p>
     </div>
 
+    <!-- INFOS PERSONNELLES -->
     <div class="form-card">
-      <h2>Informations personnelles</h2>
-      <div id="profile-info">
-        <p><strong>Nom :</strong> <span id="user-fullname">Chargement...</span></p>
-        <p><strong>Email :</strong> <span id="user-email">Chargement...</span></p>
-        <p><strong>Rôle :</strong> <span id="user-role">Chargement...</span></p>
+      <h2>📋 Informations personnelles</h2>
+      <div class="profile-info-grid">
+        <div class="profile-field">
+          <label>Nom complet</label>
+          <div id="user-fullname" class="profile-value">Chargement...</div>
+        </div>
+        <div class="profile-field">
+          <label>Email</label>
+          <div id="user-email" class="profile-value">Chargement...</div>
+        </div>
+        <div class="profile-field">
+          <label>Rôle</label>
+          <div id="user-role" class="profile-value">Chargement...</div>
+        </div>
+        <div class="profile-field">
+          <label>Membre depuis</label>
+          <div id="user-joined" class="profile-value">Chargement...</div>
+        </div>
+      </div>
+      <button class="btn-primary" id="btn-edit-profile" style="margin-top:1rem;">Modifier mon profil</button>
+    </div>
+
+    <!-- PROGRESSION -->
+    <div class="form-card">
+      <h2>📊 Ma progression</h2>
+      <div class="progress-stats">
+        <div class="stat-card">
+          <div class="stat-label">Fiches lues</div>
+          <div class="stat-value" id="stat-fiches-lues">0</div>
+          <div class="stat-sub">sur <span id="total-fiches">0</span> fiches disponibles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">QCM terminés</div>
+          <div class="stat-value" id="stat-qcm-termine">0</div>
+          <div class="stat-sub">sur <span id="total-qcm">0</span> QCM disponibles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Score moyen</div>
+          <div class="stat-value" id="stat-score-moyen">0<span style="font-size:1.5rem;">%</span></div>
+          <div class="stat-sub">sur les QCM réalisés</div>
+        </div>
       </div>
     </div>
 
+    <!-- DERNIÈRES ACTIVITÉS -->
     <div class="form-card">
-      <h2>Progression</h2>
-      <div id="progression-stats">
-        <!-- Stats de progression (fiches lues, QCM faits, etc.) -->
+      <h2>📅 Dernières activités</h2>
+      <div id="last-activities" class="activities-list">
+        <!-- Les activités seront chargées ici -->
+        <p style="text-align:center; color:var(--muted);">Aucune activité récente.</p>
       </div>
     </div>
   </main>
@@ -68,22 +107,117 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
   <script>
-    // Récupérer les infos utilisateur
-    async function loadProfile() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) window.location.href = '../index.html';
+    // Variables globales
+    let userId = null;
+    let progressionData = null;
+    let fichesData = [];
+    let qcmData = [];
 
-      const { data: profile, error } = await supabaseClient
+    // Charger les données au démarrage
+    async function loadProfile() {
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      if (userError || !user) {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      userId = user.id;
+
+      // Récupérer le profil
+      const { data: profile, error: profileError } = await supabaseClient
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
-      if (error) console.error(error);
-      else {
-        document.getElementById('user-fullname').textContent = profile.full_name;
+      if (profileError) {
+        console.error(profileError);
+      } else {
+        document.getElementById('user-fullname').textContent = profile.full_name || 'Non renseigné';
         document.getElementById('user-email').textContent = user.email;
-        document.getElementById('user-role').textContent = profile.role;
+        document.getElementById('user-role').textContent = profile.role === 'admin' ? 'Administrateur' : 'Élève';
+        document.getElementById('user-joined').textContent = new Date(profile.created_at).toLocaleDateString('fr-FR');
+      }
+
+      // Récupérer la progression
+      await loadProgression();
+
+      // Récupérer les fiches et QCM
+      await loadFiches();
+      await loadQcm();
+
+      // Afficher les stats
+      updateStats();
+    }
+
+    // Charger la progression de l'utilisateur
+    async function loadProgression() {
+      const { data, error } = await supabaseClient
+        .from('progression')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error(error);
+      } else {
+        progressionData = data;
+      }
+    }
+
+    // Charger les fiches disponibles
+    async function loadFiches() {
+      const { data, error } = await supabaseClient
+        .from('fiches')
+        .select('*');
+
+      if (error) {
+        console.error(error);
+      } else {
+        fichesData = data;
+      }
+    }
+
+    // Charger les QCM disponibles
+    async function loadQcm() {
+      const { data, error } = await supabaseClient
+        .from('qcm')
+        .select('*');
+
+      if (error) {
+        console.error(error);
+      } else {
+        qcmData = data;
+      }
+    }
+
+    // Mettre à jour les statistiques
+    function updateStats() {
+      if (!progressionData || !fichesData || !qcmData) return;
+
+      // Fiches lues
+      const fichesLues = progressionData.length;
+      document.getElementById('stat-fiches-lues').textContent = fichesLues;
+
+      // Total fiches
+      const totalFiches = fichesData.length;
+      document.getElementById('total-fiches').textContent = totalFiches;
+
+      // QCM terminés
+      const qcmTermines = progressionData.filter(p => p.qcm_id).length;
+      document.getElementById('stat-qcm-termine').textContent = qcmTermines;
+
+      // Total QCM
+      const totalQcm = qcmData.length;
+      document.getElementById('total-qcm').textContent = totalQcm;
+
+      // Score moyen (simplifié pour l'exemple)
+      const scores = progressionData
+        .filter(p => p.score !== undefined)
+        .map(p => p.score);
+
+      if (scores.length > 0) {
+        const scoreMoyen = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        document.getElementById('stat-score-moyen').textContent = scoreMoyen;
       }
     }
 

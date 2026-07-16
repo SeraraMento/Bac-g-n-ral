@@ -36,120 +36,192 @@
       <a href="ressources.html" class="sidebar-link active"><span class="icon">🎬</span> Ressources</a>
 
       <span class="sidebar-section">Informations</span>
-      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">⚖️</span> Mentions légales</a>
-      <a href="contact.html" class="sidebar-link"><span class="icon">📧</span> Contact</a>
+      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">ℹ️</span> Mentions légales</a>
+      <a href="contact.html" class="sidebar-link"><span class="icon">✉️</span> Contact</a>
     </nav>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  <!-- CONTENU PRINCIPAL -->
   <main class="main-content">
     <div class="page-header">
-      <h1>Ressources complémentaires</h1>
-      <p>Vidéos, podcasts, sites recommandés et outils pour optimiser tes révisions.</p>
+      <h1>Ressources pédagogiques</h1>
+      <p>Vidéos, fiches, liens externes et outils pour t'aider dans tes révisions.</p>
     </div>
 
-    <!-- SECTION VIDEOS -->
-    <section class="profile-section">
-      <h2><span class="icon">🎥</span> Chaînes YouTube recommandées</h2>
-
-      <div class="resources-grid">
-        <div class="resource-card">
-          <div class="resource-header">
-            <h3>Yvan Monka</h3>
-            <span class="resource-type">Maths</span>
-          </div>
-          <div class="resource-content">
-            <p>Cours clairs et exercices corrigés pour les maths.</p>
-            <a href="https://www.youtube.com/c/YvanMonka" target="_blank" class="btn-external">Voir la chaîne</a>
-          </div>
-        </div>
-
-        <div class="resource-card">
-          <div class="resource-header">
-            <h3>Les Bons Profs</h3>
-            <span class="resource-type">Toutes matières</span>
-          </div>
-          <div class="resource-content">
-            <p>Ressources pour toutes les matières du bac général.</p>
-            <a href="https://www.youtube.com/c/LesBonsProfs" target="_blank" class="btn-external">Voir la chaîne</a>
-          </div>
-        </div>
-
-        <div class="resource-card">
-          <div class="resource-header">
-            <h3>KiffelesMaths</h3>
-            <span class="resource-type">Maths</span>
-          </div>
-          <div class="resource-content">
-            <p>Méthodes et astuces pour réussir en maths.</p>
-            <a href="https://www.youtube.com/c/KiffelesMaths" target="_blank" class="btn-external">Voir la chaîne</a>
-          </div>
-        </div>
+    <!-- FILTRES -->
+    <div class="resources-filters">
+      <div class="filter-group">
+        <label for="category-filter">Matière :</label>
+        <select id="category-filter">
+          <option value="">Toutes</option>
+          <option value="Maths">Maths</option>
+          <option value="Physique-Chimie">Physique-Chimie</option>
+          <option value="SVT">SVT</option>
+          <option value="Histoire-Géo">Histoire-Géo</option>
+        </select>
       </div>
-    </section>
 
-    <!-- SECTION SITES -->
-    <section class="profile-section">
-      <h2><span class="icon">🌐</span> Sites utiles</h2>
-
-      <div class="resources-grid">
-        <div class="resource-card">
-          <div class="resource-header">
-            <h3>Afterclasse</h3>
-            <span class="resource-type">Fiches & QCM</span>
-          </div>
-          <div class="resource-content">
-            <p>Fiches de révision et QCM interactifs pour toutes les matières.</p>
-            <a href="https://www.afterclasse.fr" target="_blank" class="btn-external">Visiter Afterclasse</a>
-          </div>
-        </div>
-
-        <div class="resource-card">
-          <div class="resource-header">
-            <h3>Kartable</h3>
-            <span class="resource-type">Cours & Exercices</span>
-          </div>
-          <div class="resource-content">
-            <p>Cours complets et exercices corrigés pour le bac.</p>
-            <a href="https://www.kartable.fr" target="_blank" class="btn-external">Visiter Kartable</a>
-          </div>
-        </div>
-
-        <div class="resource-card">
-          <div class="resource-header">
-            <h3>Lumni</h3>
-            <span class="resource-type">Vidéos éducatives</span>
-          </div>
-          <div class="resource-content">
-            <p>Vidéos éducatives et documentaires pour approfondir tes connaissances.</p>
-            <a href="https://www.lumni.fr" target="_blank" class="btn-external">Visiter Lumni</a>
-          </div>
-        </div>
+      <div class="filter-group">
+        <label for="type-filter">Type :</label>
+        <select id="type-filter">
+          <option value="">Tous</option>
+          <option value="video">Vidéos</option>
+          <option value="pdf">Fiches/PDF</option>
+          <option value="lien">Liens externes</option>
+        </select>
       </div>
-    </section>
 
-    <!-- SECTION OUTILS -->
-    <section class="profile-section">
-      <h2><span class="icon">🛠️</span> Outils et applications</h2>
-      <div class="info-box">
-        <ul style="list-style: none; padding-left: 0;">
-          <li>✅ <strong>Anki</strong> : Pour créer des flashcards et mémoriser tes cours</li>
-          <li>✅ <strong>Forest</strong> : Pour rester concentré pendant tes sessions de révision</li>
-          <li>✅ <strong>Notion</strong> : Pour organiser tes notes et ton planning de révisions</li>
-          <li>✅ <strong>Google Calendar</strong> : Pour planifier tes révisions et tes examens</li>
-        </ul>
+      <div class="filter-group">
+        <label for="difficulty-filter">Difficulté :</label>
+        <select id="difficulty-filter">
+          <option value="">Toutes</option>
+          <option value="débutant">Débutant</option>
+          <option value="intermédiaire">Intermédiaire</option>
+          <option value="avancé">Avancé</option>
+        </select>
       </div>
-    </section>
+    </div>
+
+    <!-- GRILLE DES RESSOURCES -->
+    <div class="resources-grid" id="resources-grid">
+      <!-- Chargé dynamiquement depuis Supabase -->
+    </div>
   </main>
 
-  <!-- SCRIPTS -->
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-column">
+        <h3>Bac Général</h3>
+        <p>Toutes les ressources pour réussir ton bac général.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Liens utiles</h3>
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="contact.html">Contact</a>
+        <a href="#" id="btn-admin">Espace admin</a>
+      </div>
+      <div class="footer-column">
+        <h3>Réseaux</h3>
+        <a href="#" target="_blank">Instagram</a>
+        <a href="#" target="_blank">YouTube</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Bac Général. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT POUR CHARGEMENT DES RESSOURCES -->
+  <script src="../js/supabase-config.js"></script>
   <script>
-    // Logique de déconnexion
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Déconnexion simulée (à implémenter avec Supabase)');
-      // window.location.href = '../index.html';
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Vérifie si l'utilisateur est admin
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        document.getElementById('btn-admin').href = 'admin/ressources.html';
+      }
+
+      // Charge les ressources
+      await loadRessources();
+
+      // Ajoute les écouteurs d'événements pour les filtres
+      document.getElementById('category-filter').addEventListener('change', filterRessources);
+      document.getElementById('type-filter').addEventListener('change', filterRessources);
+      document.getElementById('difficulty-filter').addEventListener('change', filterRessources);
     });
+
+    async function loadRessources() {
+      const { data: ressources, error } = await supabase
+        .from('ressources')
+        .select('*')
+        .eq('is_active', true)
+        .order('title');
+
+      if (error) {
+        console.error('Erreur lors du chargement des ressources:', error);
+        return;
+      }
+
+      const grid = document.getElementById('resources-grid');
+      grid.innerHTML = '';
+
+      ressources.forEach(ressource => {
+        const resourceCard = document.createElement('div');
+        resourceCard.className = 'resource-card';
+
+        // Icône selon le type
+        let icon = '';
+        switch(ressource.type) {
+          case 'video': icon = '🎥'; break;
+          case 'pdf': icon = '📄'; break;
+          case 'lien': icon = '🔗'; break;
+          case 'fiche': icon = '📋'; break;
+        }
+
+        // Badge de difficulté
+        let difficultyBadge = '';
+        switch(ressource.difficulty) {
+          case 'débutant': difficultyBadge = '<span class="badge difficulty-debutant">Débutant</span>'; break;
+          case 'intermédiaire': difficultyBadge = '<span class="badge difficulty-intermediaire">Intermédiaire</span>'; break;
+          case 'avancé': difficultyBadge = '<span class="badge difficulty-avance">Avancé</span>'; break;
+        }
+
+        resourceCard.innerHTML = `
+          <div class="resource-header">
+            <h3>${icon} ${ressource.title}</h3>
+            ${difficultyBadge}
+          </div>
+          <div class="resource-content">
+            <p>${ressource.description}</p>
+            ${ressource.thumbnail_url ? `<img src="${ressource.thumbnail_url}" alt="${ressource.title}" class="resource-thumbnail">` : ''}
+            <div class="resource-meta">
+              <span class="resource-type">${ressource.type}</span>
+              <span class="resource-category">${ressource.category}</span>
+            </div>
+            <a href="${ressource.link}" target="_blank" class="btn-external">
+              ${getButtonText(ressource.type)}
+            </a>
+          </div>
+        `;
+
+        grid.appendChild(resourceCard);
+      });
+    }
+
+    function getButtonText(type) {
+      switch(type) {
+        case 'video': return 'Regarder la vidéo';
+        case 'pdf': return 'Télécharger le PDF';
+        case 'lien': return 'Voir le lien';
+        case 'fiche': return 'Consulter la fiche';
+        default: return 'Accéder';
+      }
+    }
+
+    function filterRessources() {
+      const category = document.getElementById('category-filter').value;
+      const type = document.getElementById('type-filter').value;
+      const difficulty = document.getElementById('difficulty-filter').value;
+
+      const cards = document.querySelectorAll('.resource-card');
+
+      cards.forEach(card => {
+        const cardCategory = card.querySelector('.resource-category').textContent;
+        const cardType = card.querySelector('.resource-type').textContent.toLowerCase();
+        const cardDifficulty = card.querySelector('.badge')?.textContent.toLowerCase();
+
+        const matchesCategory = !category || cardCategory === category;
+        const matchesType = !type || cardType === type;
+        const matchesDifficulty = !difficulty || cardDifficulty?.includes(difficulty.toLowerCase());
+
+        if (matchesCategory && matchesType && matchesDifficulty) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
   </script>
 </body>
 </html>

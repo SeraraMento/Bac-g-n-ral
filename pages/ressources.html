@@ -1,164 +1,84 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ressources - Bac Général</title>
-  <link rel="stylesheet" href="../css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fiches méthodes, programmes officiels et outils pour le Bac Général 2026">
+    <title>Ressources | Bac Général 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
 </head>
 <body>
-  <div class="container">
     <header>
-      <h1>Ressources pédagogiques</h1>
-      <nav>
-        <a href="../index.html">Accueil</a> |
-        <a href="fiches.html">Fiches</a> |
-        <a href="qcm.html">QCM</a> |
-        <a href="annales.html">Annales</a> |
-        <a href="login.html">Connexion</a>
-      </nav>
+        <div class="container">
+            <h1>Ressources pour le Bac Général 2026</h1>
+            <nav>
+                <a href="index.html">Accueil</a>
+                <a href="annales.html">Annales</a>
+                <a href="ressources.html" class="active">Ressources</a>
+                <a href="contact.html">Contact</a>
+                <a href="mentions-legales.html">Mentions légales</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-      <section class="resources-container">
-        <h2>Trouve des ressources adaptées à ton niveau</h2>
-
-        <div class="filters">
-          <select id="filter-category">
-            <option value="">Toutes les matières</option>
-            <option value="Maths">Maths</option>
-            <option value="Physique-Chimie">Physique-Chimie</option>
-            <option value="SVT">SVT</option>
-            <option value="Histoire-Géo">Histoire-Géographie</option>
-            <option value="Français">Français</option>
-            <option value="Philosophie">Philosophie</option>
-            <option value="Anglais">Anglais</option>
-          </select>
-
-          <select id="filter-type">
-            <option value="">Tous les types</option>
-            <option value="video">Vidéos</option>
-            <option value="lien">Liens externes</option>
-            <option value="pdf">PDF</option>
-            <option value="fiche">Fiches de cours</option>
-          </select>
-
-          <select id="filter-difficulty">
-            <option value="">Toutes difficultés</option>
-            <option value="débutant">Débutant</option>
-            <option value="intermédiaire">Intermédiaire</option>
-            <option value="avancé">Avancé</option>
-          </select>
-        </div>
-
-        <div class="resources-grid" id="resources-grid">
-          <!-- Les ressources seront chargées ici -->
-          <p>Chargement en cours...</p>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <script src="../js/supabase-config.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Charge les ressources
-      await loadRessources();
-
-      // Gestion des filtres
-      document.getElementById('filter-category').addEventListener('change', filterRessources);
-      document.getElementById('filter-type').addEventListener('change', filterRessources);
-      document.getElementById('filter-difficulty').addEventListener('change', filterRessources);
-    });
-
-    async function loadRessources() {
-      try {
-        const { data: ressources, error } = await supabase
-          .from('ressources')
-          .select('*')
-          .eq('is_active', true)
-          .order('title');
-
-        if (error) throw error;
-
-        const grid = document.getElementById('resources-grid');
-        grid.innerHTML = '';
-
-        if (!ressources || ressources.length === 0) {
-          grid.innerHTML = '<p>Aucune ressource disponible pour le moment.</p>';
-          return;
-        }
-
-        ressources.forEach(ressource => {
-          const card = document.createElement('div');
-          card.className = 'resource-card';
-
-          // Gestion de l'image/thumbnail
-          let thumbnailHtml = '';
-          if (ressource.thumbnail_url) {
-            thumbnailHtml = `<img src="${ressource.thumbnail_url}" alt="${ressource.title}" class="resource-thumbnail">`;
-          } else {
-            // Image par défaut selon le type
-            const defaultImages = {
-              video: 'https://via.placeholder.com/300x180/ff6b6b/ffffff?text=Vidéo',
-              lien: 'https://via.placeholder.com/300x180/4ecdc4/ffffff?text=Lien',
-              pdf: 'https://via.placeholder.com/300x180/45b7d1/ffffff?text=PDF',
-              fiche: 'https://via.placeholder.com/300x180/f9ca24/ffffff?text=Fiche'
-            };
-            thumbnailHtml = `<img src="${defaultImages[ressource.type] || defaultImages.lien}" alt="${ressource.title}" class="resource-thumbnail">`;
-          }
-
-          card.innerHTML = `
-            ${thumbnailHtml}
-            <div class="resource-content">
-              <span class="resource-category">${ressource.category}</span>
-              <h3 class="resource-title">${ressource.title}</h3>
-              <p class="resource-description">${ressource.description}</p>
-              <div class="resource-meta">
-                <span class="resource-type">${ressource.type}</span>
-                <span class="resource-difficulty difficulty-${ressource.difficulty}">
-                  ${ressource.difficulty}
-                </span>
-              </div>
-              ${ressource.link ? `
-                <a href="${ressource.link}" class="btn-download" target="_blank">
-                  Voir la ressource
-                </a>
-              ` : ''}
+        <section class="page-header">
+            <div class="container">
+                <h2>Fiches, outils et programmes pour réussir</h2>
+                <p>Téléchargez des ressources gratuites pour optimiser vos révisions.</p>
             </div>
-          `;
+        </section>
 
-          grid.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Erreur lors du chargement des ressources:', err);
-        document.getElementById('resources-grid').innerHTML =
-          '<p>Une erreur est survenue lors du chargement des ressources.</p>';
-      }
-    }
+        <section class="resources-grid">
+            <div class="container">
+                <div class="resource-card">
+                    <h3>Fiches méthodes</h3>
+                    <p>Fiches synthétiques pour chaque épreuve du bac.</p>
+                    <a href="assets/pdf/fiches-methodes.pdf" download class="btn">
+                        <span>Télécharger</span>
+                        <span class="file-size">(1.2 Mo)</span>
+                    </a>
+                </div>
 
-    function filterRessources() {
-      const category = document.getElementById('filter-category').value;
-      const type = document.getElementById('filter-type').value;
-      const difficulty = document.getElementById('filter-difficulty').value;
+                <div class="resource-card">
+                    <h3>Programmes officiels</h3>
+                    <p>Les programmes complets pour chaque spécialité.</p>
+                    <a href="assets/pdf/programmes-officiels.pdf" download class="btn">
+                        <span>Télécharger</span>
+                        <span class="file-size">(850 Ko)</span>
+                    </a>
+                </div>
 
-      const cards = document.querySelectorAll('.resource-card');
-      cards.forEach(card => {
-        const cardCategory = card.querySelector('.resource-category').textContent;
-        const cardType = card.querySelector('.resource-type').textContent;
-        const cardDifficulty = card.querySelector('.resource-difficulty').textContent.trim();
+                <div class="resource-card">
+                    <h3>Annales complètes (ZIP)</h3>
+                    <p>Toutes les annales en un seul fichier compressé.</p>
+                    <a href="assets/pdf/annales-completes.zip" download class="btn">
+                        <span>Télécharger</span>
+                        <span class="file-size">(15 Mo)</span>
+                    </a>
+                </div>
 
-        const matchesCategory = !category || cardCategory === category;
-        const matchesType = !type || cardType === type;
-        const matchesDifficulty = !difficulty || cardDifficulty === difficulty;
+                <div class="resource-card">
+                    <h3>Calendrier des épreuves</h3>
+                    <p>Dates et horaires des épreuves du bac 2026.</p>
+                    <a href="assets/pdf/calendrier-epreuves.pdf" download class="btn">
+                        <span>Télécharger</span>
+                        <span class="file-size">(450 Ko)</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        if (matchesCategory && matchesType && matchesDifficulty) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    }
-  </script>
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Bac Général. Tous droits réservés.</p>
+            <nav>
+                <a href="mentions-legales.html">Mentions légales</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </footer>
 </body>
 </html>

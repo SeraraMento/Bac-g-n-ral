@@ -1,314 +1,157 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestion des ressources - Bac Général</title>
-  <link rel="stylesheet" href="../../css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des ressources | Bac Général</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/admin.css">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Gestion des ressources</h1>
-      <nav>
-        <a href="../../index.html">Accueil</a> |
-        <a href="../dashboard.html">Dashboard</a> |
-        <a href="../ressources.html">Voir les ressources</a>
-      </nav>
-    </header>
+    <div class="admin-layout">
+        <!-- Barre latérale -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <p>Bac Général</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span>📊</span> Tableau de bord
+                </a>
+                <a href="fiches.html">
+                    <span>📝</span> Fiches
+                </a>
+                <a href="qcm.html">
+                    <span>❓</span> QCM
+                </a>
+                <a href="annales.html">
+                    <span>📄</span> Annales
+                </a>
+                <a href="ressources.html" class="active">
+                    <span>🔗</span> Ressources
+                </a>
+                <a href="users.html">
+                    <span>👤</span> Utilisateurs
+                </a>
+                <a href="stats.html">
+                    <span>📈</span> Statistiques
+                </a>
+                <a href="../login.html" class="logout-link">
+                    <span>↩️</span> Déconnexion
+                </a>
+            </nav>
+        </aside>
 
-    <main>
-      <!-- Formulaire d'ajout -->
-      <section id="add-ressource-section">
-        <h2>Ajouter une nouvelle ressource</h2>
-        <form id="add-ressource-form">
-          <div class="form-group">
-            <label for="title">Titre</label>
-            <input type="text" id="title" required>
-          </div>
+        <!-- Contenu principal -->
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Gestion des ressources</h1>
+                <p>Ajoutez des liens vers des vidéos, sites externes, etc.</p>
+            </header>
 
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" required></textarea>
-          </div>
+            <section class="admin-section">
+                <h2>Ajouter une nouvelle ressource</h2>
+                <form id="ressourceForm" class="upload-form">
+                    <div class="form-group">
+                        <label for="ressourceTitle">Titre de la ressource</label>
+                        <input type="text" id="ressourceTitle" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ressourceType">Type</label>
+                        <select id="ressourceType" name="type" required>
+                            <option value="video">Vidéo</option>
+                            <option value="lien">Lien externe</option>
+                            <option value="document">Document PDF</option>
+                            <option value="outil">Outil en ligne</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ressourceUrl">URL</label>
+                        <input type="url" id="ressourceUrl" name="url" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ressourceDescription">Description</label>
+                        <textarea id="ressourceDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Ajouter la ressource</button>
+                </form>
+            </section>
 
-          <div class="form-group">
-            <label for="type">Type</label>
-            <select id="type" required>
-              <option value="video">Vidéo</option>
-              <option value="lien">Lien externe</option>
-              <option value="pdf">PDF</option>
-              <option value="fiche">Fiche de cours</option>
-            </select>
-          </div>
+            <section class="admin-section">
+                <h2>Liste des ressources disponibles</h2>
+                <div class="pdf-table-container">
+                    <table class="pdf-table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>URL</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Khan Academy - Maths</td>
+                                <td>Lien externe</td>
+                                <td><a href="https://fr.khanacademy.org" target="_blank">https://fr.khanacademy.org</a></td>
+                                <td>
+                                    <button class="btn-edit">✏️</button>
+                                    <button class="btn-delete">🗑️</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cours de SVT - YouTube</td>
+                                <td>Vidéo</td>
+                                <td><a href="https://youtube.com/watch?v=exemple" target="_blank">https://youtube.com/watch?v=exemple</a></td>
+                                <td>
+                                    <button class="btn-edit">✏️</button>
+                                    <button class="btn-delete">🗑️</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
 
-          <div class="form-group">
-            <label for="category">Matière</label>
-            <select id="category" required>
-              <option value="Maths">Maths</option>
-              <option value="Physique-Chimie">Physique-Chimie</option>
-              <option value="SVT">SVT</option>
-              <option value="Histoire-Géo">Histoire-Géographie</option>
-              <option value="Français">Français</option>
-              <option value="Philosophie">Philosophie</option>
-              <option value="Anglais">Anglais</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="difficulty">Difficulté</label>
-            <select id="difficulty">
-              <option value="débutant">Débutant</option>
-              <option value="intermédiaire" selected>Intermédiaire</option>
-              <option value="avancé">Avancé</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="link">Lien (URL)</label>
-            <input type="url" id="link" required>
-          </div>
-
-          <div class="form-group">
-            <label for="thumbnail_url">URL de l'image miniature (optionnel)</label>
-            <input type="url" id="thumbnail_url" placeholder="https://example.com/image.jpg">
-          </div>
-
-          <div class="form-group">
-            <label for="duration">Durée (pour les vidéos, ex: 12:34)</label>
-            <input type="text" id="duration" placeholder="HH:MM">
-          </div>
-
-          <div class="form-group">
-            <label>
-              <input type="checkbox" id="is_active" checked>
-              Ressource active (visible pour les élèves)
-            </label>
-          </div>
-
-          <button type="submit" class="btn-primary">Ajouter la ressource</button>
-        </form>
-      </section>
-
-      <!-- Liste des ressources -->
-      <section id="resources-list-section">
-        <h2>Liste des ressources</h2>
-        <div class="filters">
-          <select id="filter-category">
-            <option value="">Toutes les matières</option>
-            <option value="Maths">Maths</option>
-            <option value="Physique-Chimie">Physique-Chimie</option>
-            <option value="SVT">SVT</option>
-            <option value="Histoire-Géo">Histoire-Géographie</option>
-            <option value="Français">Français</option>
-            <option value="Philosophie">Philosophie</option>
-            <option value="Anglais">Anglais</option>
-          </select>
-
-          <select id="filter-type">
-            <option value="">Tous les types</option>
-            <option value="video">Vidéo</option>
-            <option value="lien">Lien</option>
-            <option value="pdf">PDF</option>
-            <option value="fiche">Fiche</option>
-          </select>
-
-          <select id="filter-difficulty">
-            <option value="">Toutes difficultés</option>
-            <option value="débutant">Débutant</option>
-            <option value="intermédiaire">Intermédiaire</option>
-            <option value="avancé">Avancé</option>
-          </select>
-        </div>
-
-        <div id="alert-message" class="alert" style="display: none;"></div>
-
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Titre</th>
-              <th>Type</th>
-              <th>Matière</th>
-              <th>Difficulté</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="resources-table-body">
-            <!-- Les ressources seront chargées ici -->
-          </tbody>
-        </table>
-      </section>
-    </main>
-  </div>
-
-  <script src="../../js/supabase-config.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Vérifie l'authentification et les droits admin
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (!user) {
-        window.location.href = '../../pages/login.html';
-        return;
-      }
-
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError || profile.role !== 'admin') {
-        window.location.href = '../../pages/dashboard.html';
-        return;
-      }
-
-      // Charge les ressources
-      await loadRessourcesAdmin();
-
-      // Gestion du formulaire d'ajout
-      document.getElementById('add-ressource-form').addEventListener('submit', addRessource);
-
-      // Gestion des filtres
-      document.getElementById('filter-category').addEventListener('change', filterRessources);
-      document.getElementById('filter-type').addEventListener('change', filterRessources);
-      document.getElementById('filter-difficulty').addEventListener('change', filterRessources);
-    });
-
-    async function loadRessourcesAdmin() {
-      try {
-        const { data: ressources, error } = await supabase
-          .from('ressources')
-          .select('*')
-          .order('title');
-
-        if (error) throw error;
-
-        const tableBody = document.getElementById('resources-table-body');
-        tableBody.innerHTML = '';
-
-        if (!ressources || ressources.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="6">Aucune ressource trouvée.</td></tr>';
-          return;
+    <script>
+        // Vérification de la session admin
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = '../login.html';
         }
 
-        ressources.forEach(ressource => {
-          const row = document.createElement('tr');
-
-          row.innerHTML = `
-            <td>${ressource.title}</td>
-            <td>${ressource.type}</td>
-            <td>${ressource.category}</td>
-            <td>
-              <span class="resource-difficulty difficulty-${ressource.difficulty}">
-                ${ressource.difficulty}
-              </span>
-            </td>
-            <td>${ressource.is_active ? 'Active' : 'Inactive'}</td>
-            <td>
-              <button class="btn-edit" onclick="editRessource('${ressource.id}')">Modifier</button>
-              <button class="btn-delete" onclick="deleteRessource('${ressource.id}')">Supprimer</button>
-            </td>
-          `;
-
-          tableBody.appendChild(row);
+        // Déconnexion
+        document.querySelector('.logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = '../login.html';
         });
-      } catch (err) {
-        showAlert('Erreur lors du chargement des ressources: ' + err.message, 'error');
-        console.error(err);
-      }
-    }
 
-    async function addRessource(e) {
-      e.preventDefault();
+        // Gestion du formulaire
+        document.getElementById('ressourceForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Ressource ajoutée avec succès ! (Simulation)');
+            document.getElementById('ressourceForm').reset();
+        });
 
-      const formData = {
-        title: document.getElementById('title').value.trim(),
-        description: document.getElementById('description').value.trim(),
-        type: document.getElementById('type').value,
-        category: document.getElementById('category').value,
-        difficulty: document.getElementById('difficulty').value,
-        link: document.getElementById('link').value.trim(),
-        thumbnail_url: document.getElementById('thumbnail_url').value.trim(),
-        duration: document.getElementById('duration').value.trim(),
-        is_active: document.getElementById('is_active').checked
-      };
+        // Gestion des boutons
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('Édition de la ressource (Simulation)');
+            });
+        });
 
-      try {
-        const { data, error } = await supabase
-          .from('ressources')
-          .insert([formData])
-          .select();
-
-        if (error) throw error;
-
-        showAlert('Ressource ajoutée avec succès !', 'success');
-        document.getElementById('add-ressource-form').reset();
-        await loadRessourcesAdmin();
-      } catch (err) {
-        showAlert('Erreur: ' + err.message, 'error');
-        console.error(err);
-      }
-    }
-
-    async function editRessource(id) {
-      // À implémenter si besoin
-      alert('Fonctionnalité à venir: édition de la ressource ' + id);
-    }
-
-    async function deleteRessource(id) {
-      if (!confirm('Voulez-vous vraiment supprimer cette ressource ?')) return;
-
-      try {
-        const { error } = await supabase
-          .from('ressources')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
-
-        showAlert('Ressource supprimée avec succès !', 'success');
-        await loadRessourcesAdmin();
-      } catch (err) {
-        showAlert('Erreur: ' + err.message, 'error');
-        console.error(err);
-      }
-    }
-
-    function filterRessources() {
-      const category = document.getElementById('filter-category').value;
-      const type = document.getElementById('filter-type').value;
-      const difficulty = document.getElementById('filter-difficulty').value;
-
-      // Filtrer les lignes du tableau
-      const rows = document.querySelectorAll('#resources-table-body tr');
-      rows.forEach(row => {
-        const rowCategory = row.cells[2].textContent;
-        const rowType = row.cells[1].textContent;
-        const rowDifficulty = row.cells[3].textContent.trim();
-
-        const matchesCategory = !category || rowCategory === category;
-        const matchesType = !type || rowType === type;
-        const matchesDifficulty = !difficulty || rowDifficulty === difficulty;
-
-        if (matchesCategory && matchesType && matchesDifficulty) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    }
-
-    function showAlert(message, type) {
-      const alertDiv = document.getElementById('alert-message');
-      alertDiv.textContent = message;
-      alertDiv.className = `alert alert-${type}`;
-      alertDiv.style.display = 'block';
-
-      setTimeout(() => {
-        alertDiv.style.display = 'none';
-      }, 5000);
-    }
-  </script>
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (confirm('Voulez-vous vraiment supprimer cette ressource ?')) {
+                    btn.closest('tr').remove();
+                    alert('Ressource supprimée !');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

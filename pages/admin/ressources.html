@@ -1,83 +1,60 @@
 <!DOCTYPE html>
 <html lang="fr">
-  
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin - Ressources</title>
-  <link rel="stylesheet" href="../../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des ressources - Bac Général</title>
+  <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-  <!-- NAV -->
-  <nav class="navbar">
-    <div class="nav-logo">Bac<span>·</span>Admin</div>
-    <div class="nav-auth">
-      <a href="#" id="btn-logout" class="btn-register">Déconnexion</a>
-    </div>
-  </nav>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <a href="../../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
-    <nav class="sidebar-nav">
-      <span class="sidebar-section">Administration</span>
-      <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Tableau de bord</a>
-      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches</a>
-      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
-      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
-      <a href="ressources.html" class="sidebar-link active"><span class="icon">🎬</span> Ressources</a>
-      <a href="users.html" class="sidebar-link"><span class="icon">👥</span> Utilisateurs</a>
-    </nav>
-  </aside>
-
-  <!-- CONTENU PRINCIPAL -->
-  <main class="main-content">
-    <div class="page-header">
+  <div class="container">
+    <header>
       <h1>Gestion des ressources</h1>
-      <p>Ajoute, modifie ou supprime des ressources pédagogiques.</p>
-    </div>
+      <nav>
+        <a href="../../index.html">Accueil</a> |
+        <a href="../dashboard.html">Dashboard</a> |
+        <a href="../ressources.html">Voir les ressources</a>
+      </nav>
+    </header>
 
-    <!-- FORMULAIRE D'AJOUT -->
-    <div class="admin-card">
-      <h2>Ajouter une nouvelle ressource</h2>
-      <form id="add-ressource-form">
-        <div class="form-group">
-          <label for="title">Titre *</label>
-          <input type="text" id="title" required>
-        </div>
-
-        <div class="form-group">
-          <label for="description">Description *</label>
-          <textarea id="description" rows="3" required></textarea>
-        </div>
-
-        <div class="form-row">
+    <main>
+      <!-- Formulaire d'ajout -->
+      <section id="add-ressource-section">
+        <h2>Ajouter une nouvelle ressource</h2>
+        <form id="add-ressource-form">
           <div class="form-group">
-            <label for="type">Type *</label>
+            <label for="title">Titre</label>
+            <input type="text" id="title" required>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="type">Type</label>
             <select id="type" required>
               <option value="video">Vidéo</option>
-              <option value="pdf">PDF/Fiche</option>
               <option value="lien">Lien externe</option>
-              <option value="fiche">Fiche</option>
+              <option value="pdf">PDF</option>
+              <option value="fiche">Fiche de cours</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="category">Matière *</label>
+            <label for="category">Matière</label>
             <select id="category" required>
               <option value="Maths">Maths</option>
               <option value="Physique-Chimie">Physique-Chimie</option>
               <option value="SVT">SVT</option>
-              <option value="Histoire-Géo">Histoire-Géo</option>
+              <option value="Histoire-Géo">Histoire-Géographie</option>
               <option value="Français">Français</option>
               <option value="Philosophie">Philosophie</option>
+              <option value="Anglais">Anglais</option>
             </select>
           </div>
-        </div>
 
-        <div class="form-row">
           <div class="form-group">
             <label for="difficulty">Difficulté</label>
             <select id="difficulty">
@@ -88,88 +65,93 @@
           </div>
 
           <div class="form-group">
-            <label for="link">Lien *</label>
+            <label for="link">Lien (URL)</label>
             <input type="url" id="link" required>
           </div>
+
+          <div class="form-group">
+            <label for="thumbnail_url">URL de l'image miniature (optionnel)</label>
+            <input type="url" id="thumbnail_url" placeholder="https://example.com/image.jpg">
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Durée (pour les vidéos, ex: 12:34)</label>
+            <input type="text" id="duration" placeholder="HH:MM">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="is_active" checked>
+              Ressource active (visible pour les élèves)
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">Ajouter la ressource</button>
+        </form>
+      </section>
+
+      <!-- Liste des ressources -->
+      <section id="resources-list-section">
+        <h2>Liste des ressources</h2>
+        <div class="filters">
+          <select id="filter-category">
+            <option value="">Toutes les matières</option>
+            <option value="Maths">Maths</option>
+            <option value="Physique-Chimie">Physique-Chimie</option>
+            <option value="SVT">SVT</option>
+            <option value="Histoire-Géo">Histoire-Géographie</option>
+            <option value="Français">Français</option>
+            <option value="Philosophie">Philosophie</option>
+            <option value="Anglais">Anglais</option>
+          </select>
+
+          <select id="filter-type">
+            <option value="">Tous les types</option>
+            <option value="video">Vidéo</option>
+            <option value="lien">Lien</option>
+            <option value="pdf">PDF</option>
+            <option value="fiche">Fiche</option>
+          </select>
+
+          <select id="filter-difficulty">
+            <option value="">Toutes difficultés</option>
+            <option value="débutant">Débutant</option>
+            <option value="intermédiaire">Intermédiaire</option>
+            <option value="avancé">Avancé</option>
+          </select>
         </div>
 
-        <div class="form-group">
-          <label for="thumbnail_url">URL de l'image miniature (optionnel)</label>
-          <input type="url" id="thumbnail_url" placeholder="https://exemple.com/image.jpg">
-        </div>
+        <div id="alert-message" class="alert" style="display: none;"></div>
 
-        <div class="form-group">
-          <label for="duration">Durée (pour les vidéos)</label>
-          <input type="text" id="duration" placeholder="12:34">
-        </div>
-
-        <div class="form-group">
-          <label>
-            <input type="checkbox" id="is_active" checked> Ressource active
-          </label>
-        </div>
-
-        <button type="submit" class="btn-primary">Ajouter la ressource</button>
-      </form>
-    </div>
-
-    <!-- LISTE DES RESSOURCES -->
-    <div class="admin-card">
-      <h2>Ressources existantes</h2>
-      <div class="table-container">
-        <table id="ressources-table">
+        <table class="admin-table">
           <thead>
             <tr>
               <th>Titre</th>
               <th>Type</th>
               <th>Matière</th>
               <th>Difficulté</th>
+              <th>Statut</th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="ressources-list">
-            <!-- Chargé dynamiquement -->
+          <tbody id="resources-table-body">
+            <!-- Les ressources seront chargées ici -->
           </tbody>
         </table>
-      </div>
-    </div>
-  </main>
+      </section>
+    </main>
+  </div>
 
-  <!-- SCRIPT D'ADMINISTRATION -->
   <script src="../../js/supabase-config.js"></script>
   <script>
-    // Dans pages/admin/ressources.html, dans le script
-document.addEventListener('DOMContentLoaded', async () => {
-  // Vérifie l'authentification
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (!user) {
-    window.location.href = '../login.html';
-    return;
-  }
-
-  // Vérifie si l'utilisateur est admin
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError || profile.role !== 'admin') {
-    window.location.href = '../dashboard.html';
-    return;
-  }
-
-  // Le reste du code...
-});
     document.addEventListener('DOMContentLoaded', async () => {
-      // Vérifie l'authentification
-      const { data: { user }, error } = await supabase.auth.getUser();
+      // Vérifie l'authentification et les droits admin
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (!user) {
-        window.location.href = '../login.html';
+        window.location.href = '../../pages/login.html';
         return;
       }
 
-      // Vérifie si l'utilisateur est admin (tu peux ajouter un champ role dans ta table users)
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
@@ -177,101 +159,156 @@ document.addEventListener('DOMContentLoaded', async () => {
         .single();
 
       if (profileError || profile.role !== 'admin') {
-        window.location.href = '../dashboard.html';
+        window.location.href = '../../pages/dashboard.html';
         return;
       }
 
       // Charge les ressources
       await loadRessourcesAdmin();
 
-      // Gère la déconnexion
-      document.getElementById('btn-logout').addEventListener('click', async () => {
-        const { error } = await supabase.auth.signOut();
-        if (!error) window.location.href = '../login.html';
-      });
+      // Gestion du formulaire d'ajout
+      document.getElementById('add-ressource-form').addEventListener('submit', addRessource);
 
-      // Gère l'ajout d'une ressource
-      document.getElementById('add-ressource-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+      // Gestion des filtres
+      document.getElementById('filter-category').addEventListener('change', filterRessources);
+      document.getElementById('filter-type').addEventListener('change', filterRessources);
+      document.getElementById('filter-difficulty').addEventListener('change', filterRessources);
+    });
 
-        const formData = {
-          title: document.getElementById('title').value,
-          description: document.getElementById('description').value,
-          type: document.getElementById('type').value,
-          category: document.getElementById('category').value,
-          difficulty: document.getElementById('difficulty').value,
-          link: document.getElementById('link').value,
-          thumbnail_url: document.getElementById('thumbnail_url').value,
-          duration: document.getElementById('duration').value,
-          is_active: document.getElementById('is_active').checked
-        };
+    async function loadRessourcesAdmin() {
+      try {
+        const { data: ressources, error } = await supabase
+          .from('ressources')
+          .select('*')
+          .order('title');
 
+        if (error) throw error;
+
+        const tableBody = document.getElementById('resources-table-body');
+        tableBody.innerHTML = '';
+
+        if (!ressources || ressources.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="6">Aucune ressource trouvée.</td></tr>';
+          return;
+        }
+
+        ressources.forEach(ressource => {
+          const row = document.createElement('tr');
+
+          row.innerHTML = `
+            <td>${ressource.title}</td>
+            <td>${ressource.type}</td>
+            <td>${ressource.category}</td>
+            <td>
+              <span class="resource-difficulty difficulty-${ressource.difficulty}">
+                ${ressource.difficulty}
+              </span>
+            </td>
+            <td>${ressource.is_active ? 'Active' : 'Inactive'}</td>
+            <td>
+              <button class="btn-edit" onclick="editRessource('${ressource.id}')">Modifier</button>
+              <button class="btn-delete" onclick="deleteRessource('${ressource.id}')">Supprimer</button>
+            </td>
+          `;
+
+          tableBody.appendChild(row);
+        });
+      } catch (err) {
+        showAlert('Erreur lors du chargement des ressources: ' + err.message, 'error');
+        console.error(err);
+      }
+    }
+
+    async function addRessource(e) {
+      e.preventDefault();
+
+      const formData = {
+        title: document.getElementById('title').value.trim(),
+        description: document.getElementById('description').value.trim(),
+        type: document.getElementById('type').value,
+        category: document.getElementById('category').value,
+        difficulty: document.getElementById('difficulty').value,
+        link: document.getElementById('link').value.trim(),
+        thumbnail_url: document.getElementById('thumbnail_url').value.trim(),
+        duration: document.getElementById('duration').value.trim(),
+        is_active: document.getElementById('is_active').checked
+      };
+
+      try {
         const { data, error } = await supabase
           .from('ressources')
           .insert([formData])
           .select();
 
-        if (error) {
-          alert('Erreur : ' + error.message);
-        } else {
-          alert('Ressource ajoutée avec succès !');
-          document.getElementById('add-ressource-form').reset();
-          await loadRessourcesAdmin();
-        }
-      });
-    });
+        if (error) throw error;
 
-    async function loadRessourcesAdmin() {
-      const { data: ressources, error } = await supabase
-        .from('ressources')
-        .select('*')
-        .order('title');
-
-      if (error) {
-        console.error('Erreur :', error);
-        return;
+        showAlert('Ressource ajoutée avec succès !', 'success');
+        document.getElementById('add-ressource-form').reset();
+        await loadRessourcesAdmin();
+      } catch (err) {
+        showAlert('Erreur: ' + err.message, 'error');
+        console.error(err);
       }
-
-      const tbody = document.getElementById('ressources-list');
-      tbody.innerHTML = '';
-
-      ressources.forEach(ressource => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${ressource.title}</td>
-          <td>${ressource.type}</td>
-          <td>${ressource.category}</td>
-          <td>${ressource.difficulty}</td>
-          <td>
-            <button class="btn-edit" onclick="editRessource('${ressource.id}')">✏️</button>
-            <button class="btn-delete" onclick="deleteRessource('${ressource.id}')">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
     }
 
     async function editRessource(id) {
-      // Implémente la logique d'édition ici
-      alert('Fonctionnalité d\'édition à implémenter');
+      // À implémenter si besoin
+      alert('Fonctionnalité à venir: édition de la ressource ' + id);
     }
 
     async function deleteRessource(id) {
-      if (confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')) {
+      if (!confirm('Voulez-vous vraiment supprimer cette ressource ?')) return;
+
+      try {
         const { error } = await supabase
           .from('ressources')
           .delete()
           .eq('id', id);
 
-        if (error) {
-          alert('Erreur : ' + error.message);
-        } else {
-          alert('Ressource supprimée avec succès !');
-          await loadRessourcesAdmin();
-        }
+        if (error) throw error;
+
+        showAlert('Ressource supprimée avec succès !', 'success');
+        await loadRessourcesAdmin();
+      } catch (err) {
+        showAlert('Erreur: ' + err.message, 'error');
+        console.error(err);
       }
     }
-    
+
+    function filterRessources() {
+      const category = document.getElementById('filter-category').value;
+      const type = document.getElementById('filter-type').value;
+      const difficulty = document.getElementById('filter-difficulty').value;
+
+      // Filtrer les lignes du tableau
+      const rows = document.querySelectorAll('#resources-table-body tr');
+      rows.forEach(row => {
+        const rowCategory = row.cells[2].textContent;
+        const rowType = row.cells[1].textContent;
+        const rowDifficulty = row.cells[3].textContent.trim();
+
+        const matchesCategory = !category || rowCategory === category;
+        const matchesType = !type || rowType === type;
+        const matchesDifficulty = !difficulty || rowDifficulty === difficulty;
+
+        if (matchesCategory && matchesType && matchesDifficulty) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function showAlert(message, type) {
+      const alertDiv = document.getElementById('alert-message');
+      alertDiv.textContent = message;
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.style.display = 'block';
+
+      setTimeout(() => {
+        alertDiv.style.display = 'none';
+      }, 5000);
+    }
   </script>
 </body>
 </html>

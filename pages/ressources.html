@@ -1,194 +1,156 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ressources - Bac-Général</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ressources - Bac Général</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <!-- NAV -->
-  <nav class="navbar">
-    <div class="nav-logo">Bac<span>·</span>Général</div>
-    <div class="nav-links">
-      <a href="fiches.html">Fiches</a>
-      <a href="qcm.html">QCM</a>
-      <a href="annales.html">Annales</a>
-      <a href="ressources.html" class="active">Ressources</a>
-    </div>
-    <div class="nav-auth">
-      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
-      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
-    </div>
-  </nav>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
-    <nav class="sidebar-nav">
-      <span class="sidebar-section">Révisions</span>
-      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
-      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
-      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
-      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
-      <a href="ressources.html" class="sidebar-link active"><span class="icon">🎬</span> Ressources</a>
-
-      <span class="sidebar-section">Informations</span>
-      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">ℹ️</span> Mentions légales</a>
-      <a href="contact.html" class="sidebar-link"><span class="icon">✉️</span> Contact</a>
-    </nav>
-  </aside>
-
-  <!-- CONTENU PRINCIPAL -->
-  <main class="main-content">
-    <div class="page-header">
+  <div class="container">
+    <header>
       <h1>Ressources pédagogiques</h1>
-      <p>Vidéos, fiches, liens externes et outils pour t'aider dans tes révisions.</p>
-    </div>
+      <nav>
+        <a href="../index.html">Accueil</a> |
+        <a href="fiches.html">Fiches</a> |
+        <a href="qcm.html">QCM</a> |
+        <a href="annales.html">Annales</a> |
+        <a href="login.html">Connexion</a>
+      </nav>
+    </header>
 
-    <!-- FILTRES -->
-    <div class="resources-filters">
-      <div class="filter-group">
-        <label for="category-filter">Matière :</label>
-        <select id="category-filter">
-          <option value="">Toutes</option>
-          <option value="Maths">Maths</option>
-          <option value="Physique-Chimie">Physique-Chimie</option>
-          <option value="SVT">SVT</option>
-          <option value="Histoire-Géo">Histoire-Géo</option>
-        </select>
-      </div>
+    <main>
+      <section class="resources-container">
+        <h2>Trouve des ressources adaptées à ton niveau</h2>
 
-      <div class="filter-group">
-        <label for="type-filter">Type :</label>
-        <select id="type-filter">
-          <option value="">Tous</option>
-          <option value="video">Vidéos</option>
-          <option value="pdf">Fiches/PDF</option>
-          <option value="lien">Liens externes</option>
-        </select>
-      </div>
+        <div class="filters">
+          <select id="filter-category">
+            <option value="">Toutes les matières</option>
+            <option value="Maths">Maths</option>
+            <option value="Physique-Chimie">Physique-Chimie</option>
+            <option value="SVT">SVT</option>
+            <option value="Histoire-Géo">Histoire-Géographie</option>
+            <option value="Français">Français</option>
+            <option value="Philosophie">Philosophie</option>
+            <option value="Anglais">Anglais</option>
+          </select>
 
-      <div class="filter-group">
-        <label for="difficulty-filter">Difficulté :</label>
-        <select id="difficulty-filter">
-          <option value="">Toutes</option>
-          <option value="débutant">Débutant</option>
-          <option value="intermédiaire">Intermédiaire</option>
-          <option value="avancé">Avancé</option>
-        </select>
-      </div>
-    </div>
+          <select id="filter-type">
+            <option value="">Tous les types</option>
+            <option value="video">Vidéos</option>
+            <option value="lien">Liens externes</option>
+            <option value="pdf">PDF</option>
+            <option value="fiche">Fiches de cours</option>
+          </select>
 
-    <!-- GRILLE DES RESSOURCES -->
-    <div class="resources-grid" id="resources-grid">
-      <!-- Chargé dynamiquement depuis Supabase -->
-    </div>
-  </main>
-  <!-- SCRIPT POUR CHARGEMENT DES RESSOURCES -->
+          <select id="filter-difficulty">
+            <option value="">Toutes difficultés</option>
+            <option value="débutant">Débutant</option>
+            <option value="intermédiaire">Intermédiaire</option>
+            <option value="avancé">Avancé</option>
+          </select>
+        </div>
+
+        <div class="resources-grid" id="resources-grid">
+          <!-- Les ressources seront chargées ici -->
+          <p>Chargement en cours...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
   <script src="../js/supabase-config.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Vérifie si l'utilisateur est admin
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        document.getElementById('btn-admin').href = 'admin/ressources.html';
-      }
-
       // Charge les ressources
       await loadRessources();
 
-      // Ajoute les écouteurs d'événements pour les filtres
-      document.getElementById('category-filter').addEventListener('change', filterRessources);
-      document.getElementById('type-filter').addEventListener('change', filterRessources);
-      document.getElementById('difficulty-filter').addEventListener('change', filterRessources);
+      // Gestion des filtres
+      document.getElementById('filter-category').addEventListener('change', filterRessources);
+      document.getElementById('filter-type').addEventListener('change', filterRessources);
+      document.getElementById('filter-difficulty').addEventListener('change', filterRessources);
     });
 
     async function loadRessources() {
-      const { data: ressources, error } = await supabase
-        .from('ressources')
-        .select('*')
-        .eq('is_active', true)
-        .order('title');
+      try {
+        const { data: ressources, error } = await supabase
+          .from('ressources')
+          .select('*')
+          .eq('is_active', true)
+          .order('title');
 
-      if (error) {
-        console.error('Erreur lors du chargement des ressources:', error);
-        return;
-      }
+        if (error) throw error;
 
-      const grid = document.getElementById('resources-grid');
-      grid.innerHTML = '';
+        const grid = document.getElementById('resources-grid');
+        grid.innerHTML = '';
 
-      ressources.forEach(ressource => {
-        const resourceCard = document.createElement('div');
-        resourceCard.className = 'resource-card';
-
-        // Icône selon le type
-        let icon = '';
-        switch(ressource.type) {
-          case 'video': icon = '🎥'; break;
-          case 'pdf': icon = '📄'; break;
-          case 'lien': icon = '🔗'; break;
-          case 'fiche': icon = '📋'; break;
+        if (!ressources || ressources.length === 0) {
+          grid.innerHTML = '<p>Aucune ressource disponible pour le moment.</p>';
+          return;
         }
 
-        // Badge de difficulté
-        let difficultyBadge = '';
-        switch(ressource.difficulty) {
-          case 'débutant': difficultyBadge = '<span class="badge difficulty-debutant">Débutant</span>'; break;
-          case 'intermédiaire': difficultyBadge = '<span class="badge difficulty-intermediaire">Intermédiaire</span>'; break;
-          case 'avancé': difficultyBadge = '<span class="badge difficulty-avance">Avancé</span>'; break;
-        }
+        ressources.forEach(ressource => {
+          const card = document.createElement('div');
+          card.className = 'resource-card';
 
-        resourceCard.innerHTML = `
-          <div class="resource-header">
-            <h3>${icon} ${ressource.title}</h3>
-            ${difficultyBadge}
-          </div>
-          <div class="resource-content">
-            <p>${ressource.description}</p>
-            ${ressource.thumbnail_url ? `<img src="${ressource.thumbnail_url}" alt="${ressource.title}" class="resource-thumbnail">` : ''}
-            <div class="resource-meta">
-              <span class="resource-type">${ressource.type}</span>
+          // Gestion de l'image/thumbnail
+          let thumbnailHtml = '';
+          if (ressource.thumbnail_url) {
+            thumbnailHtml = `<img src="${ressource.thumbnail_url}" alt="${ressource.title}" class="resource-thumbnail">`;
+          } else {
+            // Image par défaut selon le type
+            const defaultImages = {
+              video: 'https://via.placeholder.com/300x180/ff6b6b/ffffff?text=Vidéo',
+              lien: 'https://via.placeholder.com/300x180/4ecdc4/ffffff?text=Lien',
+              pdf: 'https://via.placeholder.com/300x180/45b7d1/ffffff?text=PDF',
+              fiche: 'https://via.placeholder.com/300x180/f9ca24/ffffff?text=Fiche'
+            };
+            thumbnailHtml = `<img src="${defaultImages[ressource.type] || defaultImages.lien}" alt="${ressource.title}" class="resource-thumbnail">`;
+          }
+
+          card.innerHTML = `
+            ${thumbnailHtml}
+            <div class="resource-content">
               <span class="resource-category">${ressource.category}</span>
+              <h3 class="resource-title">${ressource.title}</h3>
+              <p class="resource-description">${ressource.description}</p>
+              <div class="resource-meta">
+                <span class="resource-type">${ressource.type}</span>
+                <span class="resource-difficulty difficulty-${ressource.difficulty}">
+                  ${ressource.difficulty}
+                </span>
+              </div>
+              ${ressource.link ? `
+                <a href="${ressource.link}" class="btn-download" target="_blank">
+                  Voir la ressource
+                </a>
+              ` : ''}
             </div>
-            <a href="${ressource.link}" target="_blank" class="btn-external">
-              ${getButtonText(ressource.type)}
-            </a>
-          </div>
-        `;
+          `;
 
-        grid.appendChild(resourceCard);
-      });
-    }
-
-    function getButtonText(type) {
-      switch(type) {
-        case 'video': return 'Regarder la vidéo';
-        case 'pdf': return 'Télécharger le PDF';
-        case 'lien': return 'Voir le lien';
-        case 'fiche': return 'Consulter la fiche';
-        default: return 'Accéder';
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Erreur lors du chargement des ressources:', err);
+        document.getElementById('resources-grid').innerHTML =
+          '<p>Une erreur est survenue lors du chargement des ressources.</p>';
       }
     }
 
     function filterRessources() {
-      const category = document.getElementById('category-filter').value;
-      const type = document.getElementById('type-filter').value;
-      const difficulty = document.getElementById('difficulty-filter').value;
+      const category = document.getElementById('filter-category').value;
+      const type = document.getElementById('filter-type').value;
+      const difficulty = document.getElementById('filter-difficulty').value;
 
       const cards = document.querySelectorAll('.resource-card');
-
       cards.forEach(card => {
         const cardCategory = card.querySelector('.resource-category').textContent;
-        const cardType = card.querySelector('.resource-type').textContent.toLowerCase();
-        const cardDifficulty = card.querySelector('.badge')?.textContent.toLowerCase();
+        const cardType = card.querySelector('.resource-type').textContent;
+        const cardDifficulty = card.querySelector('.resource-difficulty').textContent.trim();
 
         const matchesCategory = !category || cardCategory === category;
         const matchesType = !type || cardType === type;
-        const matchesDifficulty = !difficulty || cardDifficulty?.includes(difficulty.toLowerCase());
+        const matchesDifficulty = !difficulty || cardDifficulty === difficulty;
 
         if (matchesCategory && matchesType && matchesDifficulty) {
           card.style.display = 'block';

@@ -1,140 +1,102 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Annales - Bac-Général</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Téléchargez les annales du Bac Général 2026 en PDF">
+    <title>Annales | Bac Général 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
 </head>
 <body>
-  <!-- NAV -->
-  <nav class="navbar">
-    <div class="nav-logo">Bac<span>·</span>Général</div>
-    <div class="nav-links">
-      <a href="fiches.html">Fiches</a>
-      <a href="qcm.html">QCM</a>
-      <a href="annales.html" class="active">Annales</a>
-      <a href="ressources.html">Ressources</a>
-    </div>
-    <div class="nav-auth">
-      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
-      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
-    </div>
-  </nav>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
-    <nav class="sidebar-nav">
-      <span class="sidebar-section">Révisions</span>
-      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
-      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
-      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
-      <a href="annales.html" class="sidebar-link active"><span class="icon">📝</span> Annales</a>
-      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
-
-      <span class="sidebar-section">Informations</span>
-      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">⚖️</span> Mentions légales</a>
-      <a href="contact.html" class="sidebar-link"><span class="icon">📧</span> Contact</a>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="main-content">
-    <div class="page-header">
-      <h1>Annales du Bac Général</h1>
-      <p>Téléchargez les sujets et corrigés officiels des années précédentes pour vous entraîner efficacement.</p>
-    </div>
-
-    <!-- SECTION ANNALES -->
-    <section class="profile-section">
-      <h2><span class="icon">📚</span> Sujets et corrigés disponibles</h2>
-
-      <div class="annales-grid">
-        <!-- Maths -->
-        <div class="annale-card">
-          <div class="annale-header">
-            <h3>Mathématiques</h3>
-            <span class="annale-year">2025</span>
-          </div>
-          <div class="annale-content">
-            <p>Sujet complet avec corrigé détaillé</p>
-            <div class="annale-actions">
-              <a href="#" class="btn-download">Télécharger le sujet</a>
-              <a href="#" class="btn-download">Télécharger le corrigé</a>
-            </div>
-          </div>
+    <header>
+        <div class="container">
+            <h1>Annales du Bac Général 2026</h1>
+            <nav>
+                <a href="index.html">Accueil</a>
+                <a href="annales.html" class="active">Annales</a>
+                <a href="ressources.html">Ressources</a>
+                <a href="contact.html">Contact</a>
+                <a href="mentions-legales.html">Mentions légales</a>
+            </nav>
         </div>
+    </header>
 
-        <!-- Physique-Chimie -->
-        <div class="annale-card">
-          <div class="annale-header">
-            <h3>Physique-Chimie</h3>
-            <span class="annale-year">2025</span>
-          </div>
-          <div class="annale-content">
-            <p>Sujet complet avec corrigé détaillé</p>
-            <div class="annale-actions">
-              <a href="#" class="btn-download">Télécharger le sujet</a>
-              <a href="#" class="btn-download">Télécharger le corrigé</a>
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2>Sujets et corrigés disponibles</h2>
+                <p>Tous les sujets des années précédentes, classés par matière.</p>
             </div>
-          </div>
-        </div>
+        </section>
 
-        <!-- SVT -->
-        <div class="annale-card">
-          <div class="annale-header">
-            <h3>SVT</h3>
-            <span class="annale-year">2025</span>
-          </div>
-          <div class="annale-content">
-            <p>Sujet complet avec corrigé détaillé</p>
-            <div class="annale-actions">
-              <a href="#" class="btn-download">Télécharger le sujet</a>
-              <a href="#" class="btn-download">Télécharger le corrigé</a>
+        <section class="annales-list">
+            <div class="container">
+                <div class="annale-category">
+                    <h3>Mathématiques</h3>
+                    <ul>
+                        <li>
+                            <a href="assets/pdf/maths-2025.pdf" download class="btn">
+                                <span>Maths 2025</span>
+                                <span class="file-size">(2.4 Mo)</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="assets/pdf/maths-2024.pdf" download class="btn">
+                                <span>Maths 2024</span>
+                                <span class="file-size">(2.1 Mo)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="annale-category">
+                    <h3>Physique-Chimie</h3>
+                    <ul>
+                        <li>
+                            <a href="assets/pdf/physique-2025.pdf" download class="btn">
+                                <span>Physique 2025</span>
+                                <span class="file-size">(3.1 Mo)</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="assets/pdf/physique-2024.pdf" download class="btn">
+                                <span>Physique 2024</span>
+                                <span class="file-size">(2.8 Mo)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="annale-category">
+                    <h3>Sciences de la Vie et de la Terre (SVT)</h3>
+                    <ul>
+                        <li>
+                            <a href="assets/pdf/svt-2025.pdf" download class="btn">
+                                <span>SVT 2025</span>
+                                <span class="file-size">(1.9 Mo)</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="assets/pdf/svt-2024.pdf" download class="btn">
+                                <span>SVT 2024</span>
+                                <span class="file-size">(1.7 Mo)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Bac Général. Tous droits réservés.</p>
+            <nav>
+                <a href="mentions-legales.html">Mentions légales</a>
+                <a href="contact.html">Contact</a>
+            </nav>
         </div>
-
-        <!-- Français -->
-        <div class="annale-card">
-          <div class="annale-header">
-            <h3>Français</h3>
-            <span class="annale-year">2025</span>
-          </div>
-          <div class="annale-content">
-            <p>Sujet complet avec corrigé détaillé</p>
-            <div class="annale-actions">
-              <a href="#" class="btn-download">Télécharger le sujet</a>
-              <a href="#" class="btn-download">Télécharger le corrigé</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION INFOS -->
-    <section class="profile-section">
-      <h2><span class="icon">ℹ️</span> Informations importantes</h2>
-      <div class="info-box">
-        <p>✅ Les annales sont fournies à titre indicatif et ne remplacent pas les sujets officiels du bac.</p>
-        <p>✅ Les corrigés sont rédigés par des professeurs et peuvent contenir des erreurs.</p>
-        <p>✅ Pour des annales plus anciennes, consultez le site officiel de l'<a href="https://www.education.gouv.fr" target="_blank" style="color: var(--accent);">Éducation Nationale</a>.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- SCRIPTS -->
-  <script>
-    // Logique de déconnexion (similaire à profil.html)
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      // Ici tu peux ajouter la logique de déconnexion si tu utilises Supabase
-      alert('Déconnexion simulée (à implémenter avec Supabase)');
-      // window.location.href = '../index.html';
-    });
-  </script>
+    </footer>
 </body>
 </html>

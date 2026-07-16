@@ -1,382 +1,159 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestion des comptes — Admin</title>
-  <link rel="stylesheet" href="../../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    .admin-badge {
-      background: var(--accent); color: #fff;
-      font-size: 0.7rem; font-weight: 700;
-      padding: 0.2rem 0.5rem; border-radius: 4px;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      margin-left: 0.5rem;
-    }
-    .table-wrapper {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-bottom: 2rem;
-    }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th {
-      background: var(--cream, #faf5ef);
-      text-align: left;
-      padding: 0.85rem 1rem;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-    }
-    td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--paper); }
-
-    .role-badge {
-      font-size: 0.75rem; font-weight: 600;
-      padding: 0.2rem 0.6rem; border-radius: 100px;
-    }
-    .role-admin { background: #fde8d8; color: #b94c07; }
-    .role-student { background: #e8f4fd; color: #1565c0; }
-
-    .section-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 1rem;
-    }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: 1.2rem; font-weight: 700;
-    }
-
-    .search-bar {
-      display: flex; gap: 0.75rem; margin-bottom: 1.5rem;
-    }
-    .search-bar input {
-      flex: 1;
-      padding: 0.6rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      font-family: var(--font-body);
-      font-size: 0.875rem;
-      background: var(--white);
-      outline: none;
-    }
-    .search-bar input:focus { border-color: var(--accent); }
-
-    .btn-action {
-      border: none; border-radius: 8px;
-      padding: 0.35rem 0.75rem;
-      font-family: var(--font-body);
-      font-size: 0.8rem; font-weight: 600;
-      cursor: pointer; transition: opacity 0.15s;
-    }
-    .btn-action:hover { opacity: 0.8; }
-    .btn-promote { background: #fde8d8; color: #b94c07; }
-    .btn-demote  { background: #e8f4fd; color: #1565c0; }
-    .btn-delete  { background: #fdecea; color: #c62828; }
-
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4); z-index: 1000;
-      align-items: center; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 2rem; width: min(480px, 90vw);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-    }
-    .modal h2 { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 1rem; }
-    .modal label { display: block; font-weight: 600; font-size: 0.875rem; margin: 0.75rem 0 0.3rem; }
-    .modal input, .modal select {
-      width: 100%; padding: 0.6rem 1rem;
-      border: 1px solid var(--border); border-radius: 10px;
-      font-family: var(--font-body); font-size: 0.875rem;
-    }
-    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
-    .btn-cancel {
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 100px; padding: 0.5rem 1.2rem;
-      font-family: var(--font-body); font-weight: 600; cursor: pointer;
-    }
-    .btn-save {
-      background: var(--accent); color: #fff; border: none;
-      border-radius: 100px; padding: 0.5rem 1.2rem;
-      font-family: var(--font-body); font-weight: 600; cursor: pointer;
-    }
-    .btn-save:hover { background: var(--accent-hover); }
-
-    .toast {
-      position: fixed; bottom: 2rem; right: 2rem;
-      background: var(--ink); color: #fff;
-      padding: 0.75rem 1.25rem; border-radius: 12px;
-      font-size: 0.875rem; font-weight: 500;
-      opacity: 0; transform: translateY(10px);
-      transition: all 0.3s; pointer-events: none; z-index: 2000;
-    }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { background: #2a6e2a; }
-    .toast.error   { background: #c62828; }
-
-    .empty-state {
-      text-align: center; padding: 3rem;
-      color: var(--muted); font-size: 0.9rem;
-    }
-
-    .stat-chips {
-      display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;
-    }
-    .chip {
-      background: var(--white); border: 1px solid var(--border);
-      border-radius: 100px; padding: 0.4rem 1rem;
-      font-size: 0.8rem; font-weight: 600; color: var(--muted);
-    }
-    .chip span { color: var(--ink); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des utilisateurs | Bac Général</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/admin.css">
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
 <body>
+    <div class="admin-layout">
+        <!-- Barre latérale -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <p>Bac Général</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span>📊</span> Tableau de bord
+                </a>
+                <a href="fiches.html">
+                    <span>📝</span> Fiches
+                </a>
+                <a href="qcm.html">
+                    <span>❓</span> QCM
+                </a>
+                <a href="annales.html">
+                    <span>📄</span> Annales
+                </a>
+                <a href="ressources.html">
+                    <span>🔗</span> Ressources
+                </a>
+                <a href="users.html" class="active">
+                    <span>👤</span> Utilisateurs
+                </a>
+                <a href="stats.html">
+                    <span>📈</span> Statistiques
+                </a>
+                <a href="../login.html" class="logout-link">
+                    <span>↩️</span> Déconnexion
+                </a>
+            </nav>
+        </aside>
 
-  <div class="dashboard">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <span class="sidebar-logo">Bac<span>·</span>Général <span class="admin-badge">Admin</span></span>
-      <nav class="sidebar-nav">
-        <span class="sidebar-section">Contenu</span>
-        <a href="dashboard.html" class="sidebar-link"><span class="icon">📊</span> Vue d'ensemble</a>
-        <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
-        <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
-        <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
-        <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+        <!-- Contenu principal -->
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Gestion des utilisateurs</h1>
+                <p>Ajoutez, modifiez ou supprimez des comptes élèves.</p>
+            </header>
 
-        <span class="sidebar-section">Utilisateurs</span>
-        <a href="users.html" class="sidebar-link active"><span class="icon">👥</span> Élèves</a>
-        <a href="stats.html" class="sidebar-link"><span class="icon">📈</span> Statistiques</a>
+            <section class="admin-section">
+                <h2>Ajouter un nouvel utilisateur</h2>
+                <form id="userForm" class="user-form">
+                    <div class="form-group">
+                        <label for="userName">Nom complet</label>
+                        <input type="text" id="userName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email</label>
+                        <input type="email" id="userEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPassword">Mot de passe</label>
+                        <input type="password" id="userPassword" name="password" required minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="userClass">Classe</label>
+                        <select id="userClass" name="class" required>
+                            <option value="terminale">Terminale</option>
+                            <option value="premiere">Première</option>
+                            <option value="seconde">Seconde</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Ajouter l'utilisateur</button>
+                </form>
+            </section>
 
-        <span class="sidebar-section">Compte</span>
-        <a href="../../index.html" class="sidebar-link"><span class="icon">🌐</span> Voir le site</a>
-        <a href="#" class="sidebar-link" id="btn-logout"><span class="icon">🚪</span> Déconnexion</a>
-      </nav>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main-content">
-      <div class="page-header">
-        <h1>Gestion des comptes</h1>
-        <p>Consulter, promouvoir ou supprimer des utilisateurs</p>
-      </div>
-
-      <!-- STATS CHIPS -->
-      <div class="stat-chips">
-        <div class="chip">Total : <span id="count-total">—</span></div>
-        <div class="chip">Admins : <span id="count-admin">—</span></div>
-        <div class="chip">Élèves : <span id="count-student">—</span></div>
-      </div>
-
-      <!-- SEARCH -->
-      <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Rechercher par nom ou email…" />
-      </div>
-
-      <!-- TABLE -->
-      <div class="section-header">
-        <span class="section-title">Tous les comptes</span>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Nom</th>
-              <th>Email</th>
-              <th>Rôle</th>
-              <th>Inscrit le</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="users-table">
-            <tr><td colspan="5" class="empty-state">Chargement…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <!-- MODAL EDIT -->
-  <div class="modal-overlay" id="modal-edit">
-    <div class="modal">
-      <h2>Modifier le compte</h2>
-      <input type="hidden" id="edit-id" />
-      <label>Nom complet</label>
-      <input type="text" id="edit-name" />
-      <label>Email</label>
-      <input type="email" id="edit-email" />
-      <label>Rôle</label>
-      <select id="edit-role">
-        <option value="student">Élève</option>
-        <option value="admin">Admin</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn-cancel" id="modal-cancel">Annuler</button>
-        <button class="btn-save" id="modal-save">Enregistrer</button>
-      </div>
+            <section class="admin-section">
+                <h2>Liste des utilisateurs</h2>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Classe</th>
+                                <th>Date d'ajout</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Jean Dupont</td>
+                                <td>jean.dupont@lycee.fr</td>
+                                <td>Terminale</td>
+                                <td>12/05/2026</td>
+                                <td>
+                                    <button class="btn-edit-user">✏️</button>
+                                    <button class="btn-delete-user">🗑️</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Marie Martin</td>
+                                <td>marie.martin@lycee.fr</td>
+                                <td>Première</td>
+                                <td>10/05/2026</td>
+                                <td>
+                                    <button class="btn-edit-user">✏️</button>
+                                    <button class="btn-delete-user">🗑️</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
-  </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+    <script>
+        // Vérification de la session admin
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = '../login.html';
+        }
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../../js/supabase-config.js"></script>
-  <script>
-    let allUsers = [];
+        // Déconnexion
+        document.querySelector('.logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = '../login.html';
+        });
 
-    // ── Auth guard ──────────────────────────────
-    (async () => {
-      const user = await requireAdmin();
-      if (!user) return;
-      await loadUsers();
-    })();
+        // Gestion du formulaire
+        document.getElementById('userForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Utilisateur ajouté avec succès ! (Simulation)');
+            document.getElementById('userForm').reset();
+        });
 
-    // ── Toast ───────────────────────────────────
-    function showToast(msg, type = 'success') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
+        // Gestion des boutons
+        document.querySelectorAll('.btn-edit-user').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('Édition de l\'utilisateur (Simulation)');
+            });
+        });
 
-    // ── Load users ───────────────────────────────
-    async function loadUsers() {
-      const { data, error } = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        showToast('Erreur : ' + error.message, 'error');
-        return;
-      }
-
-      allUsers = data || [];
-      updateStats();
-      renderTable(allUsers);
-    }
-
-    function updateStats() {
-      document.getElementById('count-total').textContent = allUsers.length;
-      document.getElementById('count-admin').textContent = allUsers.filter(u => u.role === 'admin').length;
-      document.getElementById('count-student').textContent = allUsers.filter(u => u.role !== 'admin').length;
-    }
-
-    function renderTable(users) {
-      const tbody = document.getElementById('users-table');
-      if (!users.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucun utilisateur trouvé.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = users.map(u => `
-        <tr>
-          <td>${u.full_name || '—'}</td>
-          <td style="color:var(--muted)">${u.email || '—'}</td>
-          <td>
-            <span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-student'}">
-              ${u.role === 'admin' ? 'Admin' : 'Élève'}
-            </span>
-          </td>
-          <td style="color:var(--muted)">${new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
-          <td style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-            <button class="btn-action btn-promote" onclick="openEdit('${u.id}')">✏️ Modifier</button>
-            ${u.role !== 'admin'
-              ? `<button class="btn-action btn-promote" onclick="setRole('${u.id}', 'admin')">⬆️ Admin</button>`
-              : `<button class="btn-action btn-demote" onclick="setRole('${u.id}', 'student')">⬇️ Élève</button>`
-            }
-            <button class="btn-action btn-delete" onclick="deleteUser('${u.id}', '${(u.full_name||'').replace(/'/g,"\\'")}')">🗑️ Supprimer</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // ── Search ──────────────────────────────────
-    document.getElementById('search-input').addEventListener('input', function () {
-      const q = this.value.toLowerCase();
-      const filtered = allUsers.filter(u =>
-        (u.full_name || '').toLowerCase().includes(q) ||
-        (u.email || '').toLowerCase().includes(q)
-      );
-      renderTable(filtered);
-    });
-
-    // ── Set role ────────────────────────────────
-    async function setRole(id, role) {
-      const label = role === 'admin' ? 'passer en Admin' : 'repasser en Élève';
-      if (!confirm(`Confirmer : ${label} ?`)) return;
-
-      const { error } = await supabaseClient
-        .from('profiles').update({ role }).eq('id', id);
-
-      if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
-      showToast(role === 'admin' ? '✅ Compte promu Admin' : '✅ Compte repassé Élève');
-      await loadUsers();
-    }
-
-    // ── Delete user ─────────────────────────────
-    async function deleteUser(id, name) {
-      if (!confirm(`Supprimer le compte de "${name}" ? Cette action est irréversible.`)) return;
-
-      const { error } = await supabaseClient
-        .from('profiles').delete().eq('id', id);
-
-      if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
-      showToast('🗑️ Compte supprimé');
-      await loadUsers();
-    }
-
-    // ── Edit modal ──────────────────────────────
-    function openEdit(id) {
-      const user = allUsers.find(u => u.id === id);
-      if (!user) return;
-      document.getElementById('edit-id').value = user.id;
-      document.getElementById('edit-name').value = user.full_name || '';
-      document.getElementById('edit-email').value = user.email || '';
-      document.getElementById('edit-role').value = user.role || 'student';
-      document.getElementById('modal-edit').classList.add('open');
-    }
-
-    document.getElementById('modal-cancel').addEventListener('click', () => {
-      document.getElementById('modal-edit').classList.remove('open');
-    });
-
-    document.getElementById('modal-save').addEventListener('click', async () => {
-      const id = document.getElementById('edit-id').value;
-      const full_name = document.getElementById('edit-name').value.trim();
-      const email = document.getElementById('edit-email').value.trim();
-      const role = document.getElementById('edit-role').value;
-
-      const { error } = await supabaseClient
-        .from('profiles').update({ full_name, email, role }).eq('id', id);
-
-      if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
-      document.getElementById('modal-edit').classList.remove('open');
-      showToast('✅ Compte mis à jour');
-      await loadUsers();
-    });
-
-    // Close modal on overlay click
-    document.getElementById('modal-edit').addEventListener('click', function(e) {
-      if (e.target === this) this.classList.remove('open');
-    });
-
-    // ── Logout ──────────────────────────────────
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      signOut();
-    });
-  </script>
+        document.querySelectorAll('.btn-delete-user').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) {
+                    btn.closest('tr').remove();
+                    alert('Utilisateur supprimé !');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

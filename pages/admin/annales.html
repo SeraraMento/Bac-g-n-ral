@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des QCM | Bac Général</title>
-    <link rel="stylesheet" href="../../css/style.css">
-    <link rel="stylesheet" href="../../css/admin.css">
+    <title>Gestion des annales | Bac Général</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
     <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
 <body>
@@ -23,10 +23,10 @@
                 <a href="fiches.html">
                     <span>📝</span> Fiches
                 </a>
-                <a href="qcm.html" class="active">
+                <a href="qcm.html">
                     <span>❓</span> QCM
                 </a>
-                <a href="annales.html">
+                <a href="annales.html" class="active">
                     <span>📄</span> Annales
                 </a>
                 <a href="ressources.html">
@@ -47,73 +47,79 @@
         <!-- Contenu principal -->
         <main class="admin-content">
             <header class="admin-header">
-                <h1>Gestion des QCM</h1>
-                <p>Créez, modifiez ou supprimez des QCM pour les élèves.</p>
+                <h1>Gestion des annales</h1>
+                <p>Ajoutez ou gérez les annales corrigées.</p>
             </header>
 
             <section class="admin-section">
-                <h2>Ajouter un nouveau QCM</h2>
-                <form id="qcmForm" class="upload-form">
+                <h2>Ajouter une nouvelle annale</h2>
+                <form id="annaleForm" class="upload-form">
                     <div class="form-group">
-                        <label for="qcmTitle">Titre du QCM</label>
-                        <input type="text" id="qcmTitle" name="title" required>
+                        <label for="annaleTitle">Titre de l'annale</label>
+                        <input type="text" id="annaleTitle" name="title" required>
                     </div>
                     <div class="form-group">
-                        <label for="qcmSubject">Matière</label>
-                        <select id="qcmSubject" name="subject" required>
+                        <label for="annaleSubject">Matière</label>
+                        <select id="annaleSubject" name="subject" required>
                             <option value="maths">Mathématiques</option>
                             <option value="physique">Physique-Chimie</option>
                             <option value="svt">SVT</option>
                             <option value="francais">Français</option>
+                            <option value="philosophie">Philosophie</option>
+                            <option value="histoire">Histoire-Géo</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="qcmQuestions">Questions (JSON format)</label>
-                        <textarea id="qcmQuestions" name="questions" rows="10" required>
-[
-    {
-        "question": "Quelle est la dérivée de x² ?",
-        "options": ["2x", "x", "x/2", "2"],
-        "answer": 0
-    },
-    {
-        "question": "Quel est le pH de l'eau pure ?",
-        "options": ["7", "0", "14", "5"],
-        "answer": 0
-    }
-]
-                        </textarea>
+                        <label for="annaleYear">Année</label>
+                        <input type="number" id="annaleYear" name="year" min="2020" max="2026" required>
                     </div>
-                    <button type="submit" class="btn">Ajouter le QCM</button>
+                    <div class="form-group">
+                        <label for="annaleFile">Fichier PDF (sujet + corrigé)</label>
+                        <input type="file" id="annaleFile" name="file" accept=".pdf" required>
+                    </div>
+                    <button type="submit" class="btn">Ajouter l'annale</button>
                 </form>
             </section>
 
             <section class="admin-section">
-                <h2>Liste des QCM disponibles</h2>
+                <h2>Liste des annales disponibles</h2>
                 <div class="pdf-table-container">
                     <table class="pdf-table">
                         <thead>
                             <tr>
                                 <th>Titre</th>
                                 <th>Matière</th>
-                                <th>Questions</th>
+                                <th>Année</th>
+                                <th>Taille</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>QCM Maths - Dérivées</td>
+                                <td>Maths 2025 - Sujet + Corrigé</td>
                                 <td>Mathématiques</td>
-                                <td>10</td>
+                                <td>2025</td>
+                                <td>2.4 Mo</td>
                                 <td>
                                     <button class="btn-edit">✏️</button>
                                     <button class="btn-delete">🗑️</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td>QCM Physique - Ondes</td>
+                                <td>Physique-Chimie 2025</td>
                                 <td>Physique-Chimie</td>
-                                <td>8</td>
+                                <td>2025</td>
+                                <td>3.1 Mo</td>
+                                <td>
+                                    <button class="btn-edit">✏️</button>
+                                    <button class="btn-delete">🗑️</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>SVT 2025</td>
+                                <td>SVT</td>
+                                <td>2025</td>
+                                <td>1.9 Mo</td>
                                 <td>
                                     <button class="btn-edit">✏️</button>
                                     <button class="btn-delete">🗑️</button>
@@ -140,24 +146,24 @@
         });
 
         // Gestion du formulaire
-        document.getElementById('qcmForm').addEventListener('submit', (e) => {
+        document.getElementById('annaleForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            alert('QCM ajouté avec succès ! (Simulation)');
-            document.getElementById('qcmForm').reset();
+            alert('Annale ajoutée avec succès ! (Simulation)');
+            document.getElementById('annaleForm').reset();
         });
 
         // Gestion des boutons
         document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', () => {
-                alert('Édition du QCM (Simulation)');
+                alert('Édition de l\'annale (Simulation)');
             });
         });
 
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (confirm('Voulez-vous vraiment supprimer ce QCM ?')) {
+                if (confirm('Voulez-vous vraiment supprimer cette annale ?')) {
                     btn.closest('tr').remove();
-                    alert('QCM supprimé !');
+                    alert('Annale supprimée !');
                 }
             });
         });

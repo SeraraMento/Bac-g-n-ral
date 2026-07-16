@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mon profil - Bac-Général</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-logo">Bac<span>·</span>Général</div>
+    <div class="nav-links">
+      <a href="fiches.html">Fiches</a>
+      <a href="qcm.html">QCM</a>
+      <a href="annales.html">Annales</a>
+      <a href="ressources.html">Ressources</a>
+    </div>
+    <div class="nav-auth">
+      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
+      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
+    </div>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
+    <nav class="sidebar-nav">
+      <span class="sidebar-section">Révisions</span>
+      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
+      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
+      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
+      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
+      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
+      <span class="sidebar-section">Mon compte</span>
+      <a href="profil.html" class="sidebar-link active"><span class="icon">👤</span> Mon profil</a>
+      <a href="#" class="sidebar-link" id="btn-logout-sidebar"><span class="icon">🚪</span> Déconnexion</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>👤 Mon profil</h1>
+      <p>Gérez vos informations et préférences.</p>
+    </div>
+
+    <div class="form-card">
+      <h2>Informations personnelles</h2>
+      <div id="profile-info">
+        <p><strong>Nom :</strong> <span id="user-fullname">Chargement...</span></p>
+        <p><strong>Email :</strong> <span id="user-email">Chargement...</span></p>
+        <p><strong>Rôle :</strong> <span id="user-role">Chargement...</span></p>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>Progression</h2>
+      <div id="progression-stats">
+        <!-- Stats de progression (fiches lues, QCM faits, etc.) -->
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script>
+    // Récupérer les infos utilisateur
+    async function loadProfile() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) window.location.href = '../index.html';
+
+      const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) console.error(error);
+      else {
+        document.getElementById('user-fullname').textContent = profile.full_name;
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('user-role').textContent = profile.role;
+      }
+    }
+
+    // Déconnexion
+    document.getElementById('btn-logout').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut();
+      window.location.href = '../index.html';
+    });
+    document.getElementById('btn-logout-sidebar').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await signOut();
+      window.location.href = '../index.html';
+    });
+
+    // Charger le profil au démarrage
+    document.addEventListener('DOMContentLoaded', loadProfile);
+  </script>
+</body>
+</html>

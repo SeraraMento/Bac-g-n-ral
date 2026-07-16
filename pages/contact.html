@@ -1,98 +1,86 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Contact - Bac-Général</title>
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contactez-nous pour toute question sur le Bac Général 2026">
+    <title>Contact | Bac Général 2026</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
 </head>
 <body>
-  <!-- NAV -->
-  <nav class="navbar">
-    <div class="nav-logo">Bac<span>·</span>Général</div>
-    <div class="nav-links">
-      <a href="fiches.html">Fiches</a>
-      <a href="qcm.html">QCM</a>
-      <a href="annales.html">Annales</a>
-      <a href="ressources.html">Ressources</a>
-    </div>
-    <div class="nav-auth">
-      <a href="dashboard.html" class="btn-login">Tableau de bord</a>
-      <a href="#" class="btn-register" id="btn-logout">Déconnexion</a>
-    </div>
-  </nav>
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <a href="../index.html" class="sidebar-logo">Bac<span>·</span>Général</a>
-    <nav class="sidebar-nav">
-      <span class="sidebar-section">Révisions</span>
-      <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Tableau de bord</a>
-      <a href="fiches.html" class="sidebar-link"><span class="icon">📋</span> Fiches de cours</a>
-      <a href="qcm.html" class="sidebar-link"><span class="icon">🎯</span> QCM</a>
-      <a href="annales.html" class="sidebar-link"><span class="icon">📝</span> Annales</a>
-      <a href="ressources.html" class="sidebar-link"><span class="icon">🎬</span> Ressources</a>
-
-      <span class="sidebar-section">Informations</span>
-      <a href="mentions-legales.html" class="sidebar-link"><span class="icon">⚖️</span> Mentions légales</a>
-      <a href="contact.html" class="sidebar-link active"><span class="icon">📧</span> Contact</a>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="main-content">
-    <div class="page-header">
-      <h1>Contactez-nous</h1>
-      <p>Vous avez une question, une suggestion ou un problème ? N'hésitez pas à nous contacter !</p>
-    </div>
-
-    <section class="profile-section">
-      <h2><span class="icon">📧</span> Formulaire de contact</h2>
-      <form class="contact-form">
-        <div class="form-group">
-          <label for="name">Nom *</label>
-          <input type="text" id="name" name="name" required>
+    <header>
+        <div class="container">
+            <h1>Contactez-nous</h1>
+            <nav>
+                <a href="index.html">Accueil</a>
+                <a href="annales.html">Annales</a>
+                <a href="ressources.html">Ressources</a>
+                <a href="contact.html" class="active">Contact</a>
+                <a href="mentions-legales.html">Mentions légales</a>
+            </nav>
         </div>
-        <div class="form-group">
-          <label for="email">Email *</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="subject">Sujet *</label>
-          <input type="text" id="subject" name="subject" required>
-        </div>
-        <div class="form-group">
-          <label for="message">Message *</label>
-          <textarea id="message" name="message" rows="5" required></textarea>
-        </div>
-        <button type="submit" class="btn-edit">Envoyer</button>
-      </form>
-    </section>
+    </header>
 
-    <section class="profile-section">
-      <h2><span class="icon">📍</span> Autres moyens de contact</h2>
-      <div class="info-box">
-        <p><strong>Email :</strong> TristanBento-bacg-n-ral@outlook.fr</p>
-        <p><strong>Téléphone :</strong> 07.80.45.38.14</p>    
-      </div>
-    </section>
-  </main>
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h2>Une question ? Un problème ?</h2>
+                <p>N'hésitez pas à nous contacter via le formulaire ci-dessous.</p>
+            </div>
+        </section>
 
-  <!-- SCRIPTS -->
-  <script>
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Déconnexion simulée');
-    });
+        <section class="contact-form">
+            <div class="container">
+                <form id="contactForm" action="#" method="POST">
+                    <div class="form-group">
+                        <label for="name">Nom :</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
 
-    // Gestion du formulaire de contact
-    document.querySelector('.contact-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Message envoyé ! (Cette fonctionnalité est à implémenter avec un backend)');
-      e.target.reset();
-    });
-  </script>
+                    <div class="form-group">
+                        <label for="email">Email :</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Sujet :</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">-- Sélectionnez un sujet --</option>
+                            <option value="annales">Problème avec les annales</option>
+                            <option value="ressources">Problème avec les ressources</option>
+                            <option value="bug">Bug ou erreur sur le site</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message :</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Envoyer</button>
+                </form>
+
+                <div class="contact-info">
+                    <h3>Autres moyens de contact</h3>
+                    <p><strong>Email :</strong> contact@bac-general-2026.fr</p>
+                    <p><strong>Réseaux sociaux :</strong> [Liens vers Facebook, Twitter, etc. si applicable]</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Bac Général. Tous droits réservés.</p>
+            <nav>
+                <a href="mentions-legales.html">Mentions légales</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
 </html>

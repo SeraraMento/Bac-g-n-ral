@@ -1,292 +1,105 @@
 <!DOCTYPE html>
 <html lang="fr">
-<script>
-  // Vérifier si l'utilisateur est connecté et admin
-  document.addEventListener('DOMContentLoaded', async () => {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) {
-      window.location.href = '../../index.html';
-      return;
-    }
-
-    const { data: profile } = await supabaseClient
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile.role !== 'admin') {
-      window.location.href = '../../index.html';
-    }
-  });
-</script>
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — Bac-Général</title>
-  <link rel="stylesheet" href="../../css/style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap"
-    rel="stylesheet">
-  <style>
-    .admin-badge {
-      background: var(--accent);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-left: 0.5rem;
-    }
-
-    .table-wrapper {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-bottom: 2rem;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-
-    th {
-      background: var(--cream);
-      text-align: left;
-      padding: 0.85rem 1rem;
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-    }
-
-    td {
-      padding: 0.85rem 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    tr:hover td {
-      background: var(--paper);
-    }
-
-    .badge-student {
-      background: #e8f4fd;
-      color: #1565c0;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.2rem 0.6rem;
-      border-radius: 100px;
-    }
-
-    .section-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .btn-add {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 100px;
-      padding: 0.5rem 1.2rem;
-      font-family: var(--font-body);
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-add:hover {
-      background: #b84400;
-    }
-
-    .admin-section-title {
-      font-family: var(--font-display);
-      font-size: 1.2rem;
-      font-weight: 700;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | Bac Général</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/admin.css"> <!-- CSS spécifique admin -->
+    <link rel="icon" href="../../assets/images/logo.png" type="image/png">
 </head>
-
 <body>
+    <div class="admin-layout">
+        <!-- Barre latérale -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <p>Bac Général</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active">
+                    <span>📊</span> Tableau de bord
+                </a>
+                <a href="fiches.html">
+                    <span>📝</span> Fiches
+                </a>
+                <a href="qcm.html">
+                    <span>❓</span> QCM
+                </a>
+                <a href="annales.html">
+                    <span>📄</span> Annales
+                </a>
+                <a href="ressources.html">
+                    <span>🔗</span> Ressources
+                </a>
+                <a href="users.html">
+                    <span>👤</span> Utilisateurs
+                </a>
+                <a href="stats.html">
+                    <span>📈</span> Statistiques
+                </a>
+                <a href="../login.html" class="logout-link">
+                    <span>↩️</span> Déconnexion
+                </a>
+            </nav>
+        </aside>
 
-  <div class="dashboard">
-    <!-- SIDEBAR ADMIN -->
-    <aside class="sidebar">
-      <span class="sidebar-logo">Bac<span>·</span>Général <span class="admin-badge">Admin</span></span>
+        <!-- Contenu principal -->
+        <main class="admin-content">
+            <header class="admin-header">
+                <h1>Tableau de bord</h1>
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <h3>Fiches</h3>
+                        <p>24</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>QCM</h3>
+                        <p>18</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Annales</h3>
+                        <p>12</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Visites</h3>
+                        <p>420</p>
+                    </div>
+                </div>
+            </header>
 
-      <nav class="sidebar-nav">
-        <span class="sidebar-section">Contenu</span>
-        <a href="dashboard.html" class="sidebar-link active">
-          <span class="icon">📊</span> Vue d'ensemble
-        </a>
-        <a href="fiches.html" class="sidebar-link">
-          <span class="icon">📋</span> Fiches de cours
-        </a>
-        <a href="qcm.html" class="sidebar-link">
-          <span class="icon">🎯</span> QCM
-        </a>
-        <a href="annales.html" class="sidebar-link">
-          <span class="icon">📝</span> Annales
-        </a>
-        <a href="ressources.html" class="sidebar-link">
-          <span class="icon">🎬</span> Ressources
-        </a>
+            <section class="admin-section">
+                <h2>Actions rapides</h2>
+                <div class="quick-actions">
+                    <a href="fiches.html" class="action-card">
+                        <div class="action-icon">📝</div>
+                        <h3>Gérer les fiches</h3>
+                    </a>
+                    <a href="qcm.html" class="action-card">
+                        <div class="action-icon">❓</div>
+                        <h3>Gérer les QCM</h3>
+                    </a>
+                    <a href="annales.html" class="action-card">
+                        <div class="action-icon">📄</div>
+                        <h3>Gérer les annales</h3>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
 
-        <span class="sidebar-section">Utilisateurs</span>
-        <a href="users.html" class="sidebar-link">
-          <span class="icon">👥</span> Élèves
-        </a>
-        <a href="stats.html" class="sidebar-link">
-          <span class="icon">📈</span> Statistiques
-        </a>
+    <script>
+        // Vérification de la session admin
+        if (localStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = '../login.html';
+        }
 
-        <span class="sidebar-section">Compte</span>
-        <a href="../../index.html" class="sidebar-link">
-          <span class="icon">🌐</span> Voir le site
-        </a>
-        <a href="#" class="sidebar-link" id="btn-logout">
-          <span class="icon">🚪</span> Déconnexion
-        </a>
-      </nav>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main-content">
-      <div class="page-header">
-        <h1>Tableau de bord Admin</h1>
-        <p>Gère le contenu et les utilisateurs de Bac-Général</p>
-      </div>
-
-      <!-- STATS -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Élèves inscrits</div>
-          <div class="stat-value" id="stat-users">—</div>
-          <div class="stat-sub">comptes actifs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Fiches publiées</div>
-          <div class="stat-value" id="stat-fiches">—</div>
-          <div class="stat-sub">toutes matières</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">QCM publiés</div>
-          <div class="stat-value" id="stat-qcm">—</div>
-          <div class="stat-sub">exercices en ligne</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Annales</div>
-          <div class="stat-value" id="stat-annales">—</div>
-          <div class="stat-sub">sujets corrigés</div>
-        </div>
-      </div>
-
-      <!-- DERNIERS INSCRITS -->
-      <div class="section-actions">
-        <span class="admin-section-title">Derniers inscrits</span>
-        <a href="users.html" style="font-size:0.875rem; color:var(--accent); font-weight:500;">Voir tous →</a>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Nom</th>
-              <th>Email</th>
-              <th>Inscrit le</th>
-              <th>Rôle</th>
-            </tr>
-          </thead>
-          <tbody id="users-table">
-            <tr>
-              <td colspan="4" style="color:var(--muted); text-align:center; padding:2rem;">Chargement…</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ACTIONS RAPIDES -->
-      <div class="section-actions">
-        <span class="admin-section-title">Actions rapides</span>
-      </div>
-      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <a href="fiches.html?action=new" class="btn-add">+ Nouvelle fiche</a>
-        <a href="qcm.html?action=new" class="btn-add" style="background:var(--ink);">+ Nouveau QCM</a>
-        <a href="annales.html?action=new" class="btn-add" style="background:#2a6e2a;">+ Publier une annale</a>
-        <a href="ressources.html?action=new" class="btn-add" style="background:#1565c0;">+ Ajouter une ressource</a>
-      </div>
-    </main>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../../js/supabase-config.js"></script>
-  <script>
-    (async () => {
-      const user = await requireAdmin();
-      if (!user) return;
-
-      // Compte les fiches
-      const { count: fichesCount } = await supabaseClient
-        .from('fiches').select('*', { count: 'exact', head: true });
-      document.getElementById('stat-fiches').textContent = fichesCount ?? 0;
-
-      // Compte les QCM
-      const { count: qcmCount } = await supabaseClient
-        .from('qcm').select('*', { count: 'exact', head: true });
-      document.getElementById('stat-qcm').textContent = qcmCount ?? 0;
-
-      // Compte les annales
-      const { count: annalesCount } = await supabaseClient
-        .from('annales').select('*', { count: 'exact', head: true });
-      document.getElementById('stat-annales').textContent = annalesCount ?? 0;
-      const { count: usersCount } = await supabaseClient
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
-
-      document.getElementById('stat-users').textContent =
-        usersCount ?? 0;
-      // Derniers inscrits
-      const { data: profiles } = await supabaseClient
-        .from('profiles')
-        .select('full_name, email, created_at, role')
-        .order('created_at', { ascending: false })
-        .limit(8);
-
-      if (profiles && profiles.length > 0) {
-        document.getElementById('users-table').innerHTML = profiles.map(p => `
-          <tr>
-            <td>${p.full_name || '—'}</td>
-            <td>${p.email || '—'}</td>
-            <td>${new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-            <td><span class="badge-student">${p.role || 'élève'}</span></td>
-          </tr>
-        `).join('');
-      } else {
-        document.getElementById('users-table').innerHTML =
-          '<tr><td colspan="4" style="color:var(--muted); text-align:center; padding:2rem;">Aucun utilisateur pour le moment.</td></tr>';
-      }
-    })();
-
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      signOut();
-    });
-  </script>
+        // Déconnexion
+        document.querySelector('.logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            window.location.href = '../login.html';
+        });
+    </script>
 </body>
-
 </html>
